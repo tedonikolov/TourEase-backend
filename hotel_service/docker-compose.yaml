@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: tourease_hotel_serviceDB
+    environment:
+      - POSTGRES_DB=hotel_serviceDB
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=postgres
+    ports:
+      - 5435:5432

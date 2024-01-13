@@ -4,6 +4,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/configuration_service" />
     <file type="web" url="file://$PROJECT_DIR$/gateway_service" />
+    <file type="web" url="file://$PROJECT_DIR$/hotel_service" />
     <file type="web" url="file://$PROJECT_DIR$/logger_service" />
     <file type="web" url="file://$PROJECT_DIR$/service_registry" />
     <file type="web" url="file://$PROJECT_DIR$/user-service" />
