@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="service-registry.main" target="20" />
+      <module name="service-registry.test" target="20" />
+      <module name="user-service" target="20" />
+      <module name="user-service.main" target="20" />
+      <module name="user-service.test" target="20" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
