@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: tourease_transport_serviceDB
+    environment:
+      - POSTGRES_DB=transport_serviceDB
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=postgres
+    ports:
+      - 5436:5432
