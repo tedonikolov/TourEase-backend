@@ -1,7 +1,7 @@
 package com.tourease.configuration;
 
 import com.tourease.configuration.models.entities.Country;
-import com.tourease.configuration.models.repositories.CountryRepository;
+import com.tourease.configuration.repositories.CountryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

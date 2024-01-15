@@ -11,8 +11,17 @@ java {
     sourceCompatibility = '20'
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir "${buildDir}/generated/src/main/java"
+        }
+    }
+}
+
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 ext {
@@ -45,6 +54,10 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+springBoot {
+    mainClass = 'com/tourease/configuration/ConfigurationServiceApplication.java'
 }
 
 jar {

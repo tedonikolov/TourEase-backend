@@ -1,4 +1,4 @@
-package com.tourease.configuration.models.repositories;
+package com.tourease.configuration.repositories;
 
 
 import com.tourease.configuration.models.entities.Country;
