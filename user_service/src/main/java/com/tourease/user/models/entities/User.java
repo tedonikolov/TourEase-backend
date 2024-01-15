@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "user", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor

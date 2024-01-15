@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "regular", schema = "public")
 @Getter
 @Setter
 public class Regular {
