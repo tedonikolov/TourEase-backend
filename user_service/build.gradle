@@ -26,6 +26,8 @@ dependencyManagement {
 }
 
 dependencies {
+    implementation files('../libs/ErrorHandler.jar')
+
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.12'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'

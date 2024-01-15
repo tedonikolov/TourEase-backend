@@ -1,4 +1,4 @@
-package com.tourease.configuration.models.exception;
+package com.tourease.configuration.exception;
 
 public class InternalServiceException extends RuntimeException {
     public InternalServiceException(String message) {

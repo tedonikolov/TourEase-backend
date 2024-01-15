@@ -1,4 +1,4 @@
-package com.tourease.user.models.repositories;
+package com.tourease.user.repositories;
 
 import com.tourease.user.models.entities.Passport;
 import org.springframework.data.jpa.repository.JpaRepository;
