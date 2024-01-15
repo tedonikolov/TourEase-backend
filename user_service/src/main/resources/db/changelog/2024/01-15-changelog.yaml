@@ -1,0 +1,116 @@
+databaseChangeLog:
+  - changeSet:
+      id: user table created
+      author: Tedo
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: user_type
+                  type: VARCHAR(255)
+              - column:
+                  name: user_status
+                  type: VARCHAR(255)
+            tableName: user
+        - addAutoIncrement:
+            columnDataType: BIGINT
+            columnName: id
+            generationType: ALWAYS
+            incrementBy: 1
+            schemaName: public
+            startWith: 1
+            tableName: user
+
+  - changeSet:
+      id: passport table created
+      author: Tedo
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_passport
+                  name: regular_id
+                  type: BIGINT
+              - column:
+                  name: passport_id
+                  type: VARCHAR(255)
+              - column:
+                  name: creation_date
+                  type: DATE
+              - column:
+                  name: expiration_date
+                  type: DATE
+              - column:
+                  name: country
+                  type: VARCHAR(255)
+            tableName: passport
+
+  - changeSet:
+      id: regular table created
+      author: Tedo
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_regular
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  name: birth_date
+                  type: DATE
+              - column:
+                  name: gender
+                  type: VARCHAR(255)
+              - column:
+                  name: country
+                  type: VARCHAR(255)
+              - column:
+                  name: passport_id
+                  type: BIGINT
+            tableName: regular
+
+  - changeSet:
+      id: addPassportForeignKeys
+      author: Tedo
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: regular_id
+            baseTableName: passport
+            constraintName: FK_passport_regular
+            referencedColumnNames: user_id
+            referencedTableName: regular
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: regular
+            constraintName: FK_user_regular
+            referencedColumnNames: id
+            referencedTableName: user
