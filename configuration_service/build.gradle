@@ -46,3 +46,9 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+jar {
+    include "com/tourease/configuration/exception/*"
+    archiveFileName = "ErrorHandler.jar"
+    destinationDirectory.set(file("$buildDir/../../libs"))
+}
