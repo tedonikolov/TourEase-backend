@@ -1,4 +1,4 @@
-package com.toutease.gateway_service;
+package com.tourease.gateway_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
