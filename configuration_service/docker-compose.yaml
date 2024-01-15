@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     container_name: tourease_configuration_serviceDB
     environment:
-      - POSTGRES_DB=user_serviceDB
+      - POSTGRES_DB=configuration_serviceDB
       - POSTGRES_PASSWORD=1234
       - POSTGRES_USER=postgres
     ports:

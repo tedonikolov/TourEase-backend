@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5533/user_serviceDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="configuration_serviceDB@localhost" uuid="06c361b6-7431-42fb-a173-514a33403ccb">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5534/configuration_serviceDB</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
