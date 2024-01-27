@@ -34,6 +34,7 @@ public class RouteValidator {
 
     public final String[] adminAllowedUrlMatchers = {
             "/user-service/admin/**",
+            "/logger-service/admin/**"
     };
 
     public Predicate<ServerHttpRequest> isAllowed =

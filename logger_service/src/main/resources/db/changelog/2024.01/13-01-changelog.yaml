@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: init
+      author: Tedo
+  - changeSet:
+      id: create_table_configuration
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: chronology
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_chronology
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: log
+                  type: VARCHAR(255)
+              - column:
+                  name: created_on
+                  type: DATETIME
