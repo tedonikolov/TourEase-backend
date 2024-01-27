@@ -21,7 +21,7 @@ public class RouteValidator {
     };
 
     public final String[] regularAllowedUrlMatchers = {
-            "/user-service/regular/*",
+            "/user-service/regular/**",
     };
 
     public final String[] hotelAllowedUrlMatchers = {
@@ -33,7 +33,7 @@ public class RouteValidator {
     };
 
     public final String[] adminAllowedUrlMatchers = {
-            "/user-service/admin/*",
+            "/user-service/admin/**",
     };
 
     public Predicate<ServerHttpRequest> isAllowed =
