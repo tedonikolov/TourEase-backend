@@ -20,7 +20,7 @@ public class Passport {
     private String passportId;
     private LocalDate creationDate;
     private LocalDate expirationDate;
-
+    private Boolean expired;
     private String country;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -34,6 +34,7 @@ public class Passport {
         expirationDate=passportVO.expirationDate();
         country=passportVO.country();
         this.regular=regular;
+        expired = false;
     }
 
     public void update(PassportVO updateVO) {
@@ -41,5 +42,6 @@ public class Passport {
         creationDate=updateVO.creationDate();
         expirationDate=updateVO.expirationDate();
         country=updateVO.country();
+        expired = false;
     }
 }

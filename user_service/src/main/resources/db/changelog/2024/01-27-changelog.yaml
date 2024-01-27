@@ -6,3 +6,14 @@ databaseChangeLog:
         - dropColumn:
             tableName: regular
             columnName: passport_id
+
+  - changeSet:
+      id: addExpiredColumnPassport
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: passport
+            columns:
+              - column:
+                  name: expired
+                  type: boolean

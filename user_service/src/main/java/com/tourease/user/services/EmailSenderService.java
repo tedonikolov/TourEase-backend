@@ -66,11 +66,30 @@ public class EmailSenderService {
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
                 + "Thank you,<br>"
                 + "TourEase.";
+
+        //TODO update link with Frontend one
         String verifyURL = "http://localhost:9000/user-service/user/activateUser/" + email;
 
         body = body.replace("[[URL]]", verifyURL);
         sendEmail(email, subject, body);
 
         kafkaTemplate.send("email_sender", email, "Activation link send!");
+    }
+
+    public void sendPassportDateExpiredNotify(String email, String fullName) {
+        String subject = "Passport date expired";
+        String body = "Dear "+fullName+",<br>"
+                + "Your passport has expired<br>"
+                + "Please click the link below to verify your registration:<br>"
+                + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                + "Thank you,<br>"
+                + "TourEase.";
+        //TODO update link with Frontend one
+        String verifyURL = "http://localhost:9000/user-service/user/activateUser/" + email;
+
+        body = body.replace("[[URL]]", verifyURL);
+        sendEmail(email, subject, body);
+
+        kafkaTemplate.send("email_sender", email, "Passport update notify send!");
     }
 }

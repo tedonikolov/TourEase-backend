@@ -10,12 +10,16 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class PassportService {
-    private PassportRepository passportRepository;
-    private UserService userService;
+    private final PassportRepository passportRepository;
+    private final UserService userService;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final EmailSenderService emailSenderService;
 
     public void save(PassportVO passportVO) {
         User user = userService.findEntity(passportVO.email());
@@ -36,5 +40,16 @@ public class PassportService {
         }
 
         passportRepository.save(passport);
+    }
+
+    public void checkExpiredPassports(){
+        List<Passport> passports = passportRepository.findByExpirationDateBefore(LocalDate.now());
+        for(Passport passport : passports){
+            passport.setExpired(true);
+            kafkaTemplate.send("user_service", passport.getRegular().getUser().getEmail(), "Passport date expired!");
+            emailSenderService.sendPassportDateExpiredNotify(passport.getRegular().getUser().getEmail(),passport.getRegular().getFirstName()+" "+passport.getRegular().getLastName());
+        }
+
+        passportRepository.saveAll(passports);
     }
 }
