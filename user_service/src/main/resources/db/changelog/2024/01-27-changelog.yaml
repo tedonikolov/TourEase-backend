@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: removePassportIdFromRegular
+      author: Tedo
+      changes:
+        - dropColumn:
+            tableName: regular
+            columnName: passport_id
