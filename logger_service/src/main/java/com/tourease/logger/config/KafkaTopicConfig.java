@@ -51,6 +51,11 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic configurationServiceTopic() {
-        return TopicBuilder.name("configuration-service").build();
+        return TopicBuilder.name("configuration_service").build();
+    }
+
+    @Bean
+    public NewTopic emailSenderTopic() {
+        return TopicBuilder.name("email_sender").build();
     }
 }

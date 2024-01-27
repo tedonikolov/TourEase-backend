@@ -46,6 +46,11 @@ public class ReadMessagesService {
         createChronology(record);
     }
 
+    @KafkaListener(topics = "email_sender", groupId = "email_sender")
+    public void listenEmailSender(ConsumerRecord<String, String> record) {
+        createChronology(record);
+    }
+
     private void createChronology(ConsumerRecord<String, String> record) {
         Chronology chronology = new Chronology();
         chronology.setEmail(record.key());
