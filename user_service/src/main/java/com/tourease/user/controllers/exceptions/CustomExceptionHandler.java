@@ -1,6 +1,7 @@
 package com.tourease.user.controllers.exceptions;
 
 import com.tourease.configuration.exception.CustomException;
+import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.configuration.exception.ErrorResponse;
 import com.tourease.configuration.exception.ValidationError;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,13 @@ public class CustomExceptionHandler {
             MethodArgumentNotValidException ex) {
         List<ValidationError> list = new ArrayList<>();
         for (ObjectError error :  ex.getBindingResult().getAllErrors()) {
-            String fieldName = ((FieldError) error).getField();
+            String fieldName;
+            if(error instanceof FieldError)
+                fieldName = ((FieldError) error).getField();
+            else
+                fieldName = error.getObjectName();
             String errorMessage = error.getDefaultMessage();
-            list.add(new ValidationError(fieldName, errorMessage));
+            list.add(new ValidationError(fieldName, errorMessage, ErrorCode.Failed));
         }
         ErrorResponse response = new ErrorResponse("The request could not be executed", list);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

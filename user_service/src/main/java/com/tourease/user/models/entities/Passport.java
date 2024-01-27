@@ -1,7 +1,9 @@
 package com.tourease.user.models.entities;
 
+import com.tourease.user.models.dto.request.PassportVO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 @Table(name = "passport", schema = "public")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Passport {
     @Id
     @Column(name = "regular_id", nullable = false)
@@ -23,4 +26,20 @@ public class Passport {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "regular_id")
     private Regular regular;
+
+    public Passport(Regular regular, PassportVO passportVO) {
+        id=regular.getId();
+        passportId=passportVO.passportId();
+        creationDate=passportVO.creationDate();
+        expirationDate=passportVO.expirationDate();
+        country=passportVO.country();
+        this.regular=regular;
+    }
+
+    public void update(PassportVO updateVO) {
+        passportId=updateVO.passportId();
+        creationDate=updateVO.creationDate();
+        expirationDate=updateVO.expirationDate();
+        country=updateVO.country();
+    }
 }
