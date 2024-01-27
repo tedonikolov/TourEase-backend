@@ -11,7 +11,7 @@ public class RouteValidator {
 
     public final String[] openUrlMatchers = {
             "/login",
-            "/user-service/regular/createRegular",
+            "/user-service/user/registration",
             "/user-service/user/login",
             "/user-service/user/activateUser",
             "/user-service/user/activateUser/*",

@@ -1,5 +1,6 @@
 package com.tourease.user.models.entities;
 
+import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.enums.UserStatus;
 import com.tourease.user.models.enums.UserType;
 import jakarta.persistence.*;
@@ -33,5 +34,11 @@ public class User {
         this.password = password;
         this.userType = userType;
         this.userStatus = userStatus;
+    }
+
+    public User(UserRegistration userRegistration) {
+        email = userRegistration.email();
+        userType = userRegistration.userType();
+        userStatus = UserStatus.PENDING;
     }
 }
