@@ -1,18 +1,23 @@
 package com.tourease.configuration;
 
+import com.tourease.configuration.models.entities.Configuration;
 import com.tourease.configuration.models.entities.Country;
+import com.tourease.configuration.models.enums.Field;
+import com.tourease.configuration.repositories.ConfigurationRepository;
 import com.tourease.configuration.repositories.CountryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class InitialDataSetup implements CommandLineRunner {
 
     private final CountryRepository countryRepository;
+    private final ConfigurationRepository configurationRepository;
 
     @Override
     public void run(String... args) {
@@ -67,8 +72,15 @@ public class InitialDataSetup implements CommandLineRunner {
                     "Vatican City"
             };
 
-           countryRepository.saveAll(Arrays.stream(countries).map(Country::new).toList());
+            countryRepository.saveAll(Arrays.stream(countries).map(Country::new).toList());
 
+        }
+
+        if (configurationRepository.count() == 0) {
+            Configuration emailFrom = new Configuration(Field.EMAIL_FROM, "tekanpicha@gmail.com");
+            Configuration emailPassword = new Configuration(Field.EMAIL_PASSWORD, "wlmkshrmalmltbxc");
+
+            configurationRepository.saveAll(List.of(emailFrom, emailPassword));
         }
     }
 }

@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_configuration
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: configuration
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_configuration
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: value
+                  type: VARCHAR(255)
