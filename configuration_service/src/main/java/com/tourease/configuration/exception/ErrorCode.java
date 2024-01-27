@@ -12,7 +12,8 @@ public enum ErrorCode {
     WrongCredentials(2),
     NotActive(3),
     AlreadyActive(4),
-    Inactive(5);
+    Inactive(5),
+    Failed(6);
 
     private final int code;
 
