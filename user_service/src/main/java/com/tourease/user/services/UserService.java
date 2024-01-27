@@ -8,6 +8,7 @@ import com.tourease.user.models.entities.User;
 import com.tourease.user.models.enums.UserStatus;
 import com.tourease.user.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +18,23 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSenderService emailSenderService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public LoginResponse authorize(String username, String password){
         User user = findEntity(username);
 
         if (user.getUserStatus() != UserStatus.ACTIVE) {
+            kafkaTemplate.send("gateway_service", user.getEmail(), "Tried to login in inactive profile!");
             throw new CustomException("User is not active", ErrorCode.NotActive);
         }
 
         boolean validMatch = passwordEncoder.matches(password, user.getPassword());
         if (!validMatch) {
+            kafkaTemplate.send("gateway_service", user.getEmail(), "Wrong password!");
             throw new CustomException("Wrong password", ErrorCode.WrongCredentials);
         }
+
+        kafkaTemplate.send("gateway_service", user.getEmail(), "Login in the system!");
 
         return new LoginResponse(username,user.getUserType().name());
     }
@@ -38,6 +44,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userRegistration.password()));
 
         userRepository.save(user);
+
+        kafkaTemplate.send("user_service", user.getEmail(), "Registration created!");
 
         emailSenderService.sendActivationMail(user.getEmail());
     }
@@ -52,11 +60,14 @@ public class UserService {
                 user.setUserStatus(UserStatus.ACTIVE);
                 userRepository.save(user);
 
+                kafkaTemplate.send("user_service", user.getEmail(), "Profile activated!");
             }
         }
     }
 
     public boolean isEmailTaken(String email) {
+        kafkaTemplate.send("gateway_service", email, "Tried to register already registered profile!");
+
         User user = userRepository.getByEmail(email);
         return user != null;
     }

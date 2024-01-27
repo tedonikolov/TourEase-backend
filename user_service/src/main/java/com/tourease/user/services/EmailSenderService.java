@@ -5,6 +5,7 @@ import com.tourease.user.services.communication.ConfigurationServiceClient;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,8 +17,8 @@ import java.util.Properties;
 @Service
 @AllArgsConstructor
 public class EmailSenderService {
-
-    private ConfigurationServiceClient configurationServiceClient;
+    private final ConfigurationServiceClient configurationServiceClient;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     private JavaMailSender getMailSender(){
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -69,5 +70,7 @@ public class EmailSenderService {
 
         body = body.replace("[[URL]]", verifyURL);
         sendEmail(email, subject, body);
+
+        kafkaTemplate.send("email_sender", email, "Activation link send!");
     }
 }
