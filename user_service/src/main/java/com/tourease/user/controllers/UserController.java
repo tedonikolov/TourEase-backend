@@ -21,6 +21,7 @@ public class UserController {
         return ResponseEntity.ok(userService.authorize(username, password));
     }
 
+    @Operation(description = "Creates a new trouble ticket. Can be accessed by: Distributor, Installer" )
     @PostMapping("/registration")
     public ResponseEntity<Void> registration(@RequestBody @Valid UserRegistration userRegistration){
         userService.register(userRegistration);
