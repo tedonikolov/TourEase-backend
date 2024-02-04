@@ -55,7 +55,7 @@ public class SessionHeaderResolver extends HeaderWebSessionIdResolver {
     @Override
     public void setSessionId(ServerWebExchange exchange, String id) {
         String jws = Jwts.builder()
-                .setIssuer("realEstate Gateway")
+                .setIssuer("TourEase Gateway")
                 .setSubject(id)
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(2L, ChronoUnit.HOURS)))

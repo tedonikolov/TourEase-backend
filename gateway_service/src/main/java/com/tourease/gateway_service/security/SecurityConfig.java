@@ -25,6 +25,9 @@ import org.springframework.security.web.server.authentication.logout.WebSessionS
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.session.DefaultWebSessionManager;
@@ -56,6 +59,8 @@ public class SecurityConfig {
 
     @Autowired
     private RouteValidator routeValidator;
+
+    private static final String FRONTEND_LOCALHOST = "http://localhost:3000";
 
     @Bean
     public WebSessionManager webSessionManager() {
@@ -142,5 +147,20 @@ public class SecurityConfig {
 
     private ServerLogoutSuccessHandler getServerLogoutSuccessHandler() {
         return (exchange, authentication) -> Mono.fromRunnable(() -> exchange.getExchange().getResponse().setStatusCode(HttpStatus.OK));
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfiguration() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.applyPermitDefaultValues();
+        corsConfig.addAllowedMethod(HttpMethod.PUT);
+        corsConfig.addAllowedMethod(HttpMethod.DELETE);
+        corsConfig.setAllowedOrigins(List.of(FRONTEND_LOCALHOST));
+        corsConfig.setExposedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+        return source;
     }
 }

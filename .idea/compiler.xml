@@ -7,7 +7,7 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="user_service.main" />
+        <module name="core_service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -16,6 +16,8 @@
       <module name="user-service" target="20" />
       <module name="user-service.main" target="20" />
       <module name="user-service.test" target="20" />
+      <module name="user_service.aot" target="21" />
+      <module name="user_service.aotTest" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>

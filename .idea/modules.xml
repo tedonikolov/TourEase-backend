@@ -4,8 +4,11 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/TourEase-backend.iml" filepath="$PROJECT_DIR$/.idea/TourEase-backend.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/configuration_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/configuration_service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/core_service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway_service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotel_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotel_service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/logger_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/logger_service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/transport_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/transport_service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user_service.main.iml" />
     </modules>
   </component>
