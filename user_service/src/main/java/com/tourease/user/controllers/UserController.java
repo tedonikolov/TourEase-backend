@@ -2,6 +2,7 @@ package com.tourease.user.controllers;
 
 import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.dto.response.LoginResponse;
+import com.tourease.user.models.dto.response.UserVO;
 import com.tourease.user.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -21,16 +22,21 @@ public class UserController {
         return ResponseEntity.ok(userService.authorize(username, password));
     }
 
-    @Operation(description = "Creates a new trouble ticket. Can be accessed by: Distributor, Installer" )
+    @Operation(description = "Creates a new trouble ticket. Can be accessed by: Distributor, Installer")
     @PostMapping("/registration")
-    public ResponseEntity<Void> registration(@RequestBody @Valid UserRegistration userRegistration){
+    public ResponseEntity<Void> registration(@RequestBody @Valid UserRegistration userRegistration) {
         userService.register(userRegistration);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/activateUser/{email}")
-    public ResponseEntity<Void> activateUser(@PathVariable String email){
+    public ResponseEntity<Void> activateUser(@PathVariable String email) {
         userService.activateUser(email);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/getLoggedUser/{email}")
+    public ResponseEntity<UserVO> getLoggedUser(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getLoggedUser(email));
     }
 }

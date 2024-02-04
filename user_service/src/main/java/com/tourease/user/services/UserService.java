@@ -4,6 +4,7 @@ import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.dto.response.LoginResponse;
+import com.tourease.user.models.dto.response.UserVO;
 import com.tourease.user.models.entities.User;
 import com.tourease.user.models.enums.UserStatus;
 import com.tourease.user.repositories.UserRepository;
@@ -70,6 +71,11 @@ public class UserService {
 
         User user = userRepository.getByEmail(email);
         return user != null;
+    }
+
+    public UserVO getLoggedUser(String email){
+        User user = findEntity(email);
+        return new UserVO(user);
     }
 
     public User findEntity(String email) {
