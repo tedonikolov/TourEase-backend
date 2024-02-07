@@ -15,6 +15,8 @@ public class RouteValidator {
             "/user-service/user/login",
             "/user-service/user/activateUser",
             "/user-service/user/activateUser/*",
+            "/user-service/user/sendActivateEmail/",
+            "/user-service/user/sendActivateEmail/*",
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",

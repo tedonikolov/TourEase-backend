@@ -3,6 +3,7 @@ package com.tourease.user.controllers;
 import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.dto.response.LoginResponse;
 import com.tourease.user.models.dto.response.UserVO;
+import com.tourease.user.services.EmailSenderService;
 import com.tourease.user.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final EmailSenderService emailSenderService;
 
     @Operation(hidden = true)
     @PostMapping("/login")
@@ -29,7 +31,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/activateUser/{email}")
+    @PostMapping("/sendActivateEmail/{email}")
+    public ResponseEntity<Void> sendActivateEmail(@PathVariable String email){
+        emailSenderService.sendActivationMail(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/activateUser/{email}")
     public ResponseEntity<Void> activateUser(@PathVariable String email) {
         userService.activateUser(email);
         return ResponseEntity.ok().build();

@@ -68,7 +68,7 @@ public class EmailSenderService {
                 + "TourEase.";
 
         //TODO update link with Frontend one
-        String verifyURL = "http://localhost:9000/user-service/user/activateUser/" + email;
+        String verifyURL = "http://localhost:3000/activateProfile?email="+email;
 
         body = body.replace("[[URL]]", verifyURL);
         sendEmail(email, subject, body);
