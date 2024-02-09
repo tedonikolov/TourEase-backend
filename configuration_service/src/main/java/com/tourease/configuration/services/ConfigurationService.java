@@ -1,7 +1,6 @@
 package com.tourease.configuration.services;
 
 import com.tourease.configuration.models.dto.response.AllConfigurations;
-import com.tourease.configuration.models.dto.response.Countries;
 import com.tourease.configuration.models.dto.response.EmailInfoVO;
 import com.tourease.configuration.models.entities.Configuration;
 import com.tourease.configuration.models.entities.Country;
@@ -19,10 +18,10 @@ public class ConfigurationService {
     private final CountryRepository countryRepository;
     private final ConfigurationRepository configurationRepository;
 
-    public Countries getAllCountries() {
+    public List<String> getAllCountries() {
         List<Country> countries = countryRepository.findAll();
 
-        return new Countries(countries.stream().map(Country::getCountry).toList());
+        return countries.stream().map(Country::getCountry).toList();
     }
 
     public AllConfigurations getAllConfigurations() {
