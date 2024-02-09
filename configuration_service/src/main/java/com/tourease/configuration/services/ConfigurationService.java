@@ -10,7 +10,7 @@ import com.tourease.configuration.repositories.CountryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -20,8 +20,10 @@ public class ConfigurationService {
 
     public List<String> getAllCountries() {
         List<Country> countries = countryRepository.findAll();
+        ArrayList<String> sorted = new ArrayList<> (countries.stream().map(Country::getCountry).toList());
 
-        return countries.stream().map(Country::getCountry).toList();
+        Collections.sort(sorted);
+        return sorted;
     }
 
     public AllConfigurations getAllConfigurations() {
