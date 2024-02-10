@@ -1,5 +1,6 @@
 package com.tourease.user.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tourease.user.models.dto.request.RegularVO;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class Regular {
     @PrimaryKeyJoinColumn
     private Passport passport;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private User user;

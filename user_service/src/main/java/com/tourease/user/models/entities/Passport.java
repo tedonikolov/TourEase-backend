@@ -1,5 +1,6 @@
 package com.tourease.user.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tourease.user.models.dto.request.PassportVO;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class Passport {
     private Boolean expired;
     private String country;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "regular_id")
     private Regular regular;
