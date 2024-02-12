@@ -19,6 +19,7 @@ public class RouteValidator {
             "/user-service/user/sendActivateEmail/*",
             "/user-service/user/sendPasswordChangeEmail/",
             "/user-service/user/sendPasswordChangeEmail/*",
+            "/user-service/user/changePassword",
             "/configuration-service/country/all",
     };
     public final String[] allowedUrlMatchers = {

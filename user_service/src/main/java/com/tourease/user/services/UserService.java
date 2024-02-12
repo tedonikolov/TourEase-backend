@@ -2,6 +2,7 @@ package com.tourease.user.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
+import com.tourease.user.models.dto.request.ChangePasswordVO;
 import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.dto.response.LoginResponse;
 import com.tourease.user.models.dto.response.UserVO;
@@ -85,5 +86,12 @@ public class UserService {
     public void sendPasswordChangeLink(String email) {
         userRepository.findByEmail(email).orElseThrow(() -> new CustomException("Profile don't exist", ErrorCode.Failed));
         emailSenderService.sendPasswordChangeLink(email);
+    }
+
+    public void changePassword(ChangePasswordVO changePasswordVO) {
+        User user = findEntity(changePasswordVO.email());
+        user.setPassword(passwordEncoder.encode(changePasswordVO.password()));
+        userRepository.save(user);
+        kafkaTemplate.send("user_service", user.getEmail(), "Password Changed!");
     }
 }

@@ -1,5 +1,6 @@
 package com.tourease.user.controllers;
 
+import com.tourease.user.models.dto.request.ChangePasswordVO;
 import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.dto.response.LoginResponse;
 import com.tourease.user.models.dto.response.UserVO;
@@ -24,7 +25,6 @@ public class UserController {
         return ResponseEntity.ok(userService.authorize(username, password));
     }
 
-    @Operation(description = "Creates a new trouble ticket. Can be accessed by: Distributor, Installer")
     @PostMapping("/registration")
     public ResponseEntity<Void> registration(@RequestBody @Valid UserRegistration userRegistration) {
         userService.register(userRegistration);
@@ -51,6 +51,12 @@ public class UserController {
     @PostMapping("/sendPasswordChangeEmail/{email}")
     public ResponseEntity<Void> sendPasswordChangeEmail(@PathVariable String email){
         userService.sendPasswordChangeLink(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordVO changePasswordVO){
+        userService.changePassword(changePasswordVO);
         return ResponseEntity.ok().build();
     }
 }
