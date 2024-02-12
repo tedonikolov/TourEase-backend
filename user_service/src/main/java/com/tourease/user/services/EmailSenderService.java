@@ -80,12 +80,11 @@ public class EmailSenderService {
         String subject = "Passport date expired";
         String body = "Dear "+fullName+",<br>"
                 + "Your passport has expired<br>"
-                + "Please click the link below to verify your registration:<br>"
-                + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                + "Please click the link below to log in your profile:<br>"
+                + "<h3><a href=\"[[URL]]\" target=\"_self\">Update passport</a></h3>"
                 + "Thank you,<br>"
                 + "TourEase.";
-        //TODO update link with Frontend one
-        String verifyURL = "http://localhost:9000/user-service/user/activateUser/" + email;
+        String verifyURL = "http://localhost:3000/profile?passportExpired=1";
 
         body = body.replace("[[URL]]", verifyURL);
         sendEmail(email, subject, body);
