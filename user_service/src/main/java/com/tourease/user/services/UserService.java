@@ -81,4 +81,9 @@ public class UserService {
     public User findEntity(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new CustomException("User not found", ErrorCode.EntityNotFound));
     }
+
+    public void sendPasswordChangeLink(String email) {
+        userRepository.findByEmail(email).orElseThrow(() -> new CustomException("Profile don't exist", ErrorCode.Failed));
+        emailSenderService.sendPasswordChangeLink(email);
+    }
 }

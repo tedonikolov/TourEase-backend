@@ -47,4 +47,10 @@ public class UserController {
     public ResponseEntity<UserVO> getLoggedUser(@PathVariable String email) {
         return ResponseEntity.ok(userService.getLoggedUser(email));
     }
+
+    @PostMapping("/sendPasswordChangeEmail/{email}")
+    public ResponseEntity<Void> sendPasswordChangeEmail(@PathVariable String email){
+        userService.sendPasswordChangeLink(email);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -91,4 +91,19 @@ public class EmailSenderService {
 
         kafkaTemplate.send("email_sender", email, "Passport update notify send!");
     }
+
+    public void sendPasswordChangeLink(String email) {
+        String subject = "Password change";
+        String body = "Dear "+email+",<br>"
+                + "Please click the link below to change your password:<br>"
+                + "<h3><a href=\"[[URL]]\" target=\"_self\">Update passport</a></h3>"
+                + "Thank you,<br>"
+                + "TourEase.";
+        String verifyURL = "http://localhost:3000/changePassword?email="+email;
+
+        body = body.replace("[[URL]]", verifyURL);
+        sendEmail(email, subject, body);
+
+        kafkaTemplate.send("email_sender", email, "Password change email send!");
+    }
 }
