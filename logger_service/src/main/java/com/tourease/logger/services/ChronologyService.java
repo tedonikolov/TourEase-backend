@@ -1,16 +1,17 @@
 package com.tourease.logger.services;
 
-import com.tourease.logger.models.Type;
+import com.tourease.logger.models.custom.IndexVM;
+import com.tourease.logger.models.enums.Type;
 import com.tourease.logger.models.dto.ChronologyFilter;
 import com.tourease.logger.models.dto.MessageLog;
 import com.tourease.logger.models.entities.Chronology;
 import com.tourease.logger.models.repositories.ChronologyRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,12 +24,11 @@ public class ChronologyService {
         chronologyRepository.save(chronology);
     }
 
-    public List<MessageLog> gerChronology(ChronologyFilter filter) {
-        List<Chronology> chronologyList = chronologyRepository.findChronologyByFilter(filter.email(), filter.createdAfter(), filter.createdBefore());
+    public IndexVM<MessageLog> gerChronology(ChronologyFilter filter) {
+        Page<Chronology> page = chronologyRepository.findChronologyByFilter(filter.email(), filter.createdAfter(), filter.createdBefore(),
+                filter.type() == null ? null : filter.type().getLabel(), PageRequest.of(filter.page(), filter.pageSize()));
 
-        return filter.type() != null ?
-                chronologyList.stream().filter(chronology -> Objects.equals(chronology.getLog(), filter.type().getLabel())).map(MessageLog::new).toList() :
-                chronologyList.stream().map(MessageLog::new).toList();
+        return new IndexVM<>(page.map(MessageLog::new));
     }
 
     public Set<String> getTypes() {

@@ -1,4 +1,4 @@
-package com.tourease.logger.models;
+package com.tourease.logger.models.enums;
 
 import lombok.Getter;
 
