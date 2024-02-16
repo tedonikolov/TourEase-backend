@@ -1,0 +1,389 @@
+databaseChangeLog:
+  - changeSet:
+      id: createOwner
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: owner
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_owner
+                    nullable: false
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+              - column:
+                  name: company_address
+                  type: VARCHAR(255)
+              - column:
+                  name: company_name
+                  type: VARCHAR(255)
+              - column:
+                  name: country
+                  type: VARCHAR(255)
+              - column:
+                  name: eik
+                  type: VARCHAR(255)
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+              - column:
+                  name: phone
+                  type: VARCHAR(255)
+  - changeSet:
+      id: createHotel
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: hotel
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_hotel
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: stars
+                  type: VARCHAR(255)
+              - column:
+                  name: owner_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_owner_id
+                    referencedTableName: owner
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createBed
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: bed
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_bed
+              - column:
+                  name: people
+                  type: INT
+              - column:
+                  name: price
+                  type: DECIMAL
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: createType
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: type
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_type
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: price
+                  type: DECIMAL
+
+  - changeSet:
+      id: createType_Beds
+      author: Tedo
+      changes:
+        - createTable:
+            tableName:  type_beds
+            columns:
+              - column:
+                  name: beds_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_bed_id
+                    referencedTableName: bed
+                    referencedColumnNames: id
+              - column:
+                  name: type_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_type_id
+                    referencedTableName: type
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createCustomer
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: customer
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_customer
+              - column:
+                  name: birth_date
+                  type: DATE
+              - column:
+                  name: creation_date
+                  type: DATE
+              - column:
+                  name: expiration_date
+                  type: DATE
+              - column:
+                  name: country
+                  type: VARCHAR(255)
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+              - column:
+                  name: gender
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: createReservation
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: reservation
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_reservation
+              - column:
+                  name: price
+                  type: DECIMAL
+              - column:
+                  name: check_in
+                  type: DATETIME
+              - column:
+                  name: check_out
+                  type: DATETIME
+              - column:
+                  name: creation_date
+                  type: DATETIME
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createCustomer_Reservations
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: customer_reservations
+            columns:
+              - column:
+                  name: customer_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_customer_id
+                    referencedTableName: customer
+                    referencedColumnNames: id
+              - column:
+                  name: reservations_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_reservation_id
+                    referencedTableName: reservation
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createRoom
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: room
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_room
+                    nullable: false
+                  autoIncrement: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: number
+                  type: INT
+              - column:
+                  name: type_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_type_id
+                    nullable: false
+                    referencedTableName: type
+                    referencedColumnNames: id
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createImage
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: image
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_image
+                    nullable: false
+                  autoIncrement: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: type
+                  type: VARCHAR(255)
+              - column:
+                  name: image
+                  type: BLOB
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createRating
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: rating
+            columns:
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_rating
+                    nullable: false
+                    foreignKeyName: fk_hotel_id
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+              - column:
+                  name: number_of_rates
+                  type: BIGINT
+              - column:
+                  name: total_rating
+                  type: BIGINT
+              - column:
+                  name: rating
+                  type: DECIMAL
+
+  - changeSet:
+      id: createFacility
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: facility
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_facility
+                    nullable: false
+                  autoIncrement: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: paid
+                  type: BOOLEAN
+              - column:
+                  name: price
+                  type: DECIMAL
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: createLocation
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: location
+            columns:
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_location
+                    nullable: false
+                    foreignKeyName: fk_hotel_id
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+              - column:
+                  name: latitude
+                  type: VARCHAR(255)
+              - column:
+                  name: longitude
+                  type: VARCHAR(255)

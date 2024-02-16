@@ -29,6 +29,10 @@ public class User {
     @PrimaryKeyJoinColumn
     private Regular regular;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Owner owner;
+
     public User(String email, String password, UserType userType, UserStatus userStatus) {
         this.email = email;
         this.password = password;
