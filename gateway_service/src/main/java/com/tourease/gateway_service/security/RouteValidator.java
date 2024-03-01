@@ -40,6 +40,10 @@ public class RouteValidator {
 
     public final String[] adminAllowedUrlMatchers = {
             "/user-service/admin/**",
+            "/user-service/swagger",
+            "/hotel-service/swagger",
+            "/configuration-service/swagger",
+            "/logger-service/swagger",
             "/logger-service/admin/**"
     };
 
