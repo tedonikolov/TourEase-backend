@@ -39,7 +39,7 @@ public class EmailSenderService {
 
     private void sendEmail(String toEmail, String subject, String body) {
         JavaMailSender mailSender = getMailSender();
-        configurationServiceClient.checkConnectionCore();
+        configurationServiceClient.checkConnection();
         EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
 
         String senderName = "TourEase";
@@ -67,7 +67,6 @@ public class EmailSenderService {
                 + "Thank you,<br>"
                 + "TourEase.";
 
-        //TODO update link with Frontend one
         String verifyURL = "http://localhost:3000/activateProfile?email="+email;
 
         body = body.replace("[[URL]]", verifyURL);

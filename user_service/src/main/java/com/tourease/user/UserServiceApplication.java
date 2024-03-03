@@ -8,7 +8,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@OpenAPIDefinition(info = @Info(title = "User Service", version = "0.1.0-SNAPSHOT", description = "Documentation APIs v0.2.0. Manages Tasks, Reminders and Trouble tickets. Mainly used by Coordinators, Distributors and Installers"))
+@OpenAPIDefinition(info = @Info(title = "User Service", version = "0.0.1",
+        description = """
+                Documentation APIs v0.0.1. User-service functionality:
+                \n-a. Responsible for managing user profiles.
+                \n-b. User registration and login.
+                \n-c. Manage personal data and account settings."""))
 public class UserServiceApplication {
 
     public static void main(String[] args) {

@@ -18,9 +18,9 @@ public class ConfigurationServiceClient {
     private final String configServiceUrl = "http://configuration-service";
 
 
-    public void checkConnectionCore() {
-        Application coreService = eurekaClient.getApplication(configAppName);
-        if (coreService == null)
+    public void checkConnection() {
+        Application service = eurekaClient.getApplication(configAppName);
+        if (service == null)
             throw new InternalServiceException("No connection to config-service.");
     }
 
