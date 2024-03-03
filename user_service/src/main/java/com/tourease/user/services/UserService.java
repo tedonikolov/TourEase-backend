@@ -8,7 +8,9 @@ import com.tourease.user.models.dto.response.LoginResponse;
 import com.tourease.user.models.dto.response.UserVO;
 import com.tourease.user.models.entities.User;
 import com.tourease.user.models.enums.UserStatus;
+import com.tourease.user.models.enums.UserType;
 import com.tourease.user.repositories.UserRepository;
+import com.tourease.user.services.communication.HotelServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,9 +22,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSenderService emailSenderService;
+    private final HotelServiceClient hotelServiceClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public LoginResponse authorize(String username, String password){
+    public LoginResponse authorize(String username, String password) {
         User user = findEntity(username);
 
         if (user.getUserStatus() != UserStatus.ACTIVE) {
@@ -38,10 +41,10 @@ public class UserService {
 
         kafkaTemplate.send("gateway_service", user.getEmail(), "Login in the system!");
 
-        return new LoginResponse(username,user.getUserType().name());
+        return new LoginResponse(username, user.getUserType().name());
     }
 
-    public void register(UserRegistration userRegistration){
+    public void register(UserRegistration userRegistration) {
         User user = new User(userRegistration);
         user.setPassword(passwordEncoder.encode(userRegistration.password()));
 
@@ -62,6 +65,11 @@ public class UserService {
                 user.setUserStatus(UserStatus.ACTIVE);
                 userRepository.save(user);
 
+                if (user.getUserType() == UserType.HOTEL) {
+                    hotelServiceClient.checkConnection();
+                    hotelServiceClient.createHotelOwner(user.getId(), user.getEmail());
+                }
+
                 kafkaTemplate.send("user_service", user.getEmail(), "Profile activated!");
             }
         }
@@ -74,7 +82,7 @@ public class UserService {
         return user != null;
     }
 
-    public UserVO getLoggedUser(String email){
+    public UserVO getLoggedUser(String email) {
         User user = findEntity(email);
         return new UserVO(user);
     }
@@ -91,6 +99,10 @@ public class UserService {
     public void changePassword(ChangePasswordVO changePasswordVO) {
         User user = findEntity(changePasswordVO.email());
         user.setPassword(passwordEncoder.encode(changePasswordVO.password()));
+        if(user.getUserStatus()==UserStatus.INACTIVE){
+            user.setUserStatus(UserStatus.ACTIVE);
+            kafkaTemplate.send("user_service", user.getEmail(), "Profile activated!");
+        }
         userRepository.save(user);
         kafkaTemplate.send("user_service", user.getEmail(), "Password Changed!");
     }
