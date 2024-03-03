@@ -2,8 +2,7 @@ package com.tourease.hotel.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -11,11 +10,15 @@ import java.util.Set;
 @Table(name = "owner", schema = "public")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Owner {
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
     private String fullName;
+    private String email;
 
     @Column(unique = true)
     private String companyName;
@@ -29,4 +32,8 @@ public class Owner {
     @JsonIgnore
     private Set<Hotel> hotels;
 
+    public Owner(Long id, String email) {
+        this.id = id;
+        this.email = email;
+    }
 }

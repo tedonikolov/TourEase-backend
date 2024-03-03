@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: addEmailToOwner
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: owner
+            columns:
+              - column:
+                  name: email
+                  type: VARCHAR(255)
