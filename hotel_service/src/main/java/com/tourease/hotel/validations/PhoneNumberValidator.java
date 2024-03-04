@@ -19,20 +19,20 @@ public class PhoneNumberValidator implements ConstraintValidator<Phone, OwnerSav
 
     @Override
     public boolean isValid(OwnerSaveVO owner, ConstraintValidatorContext context) {
-        String countryCode = CountryCode.findByName(owner.country()).get(0).name();
-        String phoneNumber = owner.phone();
-
-        if (phoneNumber == null || phoneNumber.isBlank()) return true;
-
-        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phone = null;
         try {
-            phone = phoneNumberUtil.parse(phoneNumber, Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
-        } catch (NumberParseException e) {
+            String countryCode = CountryCode.findByName(owner.country()).get(0).name();
+            String phoneNumber = owner.phone();
+
+            if (phoneNumber == null || phoneNumber.isBlank()) return false;
+
+            PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+
+            Phonenumber.PhoneNumber phone = phoneNumberUtil.parse(phoneNumber, Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
+
+            return phoneNumberUtil.isValidNumberForRegion(phone, countryCode);
+        } catch (NumberParseException | IndexOutOfBoundsException e) {
             return false;
         }
-
-        return phoneNumberUtil.isValidNumberForRegion(phone, countryCode);
     }
 
 }
