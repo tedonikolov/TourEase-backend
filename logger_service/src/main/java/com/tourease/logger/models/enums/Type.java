@@ -21,7 +21,9 @@ public enum Type {
     ALREADY_EXISTING_PROFILE("Tried to register already registered profile!"),
     ACTIVATION_LINK_SEND("Activation link send!"),
     PROFILE_CREATED("Registration created!"),
-    PASSPORT_COUNTRY_NOT_MATCH("Passport country not match!");
+    PASSPORT_COUNTRY_NOT_MATCH("Passport country not match!"),
+    UPDATED_OWNER_INFORMATION("Updated owner information."),
+    OWNER_CREATED("Owner created.");
 
     private final String label;
 
