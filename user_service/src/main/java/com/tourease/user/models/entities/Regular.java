@@ -25,6 +25,7 @@ public class Regular {
 
     private String country;
     private String gender;
+    private String phone;
 
     @OneToOne(mappedBy = "regular", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
@@ -42,6 +43,7 @@ public class Regular {
         birthDate = regularVO.birthDate();
         country = regularVO.country();
         gender = regularVO.gender();
+        phone = regularVO.phone();
         this.user = user;
     }
 
@@ -51,5 +53,6 @@ public class Regular {
         birthDate = update.birthDate();
         country = update.country();
         gender = update.gender();
+        phone = update.phone();
     }
 }

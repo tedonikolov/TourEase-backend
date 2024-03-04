@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,11 +26,11 @@ public class RegularController {
             description = "Used to create or update regular user info.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully, updated regular info."),
-            @ApiResponse(responseCode = "400", description = "User not found.",
+            @ApiResponse(responseCode = "400", description = "User not found or invalid phone number.",
                     content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))})
     @PostMapping("/save")
-    public ResponseEntity<Void> save(@RequestBody RegularVO regularVO){
+    public ResponseEntity<Void> save(@RequestBody @Valid RegularVO regularVO){
         regularService.save(regularVO);
         return ResponseEntity.ok().build();
     }

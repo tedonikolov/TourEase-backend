@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: addPhoneToRegular
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: regular
+            columns:
+              - column:
+                  name: phone
+                  type: VARCHAR(255)
