@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: AddCountryToLocation
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: location
+            columns:
+              - column:
+                  name: country
+                  type: VARCHAR(255)
