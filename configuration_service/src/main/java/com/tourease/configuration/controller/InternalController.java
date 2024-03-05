@@ -12,22 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @AllArgsConstructor
 @RequestMapping("/internal")
 public class InternalController {
     private final ConfigurationService configurationService;
-
-    @Operation(summary = "Gets countries.",
-            description = "Used to get countries that are supported by system.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully, returns list of countries.")})
-    @GetMapping("/getAllCountries")
-    public ResponseEntity<List<String>> getCountries() {
-        return ResponseEntity.ok(configurationService.getAllCountries());
-    }
 
     @Operation(summary = "Gets all configurations.",
             description = "Used to get all configurations that are supported by system.")

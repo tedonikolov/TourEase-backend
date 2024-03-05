@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: RemoveCountry
+      author: Tedo
+      changes:
+        - dropTable:
+            tableName: country
