@@ -23,7 +23,9 @@ public enum Type {
     PROFILE_CREATED("Registration created!"),
     PASSPORT_COUNTRY_NOT_MATCH("Passport country not match!"),
     UPDATED_OWNER_INFORMATION("Updated owner information."),
-    OWNER_CREATED("Owner created.");
+    OWNER_CREATED("Owner created."),
+    HOTEL_CREATED("Hotel created"),
+    HOTEL_UPDATED("Hotel updated");
 
     private final String label;
 

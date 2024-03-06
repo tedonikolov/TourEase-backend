@@ -14,7 +14,7 @@ public interface ChronologyRepository extends JpaRepository<Chronology, Long> {
 
     @Query(value = "SELECT distinct ch from Chronology ch " +
             "WHERE (:email IS NULL OR lower(ch.email) LIKE concat('%',lower(:email),'%')) " +
-            "AND (:type IS NULL OR ch.log LIKE :type) " +
+            "AND (:type IS NULL OR ch.log LIKE concat('%',:type,'%')) " +
             "AND ((cast(:createdAfter as localdatetime) IS NULL AND cast(:createdBefore as localdatetime) IS NULL) " +
             "OR (cast(:createdAfter as localdatetime) IS NOT NULL AND cast(:createdBefore as localdatetime) IS NOT NULL AND ch.createdOn >= :createdAfter AND ch.createdOn <= :createdBefore) " +
             "OR (cast(:createdAfter as localdatetime) IS NOT NULL AND cast(:createdBefore as localdatetime) IS NULL AND ch.createdOn >= :createdAfter) " +

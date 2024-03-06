@@ -26,7 +26,7 @@ public class ChronologyService {
 
     public IndexVM<MessageLog> gerChronology(ChronologyFilter filter) {
         Page<Chronology> page = chronologyRepository.findChronologyByFilter(filter.email(), filter.createdAfter(), filter.createdBefore(),
-                filter.type() == null ? null : filter.type().getLabel(), PageRequest.of(filter.page(), filter.pageSize()));
+                filter.type() == null ? "" : filter.type().getLabel(), PageRequest.of(filter.page(), filter.pageSize()));
 
         return new IndexVM<>(page.map(MessageLog::new));
     }
