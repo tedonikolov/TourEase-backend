@@ -32,6 +32,7 @@ public class RouteValidator {
 
     public final String[] hotelAllowedUrlMatchers = {
             "/hotel-service/owner/**",
+            "/hotel-service/hotel/**",
     };
 
     public final String[] transportAllowedUrlMatchers = {

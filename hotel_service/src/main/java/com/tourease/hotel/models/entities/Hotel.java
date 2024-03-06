@@ -2,8 +2,7 @@ package com.tourease.hotel.models.entities;
 
 import com.tourease.hotel.models.enums.Stars;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,6 +11,9 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "hotel", schema = "public")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

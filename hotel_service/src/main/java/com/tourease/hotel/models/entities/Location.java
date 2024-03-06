@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Entity
@@ -15,9 +17,9 @@ public class Location {
     @Column(name = "hotel_id", nullable = false)
     private Long id;
 
-    private String latitude;
+    private BigDecimal latitude;
 
-    private String longitude;
+    private BigDecimal longitude;
 
     private String address;
 

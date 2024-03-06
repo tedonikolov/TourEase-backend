@@ -9,7 +9,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: BIGINT
-                  autoIncrement: true
+                  autoIncrement: false
                   constraints:
                     primaryKey: true
                     primaryKeyName: pk_owner
@@ -45,6 +45,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     primaryKeyName: pk_hotel
@@ -383,7 +384,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
               - column:
                   name: latitude
-                  type: VARCHAR(255)
+                  type: NUMBER
               - column:
                   name: longitude
-                  type: VARCHAR(255)
+                  type: NUMBER
