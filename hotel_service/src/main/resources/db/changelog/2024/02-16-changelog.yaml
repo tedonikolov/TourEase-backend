@@ -288,6 +288,9 @@ databaseChangeLog:
                   name: type
                   type: VARCHAR(255)
               - column:
+                  name: url
+                  type: VARCHAR(255)
+              - column:
                   name: image
                   type: BLOB
               - column:

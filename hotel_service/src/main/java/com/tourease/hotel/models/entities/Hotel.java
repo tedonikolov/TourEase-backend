@@ -1,5 +1,6 @@
 package com.tourease.hotel.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tourease.hotel.models.enums.Stars;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,10 +30,10 @@ public class Hotel {
     @PrimaryKeyJoinColumn
     private Location location;
 
-    @OneToOne(mappedBy = "hotel", orphanRemoval = true)
+    @OneToOne(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Rating rating;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
@@ -40,6 +41,7 @@ public class Hotel {
     private Set<Room> rooms = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Image> images = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)

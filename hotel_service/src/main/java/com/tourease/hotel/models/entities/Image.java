@@ -23,7 +23,9 @@ public class Image {
     @Lob
     private byte[] image;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    private String url;
+
+    @ManyToOne()
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
