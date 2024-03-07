@@ -20,7 +20,7 @@ public class Rating {
     private Long numberOfRates;
     private BigDecimal rating;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne()
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;

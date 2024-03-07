@@ -22,7 +22,7 @@ public class Facility {
     private boolean paid;
     private BigDecimal price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 }

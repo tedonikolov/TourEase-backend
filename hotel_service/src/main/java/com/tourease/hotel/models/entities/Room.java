@@ -18,11 +18,11 @@ public class Room {
     private String name;
     private int number;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "type_id")
     private Type type;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;

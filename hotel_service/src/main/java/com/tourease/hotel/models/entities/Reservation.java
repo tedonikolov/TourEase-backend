@@ -29,7 +29,7 @@ public class Reservation {
     private OffsetDateTime checkOut;
     private BigDecimal price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;

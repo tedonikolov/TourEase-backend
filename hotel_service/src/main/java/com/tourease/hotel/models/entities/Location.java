@@ -26,7 +26,7 @@ public class Location {
     private String city;
 
     private String country;
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne()
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;
