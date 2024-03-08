@@ -17,6 +17,12 @@ public enum FacilityEnum {
     SHUTTLE_SERVICE,
     LAUNDRY,
     ELEVATOR,
-    HOUR_FRONT_DESK
+    HOUR_FRONT_DESK,
+    BREAKFAST,
+    CHILD_BREAKFAST,
+    LUNCH,
+    CHILD_LUNCH,
+    DINNER,
+    CHILD_DINNER
 }
 
