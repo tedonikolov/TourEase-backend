@@ -32,4 +32,9 @@ public class Type {
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Room> rooms = new LinkedHashSet<>();
+
+    @ManyToOne()
+    @JoinColumn(name = "hotel_id")
+    @JsonIgnore
+    private Hotel hotel;
 }

@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/2024/03-02-changelog.yaml
   - include:
       file: db/changelog/2024/03-05-changelog.yaml
+  - include:
+      file: db/changelog/2024/03-08-changelog.yaml

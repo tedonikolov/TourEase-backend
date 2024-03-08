@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: addHotelFKToTypeAndBed
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: type
+            columns:
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+        - addColumn:
+            tableName: bed
+            columns:
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
