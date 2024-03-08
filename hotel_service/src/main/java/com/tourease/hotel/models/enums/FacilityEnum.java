@@ -3,16 +3,13 @@ package com.tourease.hotel.models.enums;
 public enum FacilityEnum {
     WIFI,
     PARKING,
-    RESTAURANT,
     SWIMMING_POOL,
     INSIDE_SWIMMING_POOL,
     GYM,
     SPA,
     ROOM_SERVICE,
     AIR_CONDITIONING,
-    BAR,
-    BUSINESS_CENTER,
-    CONCIERGE,
+    MINIBAR,
     CONFERENCE_ROOM,
     CHILDREN_PLAYGROUND,
     PET_FRIENDLY,
@@ -20,6 +17,6 @@ public enum FacilityEnum {
     SHUTTLE_SERVICE,
     LAUNDRY,
     ELEVATOR,
-    HOUR_FRONT_DESK;
+    HOUR_FRONT_DESK
 }
 
