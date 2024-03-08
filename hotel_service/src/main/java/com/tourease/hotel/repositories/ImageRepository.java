@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Long> {
     @Transactional
-    @Query("select i from Image i where i.hotel.id = ?1")
+    @Query("select i from Image i where i.hotel.id = ?1 ORDER BY i.hotel.id")
     List<Image> findByHotel_Id(Long id);
 }
