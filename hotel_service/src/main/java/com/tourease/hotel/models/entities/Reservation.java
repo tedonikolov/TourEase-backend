@@ -9,6 +9,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import com.tourease.hotel.models.enums.Currency;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -28,6 +29,8 @@ public class Reservation {
     private OffsetDateTime checkIn;
     private OffsetDateTime checkOut;
     private BigDecimal price;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @ManyToOne()
     @JoinColumn(name = "hotel_id")

@@ -27,6 +27,8 @@ public class FacilityService {
             facilityRepository.save(facility);
         }else {
             Facility facility = facilityRepository.findById(facilityVO.id()).get();
+            if(facility.getName()!=facilityVO.name())
+                throw new CustomException("Can't change facility", ErrorCode.Failed);
             FacilityMapper.updateEntity(facility,facilityVO);
             facilityRepository.save(facility);
         }

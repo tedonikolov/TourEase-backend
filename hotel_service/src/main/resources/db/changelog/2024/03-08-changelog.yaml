@@ -25,3 +25,31 @@ databaseChangeLog:
                     nullable: false
                     referencedTableName: hotel
                     referencedColumnNames: id
+  - changeSet:
+      id: addCurrencyColumns
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: bed
+            columns:
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: facility
+            columns:
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: reservation
+            columns:
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: type
+            columns:
+              - column:
+                  name: currency
+                  type: VARCHAR(255)

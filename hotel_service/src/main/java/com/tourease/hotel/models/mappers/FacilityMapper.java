@@ -10,13 +10,14 @@ public class FacilityMapper {
                 .name(vo.name())
                 .paid(vo.paid())
                 .price(vo.price())
+                .currency(vo.currency())
                 .hotel(hotel)
                 .build();
     }
 
     public static void updateEntity(Facility entity,FacilityVO vo){
-        entity.setName(vo.name());
         entity.setPaid(vo.paid());
         entity.setPrice(vo.price());
+        entity.setCurrency(vo.currency());
     }
 }

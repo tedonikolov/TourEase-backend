@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import com.tourease.hotel.models.enums.Currency;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -20,8 +21,9 @@ public class Type {
     private Long id;
 
     private String name;
-
     private BigDecimal price;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @ManyToMany
     @JoinTable(name = "type_beds",

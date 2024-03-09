@@ -1,6 +1,7 @@
 package com.tourease.hotel.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tourease.hotel.models.enums.Currency;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,8 @@ public class Bed {
     private String name;
     private int people;
     private BigDecimal price;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @ManyToMany(mappedBy = "beds")
     @JsonIgnore
