@@ -20,7 +20,7 @@ public class FacilityService {
     public void save(FacilityVO facilityVO){
         Hotel hotel = hotelRepository.findById(facilityVO.hotelId()).get();
         if(facilityVO.id()==0){
-            if(facilityRepository.findByName(facilityVO.name()).isPresent()){
+            if(facilityRepository.findByNameAndHotel_Id(facilityVO.name(), facilityVO.hotelId()).isPresent()){
                 throw new CustomException("Facility exist", ErrorCode.AlreadyExists);
             }
             Facility facility = FacilityMapper.toEntity(facilityVO,hotel);

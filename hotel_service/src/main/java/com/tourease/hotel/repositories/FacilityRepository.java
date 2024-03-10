@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface FacilityRepository extends JpaRepository<Facility, Long> {
-    @Query("select f from Facility f where f.name = ?1")
-    Optional<Facility> findByName(FacilityEnum name);
+    @Query("select f from Facility f where f.name = ?1 and f.hotel.id = ?2")
+    Optional<Facility> findByNameAndHotel_Id(FacilityEnum name, Long id);
 }
