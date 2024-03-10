@@ -26,10 +26,10 @@ public class BedController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(description = "Delete facility by id",
-            summary = "Deletes facility")
+    @Operation(description = "Delete bed by id",
+            summary = "Deletes bed")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful deleted facility")
+            @ApiResponse(responseCode = "200", description = "Successful deleted bed")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
