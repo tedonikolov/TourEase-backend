@@ -36,7 +36,7 @@ public class Type {
             inverseJoinColumns = @JoinColumn(name = "beds_id"))
     private List<Bed> beds = new ArrayList<>() {};
 
-    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "types")
     @JsonIgnore
     private Set<Room> rooms = new LinkedHashSet<>();
 

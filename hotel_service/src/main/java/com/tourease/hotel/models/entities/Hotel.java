@@ -35,6 +35,7 @@ public class Hotel {
 
     @ManyToOne()
     @JoinColumn(name = "owner_id")
+    @JsonIgnore
     private Owner owner;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -48,6 +49,7 @@ public class Hotel {
     private Set<Image> images = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Reservation> reservations = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)

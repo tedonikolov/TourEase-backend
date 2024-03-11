@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: RemoveNumberColumnFromRoom
+      author: Tedo
+      changes:
+        - dropColumn:
+            tableName: room
+            columns:
+              - column:
+                  name: number
+  - changeSet:
+      id: RemoveFKRoomType
+      author: Tedo
+      changes:
+        - dropColumn:
+            tableName: room
+            columns:
+              - column:
+                  name: type_id
+
+  - changeSet:
+      id: createRoom_types
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: room_types
+            columns:
+              - column:
+                  name: types_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_type_id
+                    referencedTableName: type
+                    referencedColumnNames: id
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_room_id
+                    referencedTableName: room
+                    referencedColumnNames: id
