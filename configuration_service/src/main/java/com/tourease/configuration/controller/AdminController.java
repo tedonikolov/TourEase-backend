@@ -1,6 +1,7 @@
 package com.tourease.configuration.controller;
 
 import com.tourease.configuration.models.dto.request.UpdateConfigurationDTO;
+import com.tourease.configuration.models.dto.response.AllConfigurations;
 import com.tourease.configuration.services.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,5 +26,14 @@ public class AdminController {
     public ResponseEntity<Void> saveAllConfigurations(@RequestBody List<UpdateConfigurationDTO> configurationSave) {
         adminService.save(configurationSave);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Gets all configurations.",
+            description = "Used to get all configurations that are supported by system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully, returns all configurations.")})
+    @GetMapping("/getAllConfigurations")
+    public ResponseEntity<AllConfigurations> getAllConfigurations() {
+        return ResponseEntity.ok(adminService.getAllConfigurations());
     }
 }

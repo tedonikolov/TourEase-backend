@@ -1,6 +1,5 @@
 package com.tourease.configuration.controller;
 
-import com.tourease.configuration.models.dto.response.AllConfigurations;
 import com.tourease.configuration.models.dto.response.EmailInfoVO;
 import com.tourease.configuration.services.ConfigurationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,15 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/internal")
 public class InternalController {
     private final ConfigurationService configurationService;
-
-    @Operation(summary = "Gets all configurations.",
-            description = "Used to get all configurations that are supported by system.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully, returns all configurations.")})
-    @GetMapping("/getAllConfigurations")
-    public ResponseEntity<AllConfigurations> getAllConfigurations() {
-        return ResponseEntity.ok(configurationService.getAllConfigurations());
-    }
 
     @Operation(summary = "Gets system email.",
             description = "Used to get system email which is used for email sender functionality.")

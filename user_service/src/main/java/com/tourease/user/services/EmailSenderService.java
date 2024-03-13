@@ -20,12 +20,10 @@ public class EmailSenderService {
     private final ConfigurationServiceClient configurationServiceClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private JavaMailSender getMailSender(){
+    private JavaMailSender getMailSender(EmailInfoVO emailInfoVO){
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-
-        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
 
         mailSender.setUsername(emailInfoVO.emailFrom());
         mailSender.setPassword(emailInfoVO.emailPassword());
@@ -37,10 +35,8 @@ public class EmailSenderService {
         return mailSender;
     }
 
-    private void sendEmail(String toEmail, String subject, String body) {
-        JavaMailSender mailSender = getMailSender();
-        configurationServiceClient.checkConnection();
-        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+    private void sendEmail(EmailInfoVO emailInfoVO, String toEmail, String subject, String body) {
+        JavaMailSender mailSender = getMailSender(emailInfoVO);
 
         String senderName = "TourEase";
 
@@ -60,6 +56,9 @@ public class EmailSenderService {
     }
 
     public void sendActivationMail(String email) {
+        configurationServiceClient.checkConnection();
+        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+
         String subject = "Please verify your registration";
         String body = "Dear "+email+",<br>"
                 + "Please click the link below to verify your registration:<br>"
@@ -67,15 +66,18 @@ public class EmailSenderService {
                 + "Thank you,<br>"
                 + "TourEase.";
 
-        String verifyURL = "http://localhost:3000/activateProfile?email="+email;
+        String verifyURL = emailInfoVO.activateProfileURL()+email;
 
         body = body.replace("[[URL]]", verifyURL);
-        sendEmail(email, subject, body);
+        sendEmail(emailInfoVO, email, subject, body);
 
         kafkaTemplate.send("email_sender", email, "Activation link send!");
     }
 
     public void sendPassportDateExpiredNotify(String email, String fullName) {
+        configurationServiceClient.checkConnection();
+        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+
         String subject = "Passport date expired";
         String body = "Dear "+fullName+",<br>"
                 + "Your passport has expired<br>"
@@ -83,25 +85,28 @@ public class EmailSenderService {
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">Update passport</a></h3>"
                 + "Thank you,<br>"
                 + "TourEase.";
-        String verifyURL = "http://localhost:3000/profile?passportExpired=1";
+        String verifyURL = emailInfoVO.passportExpiredURL();
 
         body = body.replace("[[URL]]", verifyURL);
-        sendEmail(email, subject, body);
+        sendEmail(emailInfoVO, email, subject, body);
 
         kafkaTemplate.send("email_sender", email, "Passport update notify send!");
     }
 
     public void sendPasswordChangeLink(String email) {
+        configurationServiceClient.checkConnection();
+        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+
         String subject = "Password change";
         String body = "Dear "+email+",<br>"
                 + "Please click the link below to change your password:<br>"
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">Update passport</a></h3>"
                 + "Thank you,<br>"
                 + "TourEase.";
-        String verifyURL = "http://localhost:3000/changePassword?email="+email;
+        String verifyURL = emailInfoVO.changePasswordURL()+email;
 
         body = body.replace("[[URL]]", verifyURL);
-        sendEmail(email, subject, body);
+        sendEmail(emailInfoVO, email, subject, body);
 
         kafkaTemplate.send("email_sender", email, "Password change email send!");
     }

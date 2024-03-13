@@ -5,7 +5,10 @@ import java.util.Map;
 
 public enum Field {
     EMAIL_FROM("emailFrom"),
-    EMAIL_PASSWORD("emailPassword");
+    EMAIL_PASSWORD("emailPassword"),
+    ACTIVATE_PROFILE_URL("activateProfileURL"),
+    PASSPORT_EXPIRED_URL("passportExpiredURL"),
+    CHANGE_PASSWORD_URL("changePasswordURL");
 
     private final String label;
     Field(String label) {

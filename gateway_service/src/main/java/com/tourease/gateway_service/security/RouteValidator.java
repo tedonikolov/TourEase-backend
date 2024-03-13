@@ -46,6 +46,7 @@ public class RouteValidator {
             "/user-service/swagger",
             "/hotel-service/swagger",
             "/configuration-service/swagger",
+            "/configuration-service/admin/**",
             "/logger-service/swagger",
             "/logger-service/admin/**"
     };

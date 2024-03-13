@@ -24,8 +24,11 @@ public class InitialDataSetup implements CommandLineRunner {
         if (configurationRepository.count() == 0) {
             Configuration emailFrom = new Configuration(Field.EMAIL_FROM, "tekanpicha@gmail.com");
             Configuration emailPassword = new Configuration(Field.EMAIL_PASSWORD, "wlmkshrmalmltbxc");
+            Configuration activateProfileURL = new Configuration(Field.ACTIVATE_PROFILE_URL, "http://localhost:3000/activateProfile?email=");
+            Configuration passportExpiredURL = new Configuration(Field.PASSPORT_EXPIRED_URL, "http://localhost:3000/regular/profile?passportExpired=1");
+            Configuration changePasswordURL = new Configuration(Field.CHANGE_PASSWORD_URL, "http://localhost:3000/changePassword?email=");
 
-            configurationRepository.saveAll(List.of(emailFrom, emailPassword));
+            configurationRepository.saveAll(List.of(emailFrom, emailPassword, activateProfileURL, passportExpiredURL, changePasswordURL));
         }
     }
 }
