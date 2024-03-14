@@ -25,7 +25,9 @@ public enum Type {
     UPDATED_OWNER_INFORMATION("Updated owner information."),
     OWNER_CREATED("Owner created."),
     HOTEL_CREATED("Hotel created"),
-    HOTEL_UPDATED("Hotel updated");
+    HOTEL_UPDATED("Hotel updated"),
+    CONFIG_UPDATED("Configurations updated!"),
+    PASSWORD_CHANGED("Password Changed!");
 
     private final String label;
 
