@@ -8,7 +8,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway_service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotel_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotel_service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/logger_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/logger_service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/transport_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/transport_service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user_service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user_service.main.iml" />
     </modules>
   </component>
