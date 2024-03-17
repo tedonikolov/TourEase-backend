@@ -100,7 +100,7 @@ public class EmailSenderService {
         String subject = "Password change";
         String body = "Dear "+email+",<br>"
                 + "Please click the link below to change your password:<br>"
-                + "<h3><a href=\"[[URL]]\" target=\"_self\">Update passport</a></h3>"
+                + "<h3><a href=\"[[URL]]\" target=\"_self\">Change password</a></h3>"
                 + "Thank you,<br>"
                 + "TourEase.";
         String verifyURL = emailInfoVO.changePasswordURL()+email;

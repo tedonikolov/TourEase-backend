@@ -4,6 +4,7 @@ import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.user.models.dto.request.ChangePasswordVO;
 import com.tourease.user.models.dto.request.UserRegistration;
+import com.tourease.user.models.dto.request.WorkerVO;
 import com.tourease.user.models.dto.response.LoginResponse;
 import com.tourease.user.models.dto.response.UserVO;
 import com.tourease.user.models.entities.User;
@@ -99,11 +100,43 @@ public class UserService {
     public void changePassword(ChangePasswordVO changePasswordVO) {
         User user = findEntity(changePasswordVO.email());
         user.setPassword(passwordEncoder.encode(changePasswordVO.password()));
-        if(user.getUserStatus()==UserStatus.INACTIVE){
+        if(user.getUserStatus()==UserStatus.PENDING){
             user.setUserStatus(UserStatus.ACTIVE);
             kafkaTemplate.send("user_service", user.getEmail(), "Profile activated!");
         }
         userRepository.save(user);
         kafkaTemplate.send("user_service", user.getEmail(), "Password Changed!");
+    }
+
+    public Long createUserForWorker(WorkerVO workerVO) {
+        User user = new User();
+        user.setEmail(workerVO.email());
+        user.setUserType(UserType.valueOf(workerVO.workerType().name()));
+        user.setUserStatus(UserStatus.PENDING);
+
+        emailSenderService.sendPasswordChangeLink(user.getEmail());
+        kafkaTemplate.send("user_service", user.getEmail(), "Registration created!");
+
+        return userRepository.save(user).getId();
+    }
+
+    public void changeUserType(Long id, UserType userType){
+        User user = userRepository.findById(id).get();
+        user.setUserType(userType);
+        userRepository.save(user);
+    }
+
+    public void makeInactive(Long id) {
+        User user = userRepository.findById(id).get();
+        user.setUserStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
+        kafkaTemplate.send("user_service", user.getEmail(), "Profile inactive!");
+    }
+
+    public void makeActive(Long id) {
+        User user = userRepository.findById(id).get();
+        user.setUserStatus(UserStatus.ACTIVE);
+        userRepository.save(user);
+        kafkaTemplate.send("user_service", user.getEmail(), "Profile active!");
     }
 }
