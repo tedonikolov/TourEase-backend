@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: createWorker
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: worker
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_worker
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: worker_type
+                  type: VARCHAR(255)
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+              - column:
+                  name: phone
+                  type: VARCHAR(255)
+              - column:
+                  name: registration_date
+                  type: DATE
+              - column:
+                  name: fired_date
+                  type: DATE
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
