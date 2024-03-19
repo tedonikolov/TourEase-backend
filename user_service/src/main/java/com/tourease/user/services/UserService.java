@@ -109,6 +109,9 @@ public class UserService {
     }
 
     public Long createUserForWorker(WorkerVO workerVO) {
+        if(isEmailTaken(workerVO.email())){
+            throw new CustomException("Email already exists", ErrorCode.AlreadyExists);
+        }
         User user = new User();
         user.setEmail(workerVO.email());
         user.setUserType(UserType.valueOf(workerVO.workerType().name()));

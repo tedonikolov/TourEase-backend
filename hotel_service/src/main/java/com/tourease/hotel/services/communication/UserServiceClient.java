@@ -2,12 +2,15 @@ package com.tourease.hotel.services.communication;
 
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
+import com.tourease.configuration.exception.CustomException;
+import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.configuration.exception.InternalServiceException;
 import com.tourease.hotel.models.dto.requests.WorkerRegisterVO;
 import com.tourease.hotel.models.enums.WorkerType;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -26,7 +29,11 @@ public class UserServiceClient {
     }
 
     public Long createWorkerUser(String email, WorkerType workerType) {
-        return restTemplate.postForObject(userServiceUrl + "/internal/createUserForWorker", new HttpEntity<>(new WorkerRegisterVO(email,workerType)), Long.class);
+        try {
+            return restTemplate.postForObject(userServiceUrl + "/internal/createUserForWorker", new HttpEntity<>(new WorkerRegisterVO(email,workerType)), Long.class);
+        }catch (HttpClientErrorException exception){
+            throw new CustomException("Email already exists", ErrorCode.AlreadyExists);
+        }
     }
 
     public void fireWorker(Long id) {
