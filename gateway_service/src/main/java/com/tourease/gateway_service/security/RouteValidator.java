@@ -37,10 +37,6 @@ public class RouteValidator {
             "/hotel-service/hotel/**",
     };
 
-    public final String[] transportAllowedUrlMatchers = {
-            "/user-service/transport/*",
-    };
-
     public final String[] adminAllowedUrlMatchers = {
             "/user-service/admin/**",
             "/user-service/swagger",

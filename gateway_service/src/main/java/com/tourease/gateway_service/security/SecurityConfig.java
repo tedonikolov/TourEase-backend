@@ -82,8 +82,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(routeValidator.openUrlMatchers).permitAll()
                         .pathMatchers(routeValidator.regularAllowedUrlMatchers).hasAuthority(REGULAR.name())
-                        .pathMatchers(routeValidator.hotelAllowedUrlMatchers).hasAuthority(HOTEL.name())
-                        .pathMatchers(routeValidator.transportAllowedUrlMatchers).hasAuthority(TRANSPORT.name())
+                        .pathMatchers(routeValidator.hotelAllowedUrlMatchers).hasAnyAuthority(HOTEL.name(),MANAGER.name(), RECEPTIONIST.name())
                         .pathMatchers(routeValidator.adminAllowedUrlMatchers).hasAuthority(ADMIN.name())
                         .pathMatchers(routeValidator.allowedUrlMatchers).authenticated()
                         .anyExchange().denyAll()
