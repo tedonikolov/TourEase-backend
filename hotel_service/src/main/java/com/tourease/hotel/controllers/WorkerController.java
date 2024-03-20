@@ -1,6 +1,7 @@
 package com.tourease.hotel.controllers;
 
 import com.tourease.hotel.models.dto.requests.WorkerVO;
+import com.tourease.hotel.models.dto.response.WorkerInfo;
 import com.tourease.hotel.services.WorkerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +26,16 @@ public class WorkerController {
     public ResponseEntity<Void> save(@RequestBody @Valid WorkerVO workerVO) {
         workerService.save(workerVO);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Create/update worker",
+            summary = "Create/update worker")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful saved type")
+    })
+    @GetMapping("/getWorker/{email}")
+    public ResponseEntity<WorkerInfo> getWorkerByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(workerService.getWorkerByEmail(email));
     }
 
     @Operation(description = "Delete type by id",

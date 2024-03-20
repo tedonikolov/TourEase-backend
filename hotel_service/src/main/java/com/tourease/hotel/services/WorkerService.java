@@ -1,6 +1,7 @@
 package com.tourease.hotel.services;
 
 import com.tourease.hotel.models.dto.requests.WorkerVO;
+import com.tourease.hotel.models.dto.response.WorkerInfo;
 import com.tourease.hotel.models.entities.Hotel;
 import com.tourease.hotel.models.entities.Worker;
 import com.tourease.hotel.models.mappers.WorkerMapper;
@@ -60,5 +61,11 @@ public class WorkerService {
         worker.setFiredDate(null);
 
         workerRepository.save(worker);
+    }
+
+    public WorkerInfo getWorkerByEmail(String email) {
+        Worker worker = workerRepository.findByEmail(email);
+
+        return new WorkerInfo(worker);
     }
 }
