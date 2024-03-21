@@ -17,6 +17,7 @@ public enum Type {
     PASSPORT_CREATED("Passport info created!"),
     PASSPORT_UPDATED("Passport info updated!"),
     PROFILE_ACTIVATE("Profile activated!"),
+    PROFILE_INACTIVATE("Profile active!"),
     LOGIN_INACTIVE_PROFILE("Tried to login in inactive profile!"),
     ALREADY_EXISTING_PROFILE("Tried to register already registered profile!"),
     ACTIVATION_LINK_SEND("Activation link send!"),

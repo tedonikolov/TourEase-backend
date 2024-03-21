@@ -140,6 +140,6 @@ public class UserService {
         User user = userRepository.findById(id).get();
         user.setUserStatus(UserStatus.ACTIVE);
         userRepository.save(user);
-        kafkaTemplate.send("user_service", user.getEmail(), "Profile active!");
+        kafkaTemplate.send("user_service", user.getEmail(), "Profile activated!");
     }
 }
