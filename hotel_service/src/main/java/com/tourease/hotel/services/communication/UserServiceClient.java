@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @AllArgsConstructor
 public class UserServiceClient {
-    private final RestTemplate restTemplate;
+    private final RestTemplate defaultRestTemplate;
     private final EurekaClient eurekaClient;
 
     private final String userAppName = "USER-SERVICE";
@@ -30,22 +30,22 @@ public class UserServiceClient {
 
     public Long createWorkerUser(String email, WorkerType workerType) {
         try {
-            return restTemplate.postForObject(userServiceUrl + "/internal/createUserForWorker", new HttpEntity<>(new WorkerRegisterVO(email,workerType)), Long.class);
+            return defaultRestTemplate.postForObject(userServiceUrl + "/internal/createUserForWorker", new HttpEntity<>(new WorkerRegisterVO(email,workerType)), Long.class);
         }catch (HttpClientErrorException exception){
             throw new CustomException("Email already exists", ErrorCode.AlreadyExists);
         }
     }
 
     public void fireWorker(Long id) {
-        restTemplate.postForLocation(userServiceUrl + "/internal/fireWorker/"+id,null);
+        defaultRestTemplate.postForLocation(userServiceUrl + "/internal/fireWorker/"+id,null);
     }
 
     public void reassignWorker(Long id) {
-        restTemplate.postForLocation(userServiceUrl + "/internal/reassignWorker/"+id,null);
+        defaultRestTemplate.postForLocation(userServiceUrl + "/internal/reassignWorker/"+id,null);
     }
 
     public void changeUserType(Long id, WorkerType workerType) {
-        restTemplate.postForLocation(userServiceUrl + "/internal/changeUserType/"+id, new HttpEntity<>(workerType));
+        defaultRestTemplate.postForLocation(userServiceUrl + "/internal/changeUserType/"+id, new HttpEntity<>(workerType));
     }
 
 }

@@ -38,6 +38,8 @@ dependencies {
     implementation 'com.github.usefulness:webp-imageio:0.5.1'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.8.0'
     implementation 'com.neovisionaries:nv-i18n:1.11'
+    // https://mvnrepository.com/artifact/me.paulschwarz/spring-dotenv
+    implementation 'me.paulschwarz:spring-dotenv:2.5.4'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

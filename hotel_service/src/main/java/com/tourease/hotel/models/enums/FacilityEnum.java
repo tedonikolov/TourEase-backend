@@ -4,8 +4,10 @@ public enum FacilityEnum {
     WIFI,
     PARKING,
     SWIMMING_POOL,
+    POOL,
     INSIDE_SWIMMING_POOL,
     GYM,
+    FITNESS,
     SPA,
     ROOM_SERVICE,
     AIR_CONDITIONING,
@@ -13,6 +15,7 @@ public enum FacilityEnum {
     CONFERENCE_ROOM,
     CHILDREN_PLAYGROUND,
     PET_FRIENDLY,
+    PETS,
     BEACH_ACCESS,
     SHUTTLE_SERVICE,
     LAUNDRY,
@@ -23,6 +26,7 @@ public enum FacilityEnum {
     LUNCH,
     CHILD_LUNCH,
     DINNER,
-    CHILD_DINNER
+    CHILD_DINNER,
+    IRON
 }
 
