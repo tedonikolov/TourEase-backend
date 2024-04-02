@@ -144,11 +144,15 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(255)
+                  type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
-                    primaryKeyName: pk_customer
+                    primaryKeyName: pk_customer_id
+              - column:
+                  name: passport_id
+                  type: VARCHAR(255)
               - column:
                   name: birth_date
                   type: DATE
@@ -213,7 +217,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: customer_id
-                  type: VARCHAR(255)
+                  type: BIGINT
                   constraints:
                     nullable: false
                     foreignKeyName: fk_customer_id

@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "room", schema = "public")
@@ -31,4 +33,14 @@ public class Room {
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Reservation> reservations = new LinkedHashSet<>();
+
+    public Room(String name, List<Type> types, Hotel hotel) {
+        this.name = name;
+        this.types = types;
+        this.hotel = hotel;
+    }
 }

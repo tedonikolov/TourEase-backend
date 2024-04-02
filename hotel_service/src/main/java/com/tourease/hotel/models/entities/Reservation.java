@@ -1,9 +1,9 @@
 package com.tourease.hotel.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tourease.hotel.models.enums.ReservationStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -18,27 +18,40 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "reservation", schema = "public")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+    private Long reservationNumber;
 
     @CreationTimestamp
     private OffsetDateTime creationDate;
     private OffsetDateTime checkIn;
     private OffsetDateTime checkOut;
+    private int nights;
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private Currency currency;
+    private boolean paid;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
 
     @ManyToOne()
-    @JoinColumn(name = "hotel_id")
+    @JoinColumn(name = "room_id")
     @JsonIgnore
-    private Hotel hotel;
+    private Room room;
 
     @ManyToMany(mappedBy = "reservations")
     private Set<Customer> customers = new LinkedHashSet<>();
+
+    @ManyToOne()
+    @JoinColumn(name = "worker_id")
+    @JsonIgnore
+    private Worker worker;
 
     @Override
     public final boolean equals(Object o) {

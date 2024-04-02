@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "worker")
@@ -33,4 +35,8 @@ public class Worker {
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;
+
+    @OneToMany(mappedBy = "worker", orphanRemoval = true)
+    private List<Reservation> reservations = new ArrayList<>();
+
 }
