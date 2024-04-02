@@ -1,5 +1,7 @@
 package com.tourease.hotel.services;
 
+import com.tourease.configuration.exception.CustomException;
+import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.dto.requests.TypeVO;
 import com.tourease.hotel.models.entities.Bed;
 import com.tourease.hotel.models.entities.Hotel;
@@ -38,5 +40,9 @@ public class TypeService {
 
     public void delete(Long id) {
         typeRepository.deleteById(id);
+    }
+
+    public Type findById(Long id) {
+        return typeRepository.findById(id).orElseThrow(() -> new CustomException("Type not found", ErrorCode.EntityNotFound));
     }
 }

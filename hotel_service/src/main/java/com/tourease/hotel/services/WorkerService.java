@@ -68,4 +68,8 @@ public class WorkerService {
 
         return new WorkerInfo(worker);
     }
+
+    public Worker findById(Long id) {
+        return workerRepository.findById(id).orElseThrow(() -> new RuntimeException("Worker not found"));
+    }
 }

@@ -22,19 +22,19 @@ public class RoomService {
     private final HotelRepository hotelRepository;
     private final TypeRepository typeRepository;
 
-    public void save(RoomVO roomVO){
+    public void save(RoomVO roomVO) {
         Hotel hotel = hotelRepository.findById(roomVO.hotelId()).get();
         List<Type> types = typeRepository.findAllById(roomVO.types());
         Room room;
 
-        if(roomVO.id()==0){
-            if(roomRepository.findByNameAndHotel_Id(roomVO.name(), roomVO.hotelId()).isPresent()){
+        if (roomVO.id() == 0) {
+            if (roomRepository.findByNameAndHotel_Id(roomVO.name(), roomVO.hotelId()).isPresent()) {
                 throw new CustomException("Room exist", ErrorCode.AlreadyExists);
             }
-            room = RoomMapper.toEntity(roomVO,hotel);
-        }else {
+            room = RoomMapper.toEntity(roomVO, hotel);
+        } else {
             room = roomRepository.findById(roomVO.id()).get();
-            RoomMapper.updateEntity(room,roomVO);
+            RoomMapper.updateEntity(room, roomVO);
         }
 
         room.setTypes(types);
@@ -43,5 +43,9 @@ public class RoomService {
 
     public void delete(Long id) {
         roomRepository.deleteById(id);
+    }
+
+    public Room findById(Long id) {
+        return roomRepository.findById(id).orElseThrow(() -> new CustomException("Room not found", ErrorCode.EntityNotFound));
     }
 }
