@@ -1,5 +1,6 @@
 package com.tourease.hotel.controllers;
 
+import com.tourease.hotel.models.custom.IndexVM;
 import com.tourease.hotel.models.dto.requests.FilterHotelListing;
 import com.tourease.hotel.models.dto.requests.HotelCreateVO;
 import com.tourease.hotel.models.dto.response.HotelPreview;
@@ -15,8 +16,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/hotel")
@@ -44,7 +43,7 @@ public class HotelController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieve information")
     })
     @GetMapping("/listing")
-    public ResponseEntity<List<HotelPreview>> getHotelListing(@Parameter(name = "filter", in = ParameterIn.QUERY) FilterHotelListing filterHotelListing){
+    public ResponseEntity<IndexVM<HotelPreview>> getHotelListing(@Parameter(name = "filter", in = ParameterIn.QUERY) FilterHotelListing filterHotelListing){
 
         return ResponseEntity.ok(hotelService.listing(filterHotelListing));
     }

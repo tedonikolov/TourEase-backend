@@ -4,6 +4,7 @@ import com.tourease.hotel.models.enums.FacilityEnum;
 import com.tourease.hotel.models.enums.Stars;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public record FilterHotelListing(String country,
@@ -14,5 +15,8 @@ public record FilterHotelListing(String country,
                                  List<FacilityEnum> facilities,
                                  Integer people,
                                  BigDecimal fromPrice,
-                                 BigDecimal toPrice) {
+                                 BigDecimal toPrice,
+                                 OffsetDateTime fromDate,
+                                 OffsetDateTime toDate,
+                                 int pageNumber) {
 }

@@ -2,6 +2,7 @@ package com.tourease.hotel.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
+import com.tourease.hotel.models.custom.IndexVM;
 import com.tourease.hotel.models.dto.requests.FilterHotelListing;
 import com.tourease.hotel.models.dto.requests.HotelCreateVO;
 import com.tourease.hotel.models.dto.response.HotelPreview;
@@ -9,7 +10,10 @@ import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.mappers.HotelMapper;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.repositories.ImageRepository;
+import com.tourease.hotel.repositories.ReservationRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 public class HotelService {
     private final HotelRepository hotelRepository;
     private final ImageRepository imageRepository;
+    private final ReservationRepository reservationRepository;
     private final OwnerService ownerService;
     private final LocationService locationService;
     private final KafkaTemplate<String, String> kafkaTemplate;
@@ -49,26 +54,63 @@ public class HotelService {
         return hotelRepository.findById(id).orElseThrow(() -> new CustomException("Hotel not found", ErrorCode.EntityNotFound));
     }
 
-    public List<HotelPreview> listing(FilterHotelListing filterHotelListing) {
+    public IndexVM<HotelPreview> listing(FilterHotelListing filterHotelListing) {
         List<Hotel> hotelsList = hotelRepository.findHotelByFilter(filterHotelListing.country(),
                 filterHotelListing.city(), filterHotelListing.address(),
-               filterHotelListing.name(), filterHotelListing.stars(),
-               filterHotelListing.facilities());
+                filterHotelListing.name(), filterHotelListing.stars(),
+                filterHotelListing.facilities());
 
         List<HotelPreview> hotels = new ArrayList<>();
 
         for (Hotel hotel : hotelsList) {
-            List<Image> images = imageRepository.findByHotel_Id(hotel.getId());
-
             Set<Type> types = hotel.getTypes().stream().filter(type -> filterTypePrice(type, filterHotelListing) && filterTypePeople(type, filterHotelListing)).collect(Collectors.toSet());
 
             if (!types.isEmpty()) {
-                HotelPreview hotelPreview = new HotelPreview(hotel, types, images.size() < 5 ? images : images.subList(0, 5));
+                HotelPreview hotelPreview = new HotelPreview(hotel, types);
                 hotels.add(hotelPreview);
             }
         }
 
-        return hotels;
+        List<HotelPreview> listing = new ArrayList<>();
+
+        if(hotels.size()>10) {
+            for (int i = filterHotelListing.pageNumber() * 10 - 10; i < hotels.size(); i++) {
+                if (filterHotelListing.fromDate() != null && filterHotelListing.toDate() != null) {
+                    Set<Type> types = hotels.get(i).getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
+                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.fromDate(), filterHotelListing.fromDate().plusDays(1),
+                                            filterHotelListing.toDate(), filterHotelListing.toDate().minusDays(1)).isEmpty())
+                            .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
+                    if (types.isEmpty())
+                        continue;
+
+                    hotels.get(i).setTypes(types);
+                }
+
+                List<Image> images = imageRepository.findByHotel_Id(hotels.get(i).getHotelId());
+                hotels.get(i).setImages(images.stream().map(Image::getUrl).collect(Collectors.toList()));
+
+                listing.add(hotels.get(i));
+                if(listing.size()==10)
+                    break;
+            }
+        } else {
+            for (HotelPreview hotel : hotels) {
+                if (filterHotelListing.fromDate() != null && filterHotelListing.toDate() != null) {
+                    Set<Type> types = hotel.getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
+                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.fromDate(), filterHotelListing.fromDate().plusDays(1),
+                                            filterHotelListing.toDate(), filterHotelListing.toDate().minusDays(1)).isEmpty())
+                            .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
+                    if (types.isEmpty())
+                        continue;
+                    hotel.setTypes(types);
+                }
+                List<Image> images = imageRepository.findByHotel_Id(hotel.getHotelId());
+                hotel.setImages(images.stream().map(Image::getUrl).collect(Collectors.toList()));
+                listing.add(hotel);
+            }
+        }
+
+        return new IndexVM<>(new PageImpl<>(listing, PageRequest.of(filterHotelListing.pageNumber()-1, 10), hotels.size()));
     }
 
     private boolean filterTypePrice(Type type, FilterHotelListing filter) {
