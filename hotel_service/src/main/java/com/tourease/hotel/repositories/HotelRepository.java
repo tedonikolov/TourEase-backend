@@ -11,12 +11,14 @@ import java.util.List;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
-    @Query(value = "SELECT distinct h from Hotel h " +
-            "JOIN Location l on l.id=h.id " +
-            "JOIN Facility f on f.hotel.id=h.id " +
-            "JOIN Bed b on b.hotel.id=h.id " +
-            "JOIN Type t on t.hotel.id=h.id " +
-            "LEFT JOIN Rating r on r.hotel.id=h.id " +
+    @Query(value = "SELECT DISTINCT h from Hotel h " +
+            "JOIN FETCH h.types t " +
+            "JOIN FETCH h.beds b " +
+            "JOIN Location l on h.id=l.id " +
+            "JOIN Facility f on h.id=f.hotel.id " +
+            "LEFT JOIN b.types bt " +
+            "LEFT JOIN t.beds tb " +
+            "LEFT JOIN Rating r on h.id=r.hotel.id " +
             "WHERE (lower(l.country) LIKE concat('%',lower(:country),'%') OR :country IS NULL)" +
             "AND ((lower(l.city) LIKE concat('%',lower(:city),'%') OR :city IS NULL)" +
             "AND (lower(l.address) LIKE concat('%',lower(:address),'%') OR :address IS NULL))" +

@@ -30,8 +30,8 @@ public class Type {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @ManyToMany
-    @JoinTable(name = "type_beds",
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "type_beds", schema = "public",
             joinColumns = @JoinColumn(name = "type_id"),
             inverseJoinColumns = @JoinColumn(name = "beds_id"))
     private List<Bed> beds = new ArrayList<>() {};

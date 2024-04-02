@@ -28,7 +28,7 @@ public class Bed {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @ManyToMany(mappedBy = "beds")
+    @ManyToMany(mappedBy = "beds",fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Type> types = new LinkedHashSet<>();
 
