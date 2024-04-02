@@ -25,4 +25,10 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             "AND (:facilities IS NULL OR f.name in :facilities) " +
             "ORDER BY h.id")
     List<Hotel> findHotelByFilter(String country, String city, String address, String name, Stars stars, List<FacilityEnum> facilities);
+
+    @Query(value = "SELECT DISTINCT h from Hotel h " +
+            "JOIN FETCH h.types t " +
+            "JOIN FETCH h.beds b " +
+            "ORDER BY h.id")
+    List<Hotel> getAll();
 }
