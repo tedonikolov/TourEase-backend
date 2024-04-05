@@ -11,6 +11,7 @@ import com.tourease.user.models.entities.User;
 import com.tourease.user.models.enums.UserStatus;
 import com.tourease.user.models.enums.UserType;
 import com.tourease.user.repositories.UserRepository;
+import com.tourease.user.services.communication.AuthenticationServiceClient;
 import com.tourease.user.services.communication.HotelServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,6 +25,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailSenderService emailSenderService;
     private final HotelServiceClient hotelServiceClient;
+    private final AuthenticationServiceClient authenticationServiceClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public LoginResponse authorize(String username, String password) {
@@ -56,7 +58,12 @@ public class UserService {
         emailSenderService.sendActivationMail(user.getEmail());
     }
 
-    public void activateUser(String email) {
+    public void activateUser(String token) {
+        authenticationServiceClient.checkConnection();
+        String email = authenticationServiceClient.retrieveEmailFromToken(token);
+        if (email==null)
+            throw new CustomException("Invalid token", ErrorCode.Failed);
+
         User user = findEntity(email);
 
         switch (user.getUserStatus()) {
@@ -98,7 +105,13 @@ public class UserService {
     }
 
     public void changePassword(ChangePasswordVO changePasswordVO) {
-        User user = findEntity(changePasswordVO.email());
+        authenticationServiceClient.checkConnection();
+        String email = authenticationServiceClient.retrieveEmailFromToken(changePasswordVO.email());
+
+        if (email==null)
+            throw new CustomException("Couldn't change password!", ErrorCode.Failed);
+
+        User user = findEntity(email);
         user.setPassword(passwordEncoder.encode(changePasswordVO.password()));
         if(user.getUserStatus()==UserStatus.PENDING){
             user.setUserStatus(UserStatus.ACTIVE);

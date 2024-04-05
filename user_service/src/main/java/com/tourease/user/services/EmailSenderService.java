@@ -1,6 +1,7 @@
 package com.tourease.user.services;
 
 import com.tourease.user.models.dto.request.EmailInfoVO;
+import com.tourease.user.services.communication.AuthenticationServiceClient;
 import com.tourease.user.services.communication.ConfigurationServiceClient;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -18,6 +19,7 @@ import java.util.Properties;
 @AllArgsConstructor
 public class EmailSenderService {
     private final ConfigurationServiceClient configurationServiceClient;
+    private final AuthenticationServiceClient authenticationServiceClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     private JavaMailSender getMailSender(EmailInfoVO emailInfoVO){
@@ -57,7 +59,10 @@ public class EmailSenderService {
 
     public void sendActivationMail(String email) {
         configurationServiceClient.checkConnection();
+        authenticationServiceClient.checkConnection();
+
         EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+        String token = authenticationServiceClient.generateTokenForEmail(email);
 
         String subject = "Please verify your registration";
         String body = "Dear "+email+",<br>"
@@ -66,7 +71,7 @@ public class EmailSenderService {
                 + "Thank you,<br>"
                 + "TourEase.";
 
-        String verifyURL = emailInfoVO.activateProfileURL()+email;
+        String verifyURL = emailInfoVO.activateProfileURL()+token;
 
         body = body.replace("[[URL]]", verifyURL);
         sendEmail(emailInfoVO, email, subject, body);
@@ -76,6 +81,7 @@ public class EmailSenderService {
 
     public void sendPassportDateExpiredNotify(String email, String fullName) {
         configurationServiceClient.checkConnection();
+
         EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
 
         String subject = "Passport date expired";
@@ -95,7 +101,9 @@ public class EmailSenderService {
 
     public void sendPasswordChangeLink(String email) {
         configurationServiceClient.checkConnection();
+        authenticationServiceClient.checkConnection();
         EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+        String token = authenticationServiceClient.generateTokenForEmail(email);
 
         String subject = "Password change";
         String body = "Dear "+email+",<br>"
@@ -103,7 +111,7 @@ public class EmailSenderService {
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">Change password</a></h3>"
                 + "Thank you,<br>"
                 + "TourEase.";
-        String verifyURL = emailInfoVO.changePasswordURL()+email;
+        String verifyURL = emailInfoVO.changePasswordURL()+token;
 
         body = body.replace("[[URL]]", verifyURL);
         sendEmail(emailInfoVO, email, subject, body);
