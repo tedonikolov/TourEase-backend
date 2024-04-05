@@ -3,6 +3,7 @@ package com.tourease.gateway_service.security;
 import com.google.gson.Gson;
 import com.tourease.gateway_service.models.UserData;
 import com.tourease.gateway_service.models.UsernamePassword;
+import com.tourease.gateway_service.services.CommunicationAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,17 +56,14 @@ public class SecurityConfig {
     @Autowired
     private AuthManager authManager;
     @Autowired
-    private SessionHeaderResolver sessionHeaderResolver;
-
-    @Autowired
     private RouteValidator routeValidator;
-
+    @Autowired
+    private CommunicationAuthentication communicationAuthentication;
     private static final String FRONTEND_LOCALHOST = "http://localhost:3000";
 
     @Bean
     public WebSessionManager webSessionManager() {
-        DefaultWebSessionManager webSessionManager = new DefaultWebSessionManager();
-        webSessionManager.setSessionIdResolver(sessionHeaderResolver);
+        DefaultWebSessionManager webSessionManager = new TokenReaderWebSessionManager();
         webSessionManager.setSessionStore(webSessionStore);
         return webSessionManager;
     }
@@ -133,6 +131,12 @@ public class SecurityConfig {
                     sessionRegistry.registerNewSession(webSession.getId(), authentication.getPrincipal());
                     return webSession;
                 })
+                .flatMap(webSession->communicationAuthentication.generateToken(webSession.getId())
+                        .doOnSuccess(jws -> exchange.getExchange().getResponse().getHeaders().set("Authorization", jws))
+                        .onErrorResume(e -> {
+                            System.out.println("Error generating token: " + e);
+                            return Mono.empty();
+                        }))
                 .then(exchange.getExchange().getResponse().writeWith(Flux.just(buffer)));
     }
 
