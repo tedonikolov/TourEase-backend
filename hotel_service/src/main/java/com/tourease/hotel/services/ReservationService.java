@@ -86,4 +86,26 @@ public class ReservationService {
         }));
         return reservations.stream().map(SchemaReservationsVO::new).toList();
     }
+
+    public void changeReservationStatusToEnding() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        for (Reservation reservation : reservations) {
+            if (reservation.getStatus().equals(ReservationStatus.ACCOMMODATED) &&
+                    reservation.getCheckOut().isBefore(OffsetDateTime.from(OffsetDateTime.now().plusDays(1)))) {
+                reservation.setStatus(ReservationStatus.ENDING);
+                reservationRepository.save(reservation);
+            }
+        }
+    }
+
+    public void changeReservationStatusToNoShow() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        for (Reservation reservation : reservations) {
+            if ((reservation.getStatus().equals(ReservationStatus.PENDING) || reservation.getStatus().equals(ReservationStatus.CONFIRMED))
+                    && reservation.getCheckIn().isBefore(OffsetDateTime.from(OffsetDateTime.now()))) {
+                reservation.setStatus(ReservationStatus.NO_SHOW);
+                reservationRepository.save(reservation);
+            }
+        }
+    }
 }
