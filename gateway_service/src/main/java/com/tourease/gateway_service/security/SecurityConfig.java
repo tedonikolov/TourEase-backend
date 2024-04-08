@@ -76,15 +76,16 @@ public class SecurityConfig {
                         logout.logoutUrl("/logout")
                                 .logoutHandler(new WebSessionServerLogoutHandler())
                                 .logoutSuccessHandler(getServerLogoutSuccessHandler())
-                        )
+                )
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(routeValidator.openUrlMatchers).permitAll()
                         .pathMatchers(routeValidator.regularAllowedUrlMatchers).hasAuthority(REGULAR.name())
-                        .pathMatchers(routeValidator.hotelAllowedUrlMatchers).hasAnyAuthority(HOTEL.name(),MANAGER.name(), RECEPTIONIST.name())
+                        .pathMatchers(routeValidator.hotelAllowedUrlMatchers).hasAnyAuthority(HOTEL.name(), MANAGER.name(), RECEPTIONIST.name())
+                        .pathMatchers(routeValidator.workingEndpointsAllowedUrlMatchers).hasAnyAuthority(MANAGER.name(), RECEPTIONIST.name())
                         .pathMatchers(routeValidator.adminAllowedUrlMatchers).hasAuthority(ADMIN.name())
                         .pathMatchers(routeValidator.allowedUrlMatchers).authenticated()
                         .anyExchange().denyAll()
-                        );
+                );
         return http.build();
     }
 
@@ -131,7 +132,7 @@ public class SecurityConfig {
                     sessionRegistry.registerNewSession(webSession.getId(), authentication.getPrincipal());
                     return webSession;
                 })
-                .flatMap(webSession->communicationAuthentication.generateToken(webSession.getId())
+                .flatMap(webSession -> communicationAuthentication.generateToken(webSession.getId())
                         .doOnSuccess(jws -> exchange.getExchange().getResponse().getHeaders().set("Authorization", jws))
                         .onErrorResume(e -> {
                             System.out.println("Error generating token: " + e);

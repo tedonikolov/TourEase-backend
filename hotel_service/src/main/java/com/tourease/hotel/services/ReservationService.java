@@ -3,6 +3,7 @@ package com.tourease.hotel.services;
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
+import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.WorkerType;
@@ -12,7 +13,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -67,5 +72,18 @@ public class ReservationService {
         } else {
             throw new CustomException("Room is already taken", ErrorCode.AlreadyExists);
         }
+    }
+
+    public List<SchemaReservationsVO> getAllReservationsViewByHotel(Long hotelId, LocalDate date) {
+        LocalDate plusDay = date.plusDays(1);
+        List<Reservation> reservations = reservationRepository.findAllByRoomHotelIdAndDate(hotelId, date, plusDay);
+        reservations.sort(Comparator.comparing((Reservation r) -> switch (r.getStatus()) {
+            case FINISHED -> 1;
+            case CONFIRMED -> 2;
+            case ACCOMMODATED -> 3;
+            case ENDING -> 4;
+            default -> 0;
+        }));
+        return reservations.stream().map(SchemaReservationsVO::new).toList();
     }
 }
