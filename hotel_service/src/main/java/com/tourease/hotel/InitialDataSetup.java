@@ -3,6 +3,7 @@ package com.tourease.hotel;
 import com.tourease.hotel.models.entities.Hotel;
 import com.tourease.hotel.models.entities.Room;
 import com.tourease.hotel.models.entities.Type;
+import com.tourease.hotel.models.enums.RoomStatus;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.services.communication.BookingApiClient;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class InitialDataSetup implements CommandLineRunner {
                     List<Type> types = new ArrayList<>();
                     types.add(type);
 
-                    rooms.add(new Room( Integer.toString(number), types, hotel));
+                    rooms.add(new Room(Integer.toString(number), RoomStatus.FREE, types, hotel));
                 }
                 j++;
             }

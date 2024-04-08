@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeRoomStatus
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: room
+            columns:
+              - column:
+                  name: status
+                  type: VARCHAR(255)

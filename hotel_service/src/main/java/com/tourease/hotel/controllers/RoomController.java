@@ -36,4 +36,15 @@ public class RoomController {
         roomService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(description = "Change room status by id",
+            summary = "Change room status by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful changed room status")
+    })
+    @PutMapping("changeStatus/{id}")
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id) {
+        roomService.changeStatus(id);
+        return ResponseEntity.ok().build();
+    }
 }

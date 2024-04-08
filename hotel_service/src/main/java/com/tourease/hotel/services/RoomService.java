@@ -6,6 +6,7 @@ import com.tourease.hotel.models.dto.requests.RoomVO;
 import com.tourease.hotel.models.entities.Hotel;
 import com.tourease.hotel.models.entities.Room;
 import com.tourease.hotel.models.entities.Type;
+import com.tourease.hotel.models.enums.RoomStatus;
 import com.tourease.hotel.models.mappers.RoomMapper;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.repositories.RoomRepository;
@@ -47,5 +48,17 @@ public class RoomService {
 
     public Room findById(Long id) {
         return roomRepository.findById(id).orElseThrow(() -> new CustomException("Room not found", ErrorCode.EntityNotFound));
+    }
+
+    public void changeStatus(Long id) {
+        Room room = roomRepository.findById(id).orElseThrow(() -> new CustomException("Room not found", ErrorCode.EntityNotFound));
+        if(room.getStatus()==null)
+            room.setStatus(RoomStatus.FREE);
+        switch (room.getStatus()) {
+            case FREE -> room.setStatus(RoomStatus.CLEANING);
+            case CLEANING -> room.setStatus(RoomStatus.MAINTENANCE);
+            case MAINTENANCE -> room.setStatus(RoomStatus.FREE);
+        }
+        roomRepository.save(room);
     }
 }
