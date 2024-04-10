@@ -3,7 +3,7 @@ package com.tourease.hotel.models.dto.requests;
 import java.time.LocalDate;
 
 public record CustomerDTO(String fullName,
-                          String phone,
+                          String phoneNumber,
                           String passportId,
                           LocalDate birthDate,
                           LocalDate creationDate,

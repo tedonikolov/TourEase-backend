@@ -20,7 +20,7 @@ public class CustomerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful saved room")
     })
-    @PostMapping("/getCustomerByPassportId/{passportId}")
+    @GetMapping("/getCustomerByPassportId/{passportId}")
     public ResponseEntity<CustomerDTO> getCustomerByPassportId(@PathVariable String passportId) {
         return ResponseEntity.ok(customerService.getCustomerByPassportId(passportId));
     }

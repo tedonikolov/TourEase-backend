@@ -1,5 +1,6 @@
 package com.tourease.hotel.controllers;
 
+import com.tourease.hotel.models.dto.requests.CustomerDTO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.services.ReservationService;
@@ -38,5 +39,16 @@ public class ReservationController {
     @GetMapping("/worker/getAllReservationsViewByHotel")
     public ResponseEntity<List<SchemaReservationsVO>> getAllReservationsViewByHotel(@RequestHeader Long hotelId, @RequestParam LocalDate date) {
         return ResponseEntity.ok(reservationService.getAllReservationsViewByHotel(hotelId, date));
+    }
+
+    @Operation(description = "Create/update customer",
+            summary = "Create/update customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful saved room")
+    })
+    @PostMapping("/worker/addCustomer")
+    public ResponseEntity<Void> addCustomerToReservation(@RequestHeader Long reservationId, @RequestBody CustomerDTO customerDTO) {
+        reservationService.addCustomerToReservation(reservationId, customerDTO);
+        return ResponseEntity.ok().build();
     }
 }

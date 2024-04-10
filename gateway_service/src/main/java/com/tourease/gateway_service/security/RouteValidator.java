@@ -42,6 +42,8 @@ public class RouteValidator {
             "/hotel-service/reservation/worker/getAllReservationsViewByHotel",
             "/hotel-service/hotel/room/changeStatus",
             "/hotel-service/hotel/room/changeStatus/*",
+            "/hotel-service/hotel/customer/getCustomerByPassportId",
+            "/hotel-service/hotel/customer/getCustomerByPassportId/*",
     };
 
     public final String[] adminAllowedUrlMatchers = {

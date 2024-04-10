@@ -1,7 +1,5 @@
 package com.tourease.hotel.services;
 
-import com.tourease.configuration.exception.CustomException;
-import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.dto.requests.CustomerDTO;
 import com.tourease.hotel.models.entities.Customer;
 import com.tourease.hotel.models.mappers.CustomerMapper;
@@ -24,7 +22,7 @@ public class CustomerService {
         Customer customer = findByPassportId(passportId);
 
         if (customer == null) {
-            throw new CustomException("Customer not found", ErrorCode.EntityNotFound);
+            return null;
         }
 
         return CustomerMapper.toModel(customer);
@@ -32,5 +30,10 @@ public class CustomerService {
 
     public Customer findByPassportId(String passportId) {
         return customerRepository.findByPassportId(passportId).orElse(null);
+    }
+
+    public void updateCustomer(Customer customer, CustomerDTO customerDTO) {
+        CustomerMapper.updateEntity(customer, customerDTO);
+        customerRepository.save(customer);
     }
 }

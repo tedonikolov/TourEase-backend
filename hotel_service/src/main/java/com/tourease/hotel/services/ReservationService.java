@@ -2,6 +2,7 @@ package com.tourease.hotel.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
+import com.tourease.hotel.models.dto.requests.CustomerDTO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.models.entities.*;
@@ -107,5 +108,20 @@ public class ReservationService {
                 reservationRepository.save(reservation);
             }
         }
+    }
+
+    public void addCustomerToReservation(Long reservationId, CustomerDTO customerDTO) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
+        Customer customer = customerService.findByPassportId(customerDTO.passportId());
+
+        if (customer == null) {
+            customer = customerService.createCustomer(customerDTO);
+        } else
+            customerService.updateCustomer(customer, customerDTO);
+
+        reservation.getCustomers().add(customer);
+        customer.getReservations().add(reservation);
+
+        reservationRepository.save(reservation);
     }
 }

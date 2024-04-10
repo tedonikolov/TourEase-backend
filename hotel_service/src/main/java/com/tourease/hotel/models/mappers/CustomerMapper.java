@@ -7,7 +7,7 @@ public class CustomerMapper {
     public static Customer toEntity(CustomerDTO customerDTO) {
         return Customer.builder()
                 .fullName(customerDTO.fullName())
-                .phoneNumber(customerDTO.phone())
+                .phoneNumber(customerDTO.phoneNumber())
                 .passportId(customerDTO.passportId())
                 .birthDate(customerDTO.birthDate())
                 .creationDate(customerDTO.creationDate())
@@ -28,5 +28,16 @@ public class CustomerMapper {
                 customer.getCountry(),
                 customer.getGender()
         );
+    }
+
+    public static void updateEntity(Customer customer, CustomerDTO customerDTO) {
+        customer.setFullName(customerDTO.fullName());
+        customer.setPhoneNumber(customerDTO.phoneNumber());
+        customer.setPassportId(customerDTO.passportId());
+        customer.setBirthDate(customerDTO.birthDate());
+        customer.setCreationDate(customerDTO.creationDate());
+        customer.setExpirationDate(customerDTO.expirationDate());
+        customer.setCountry(customerDTO.country());
+        customer.setGender(customerDTO.gender());
     }
 }
