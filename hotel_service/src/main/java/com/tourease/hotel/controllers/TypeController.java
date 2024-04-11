@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/hotel/type")
 @AllArgsConstructor
@@ -35,5 +37,15 @@ public class TypeController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         typeService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Get types by room id",
+            summary = "Get types by room id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieve types")
+    })
+    @GetMapping("/getTypesByRoomId")
+    public ResponseEntity<List<TypeVO>> getTypesByRoomId(@RequestHeader Long roomId) {
+        return ResponseEntity.ok(typeService.getTypesByRoomId(roomId));
     }
 }

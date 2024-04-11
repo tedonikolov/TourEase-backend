@@ -45,4 +45,10 @@ public class TypeService {
     public Type findById(Long id) {
         return typeRepository.findById(id).orElseThrow(() -> new CustomException("Type not found", ErrorCode.EntityNotFound));
     }
+
+    public List<TypeVO> getTypesByRoomId(Long roomId) {
+        List<Type> types = typeRepository.findByRooms_Id(roomId);
+
+        return types.stream().map(TypeVO::new).toList();
+    }
 }

@@ -37,6 +37,7 @@ public class Worker {
     private Hotel hotel;
 
     @OneToMany(mappedBy = "worker", orphanRemoval = true)
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
 }
