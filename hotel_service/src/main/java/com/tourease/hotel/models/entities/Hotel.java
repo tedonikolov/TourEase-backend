@@ -56,4 +56,8 @@ public class Hotel {
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Type> types = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Payment> payments = new LinkedHashSet<>();
 }

@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: createPaymentTable
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: payment
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: price
+                  type: DECIMAL
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+              - column:
+                  name: payment_date
+                  type: DATETIME
+              - column:
+                  name: paid
+                  type: BOOLEAN
+              - column:
+                  name: payment_type
+                  type: VARCHAR(255)
+              - column:
+                  name: paid_for
+                  type: VARCHAR(255)
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+              - column:
+                  name: customer_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_customer_id
+                    nullable: false
+                    referencedTableName: customer
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: dropColumnsReservation
+      author: Tedo
+      changes:
+        - dropColumn:
+            tableName: reservation
+            columnName: price
+        - dropColumn:
+            tableName: reservation
+            columnName: currency
+        - dropColumn:
+            tableName: reservation
+            columnName: paid
+
+  - changeSet:
+      id: addColumnPayment
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: payment
+            columns:
+              - column:
+                  name: worker_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_worker_id
+                    referencedTableName: worker
+                    referencedColumnNames: id

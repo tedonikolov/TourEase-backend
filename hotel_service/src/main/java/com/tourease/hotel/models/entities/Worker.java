@@ -8,7 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "worker")
@@ -40,4 +42,7 @@ public class Worker {
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Payment> payments = new LinkedHashSet<>();
 }

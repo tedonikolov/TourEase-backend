@@ -36,4 +36,7 @@ public class Customer {
     @JsonIgnore
     private Set<Reservation> reservations = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Payment> payments = new LinkedHashSet<>();
 }
