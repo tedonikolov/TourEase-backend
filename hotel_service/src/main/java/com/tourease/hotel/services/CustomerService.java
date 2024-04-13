@@ -36,4 +36,8 @@ public class CustomerService {
         CustomerMapper.updateEntity(customer, customerDTO);
         customerRepository.save(customer);
     }
+
+    public Customer findById(Long id) {
+        return customerRepository.findById(id).orElse(null);
+    }
 }

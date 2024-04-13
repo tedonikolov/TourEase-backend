@@ -1,6 +1,8 @@
 package com.tourease.hotel.controllers;
 
 import com.tourease.hotel.models.dto.requests.RoomVO;
+import com.tourease.hotel.models.dto.response.RoomReservationVO;
+import com.tourease.hotel.models.entities.Room;
 import com.tourease.hotel.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -8,6 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/hotel/room")
@@ -46,5 +52,35 @@ public class RoomController {
     public ResponseEntity<Void> changeStatus(@PathVariable Long id) {
         roomService.changeStatus(id);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Get room by id",
+            summary = "Get room by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful get room")
+    })
+    @GetMapping("/getRoomById")
+    public ResponseEntity<Room> findById(@RequestHeader Long id) {
+        return ResponseEntity.ok(roomService.getRoomById(id));
+    }
+
+    @Operation(description = "Get room reservation for date",
+            summary = "Get room reservation for date")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful get reservation")
+    })
+    @GetMapping("/getReservationForRoom")
+    public ResponseEntity<RoomReservationVO> getReservationForRoom(@RequestHeader Long id, @RequestParam LocalDate date) {
+        return ResponseEntity.ok(roomService.getReservationForRoom(id, date));
+    }
+
+    @Operation(description = "Get room reservations",
+            summary = "Get room reservations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful get reservations")
+    })
+    @GetMapping("/getTakenDaysForRoom")
+    public ResponseEntity<List<OffsetDateTime>> getTakenDaysForRoom(@RequestHeader Long id) {
+        return ResponseEntity.ok(roomService.getTakenDaysForRoom(id));
     }
 }

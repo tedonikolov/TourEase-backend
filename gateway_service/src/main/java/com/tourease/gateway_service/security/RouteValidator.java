@@ -39,9 +39,12 @@ public class RouteValidator {
 
     public final String[] workingEndpointsAllowedUrlMatchers = {
             "/hotel-service/worker/**",
-            "/hotel-service/reservation/worker/getAllReservationsViewByHotel",
+            "/hotel-service/reservation/worker/**",
+            "/hotel-service/hotel/room/getRoomById",
+            "/hotel-service/hotel/room/getReservationForRoom",
             "/hotel-service/hotel/room/changeStatus",
             "/hotel-service/hotel/room/changeStatus/*",
+            "/hotel-service/hotel/room/getTakenDaysForRoom",
             "/hotel-service/hotel/customer/getCustomerByPassportId",
             "/hotel-service/hotel/customer/getCustomerByPassportId/*",
             "/hotel-service/hotel/types/getTypesByRoomId",

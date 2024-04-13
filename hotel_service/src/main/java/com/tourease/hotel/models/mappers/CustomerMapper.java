@@ -6,6 +6,7 @@ import com.tourease.hotel.models.entities.Customer;
 public class CustomerMapper {
     public static Customer toEntity(CustomerDTO customerDTO) {
         return Customer.builder()
+                .id(customerDTO.id())
                 .fullName(customerDTO.fullName())
                 .phoneNumber(customerDTO.phoneNumber())
                 .passportId(customerDTO.passportId())
@@ -19,6 +20,7 @@ public class CustomerMapper {
 
     public static CustomerDTO toModel(Customer customer) {
         return new CustomerDTO(
+                customer.getId(),
                 customer.getFullName(),
                 customer.getPhoneNumber(),
                 customer.getPassportId(),
@@ -31,6 +33,7 @@ public class CustomerMapper {
     }
 
     public static void updateEntity(Customer customer, CustomerDTO customerDTO) {
+        customer.setId(customerDTO.id());
         customer.setFullName(customerDTO.fullName());
         customer.setPhoneNumber(customerDTO.phoneNumber());
         customer.setPassportId(customerDTO.passportId());
