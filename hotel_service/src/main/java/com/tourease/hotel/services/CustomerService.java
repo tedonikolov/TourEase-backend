@@ -7,6 +7,8 @@ import com.tourease.hotel.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+
 @Service
 @AllArgsConstructor
 public class CustomerService {
@@ -14,6 +16,7 @@ public class CustomerService {
 
     public Customer createCustomer(CustomerDTO customerInfo) {
         Customer customer = CustomerMapper.toEntity(customerInfo);
+        customer.setReservations(new HashSet<>());
 
         return customerRepository.save(customer);
     }

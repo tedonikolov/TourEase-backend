@@ -2,6 +2,7 @@ package com.tourease.hotel.controllers;
 
 import com.tourease.hotel.models.dto.requests.CustomerDTO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
+import com.tourease.hotel.models.dto.requests.ReservationUpdateVO;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.services.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,17 @@ public class ReservationController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(description = "Update reservation",
+            summary = "Update reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful check out reservation")
+    })
+    @PutMapping("/worker/updateReservation")
+    public ResponseEntity<Void> markPayment(@RequestHeader Long workerId, @RequestBody ReservationUpdateVO reservationInfo) {
+        reservationService.updateReservation(reservationInfo, workerId);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(description = "Get all reservations for schema view",
             summary = "Get all reservations for schema view")
     @ApiResponses(value = {
@@ -49,6 +61,17 @@ public class ReservationController {
     @PostMapping("/worker/addCustomer")
     public ResponseEntity<Void> addCustomerToReservation(@RequestHeader Long reservationId, @RequestBody CustomerDTO customerDTO) {
         reservationService.addCustomerToReservation(reservationId, customerDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Check out reservation",
+            summary = "Check out reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful check out reservation")
+    })
+    @PutMapping("/worker/checkOutReservation")
+    public ResponseEntity<Void> changeReservationStatusToFinished(@RequestHeader Long reservationId) {
+        reservationService.changeReservationStatusToFinished(reservationId);
         return ResponseEntity.ok().build();
     }
 }
