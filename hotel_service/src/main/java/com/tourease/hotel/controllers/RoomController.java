@@ -1,6 +1,7 @@
 package com.tourease.hotel.controllers;
 
 import com.tourease.hotel.models.dto.requests.RoomVO;
+import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
 import com.tourease.hotel.models.dto.response.RoomReservationVO;
 import com.tourease.hotel.models.entities.Room;
 import com.tourease.hotel.services.RoomService;
@@ -82,5 +83,15 @@ public class RoomController {
     @GetMapping("/getTakenDaysForRoom")
     public ResponseEntity<List<OffsetDateTime>> getTakenDaysForRoom(@RequestHeader Long id) {
         return ResponseEntity.ok(roomService.getTakenDaysForRoom(id));
+    }
+
+    @Operation(description = "Get room count between dates for hotel",
+            summary = "Get room count between dates for hotel")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful returns reservations")
+    })
+    @GetMapping("/getFreeRoomCountByDatesForHotel")
+    public ResponseEntity<List<FreeRoomCountVO>> getFreeRoomCountByDatesForHotel(@RequestHeader Long hotelId, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
+        return ResponseEntity.ok(roomService.getFreeRoomCountByDatesForHotel(hotelId, fromDate, toDate));
     }
 }

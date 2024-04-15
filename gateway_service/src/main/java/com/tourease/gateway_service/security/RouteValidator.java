@@ -18,7 +18,8 @@ public class RouteValidator {
             "/user-service/user/sendPasswordChangeEmail/*",
             "/user-service/user/changePassword",
             "/hotel-service/hotel/image",
-            "/hotel-service/hotel/image/*"
+            "/hotel-service/hotel/image/*",
+            "/hotel-service/hotel/room/getFreeRoomCountByDatesForHotel",
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",

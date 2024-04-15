@@ -3,7 +3,9 @@ package com.tourease.hotel.services;
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.dto.requests.RoomVO;
+import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
 import com.tourease.hotel.models.dto.response.RoomReservationVO;
+import com.tourease.hotel.models.dto.response.TypeCount;
 import com.tourease.hotel.models.entities.Hotel;
 import com.tourease.hotel.models.entities.Reservation;
 import com.tourease.hotel.models.entities.Room;
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -111,5 +110,33 @@ public class RoomService {
         }
 
         return offsetDateTimes;
+    }
+
+    public List<FreeRoomCountVO> getFreeRoomCountByDatesForHotel(Long hotelId, LocalDate fromDate, LocalDate toDate) {
+        List<FreeRoomCountVO> typeCountMap = new ArrayList<>();
+        // Get all room types count for the hotel
+        List<Room> rooms = roomRepository.findAllByHotel_Id(hotelId);
+        Map<Type,Integer> typesCount = new HashMap<>();
+        rooms.stream().map(Room::getTypes).forEach(types -> types.forEach(type -> typesCount.put(type, typesCount.getOrDefault(type,0)+1)));
+        List<TypeCount> typeCounts = new ArrayList<>();
+        typesCount.forEach((type,count) -> typeCounts.add(new TypeCount(type.getId(),type.getName(),count)));
+        typeCountMap.add(new FreeRoomCountVO(null,typeCounts));
+
+        for (LocalDate date = fromDate; date.isBefore(toDate.plusDays(1)); date = date.plusDays(1)) {
+            List<TypeCount> dateCounts = new ArrayList<>();
+            typesCount.forEach((type,count) -> dateCounts.add(new TypeCount(type.getId(),type.getName(),count)));
+            FreeRoomCountVO freeRoomCountVO = new FreeRoomCountVO(date,dateCounts);
+
+            //Find the room count for each date
+            List<Room> takenRooms = roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
+
+            takenRooms.stream().map(Room::getTypes).forEach(types -> types.forEach(type -> {
+                Optional<TypeCount> typeCount = freeRoomCountVO.typesCount().stream().filter(tc -> tc.getId().equals(type.getId())).findFirst();
+                typeCount.ifPresent(value -> value.setCount(value.getCount()-1));
+            }));
+            typeCountMap.add(freeRoomCountVO);
+        }
+
+        return typeCountMap;
     }
 }
