@@ -1,8 +1,11 @@
 package com.tourease.configuration;
 
 import com.tourease.configuration.models.entities.Configuration;
+import com.tourease.configuration.models.entities.CurrencyRate;
+import com.tourease.configuration.models.enums.Currency;
 import com.tourease.configuration.models.enums.Field;
 import com.tourease.configuration.repositories.ConfigurationRepository;
+import com.tourease.configuration.repositories.CurrencyRateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,7 @@ import java.util.List;
 public class InitialDataSetup implements CommandLineRunner {
 
     private final ConfigurationRepository configurationRepository;
+    private final CurrencyRateRepository currencyRateRepository;
 
     @Override
     public void run(String... args) {
@@ -30,5 +34,17 @@ public class InitialDataSetup implements CommandLineRunner {
 
             configurationRepository.saveAll(List.of(emailFrom, emailPassword, activateProfileURL, passportExpiredURL, changePasswordURL));
         }
+        if (currencyRateRepository.count() == 0) {
+            CurrencyRate bgn = new CurrencyRate(Currency.BGN);
+            CurrencyRate eur = new CurrencyRate(Currency.EUR);
+            CurrencyRate rub = new CurrencyRate(Currency.RUB);
+            CurrencyRate usd = new CurrencyRate(Currency.USD);
+            CurrencyRate gbp = new CurrencyRate(Currency.GBP);
+            CurrencyRate ron = new CurrencyRate(Currency.RON);
+            CurrencyRate lira = new CurrencyRate(Currency.TRY);
+
+            currencyRateRepository.saveAll(List.of(bgn, eur, rub, usd, gbp, ron, lira));
+        }
+
     }
 }

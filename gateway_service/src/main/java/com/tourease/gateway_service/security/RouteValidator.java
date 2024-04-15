@@ -17,12 +17,12 @@ public class RouteValidator {
             "/user-service/user/sendPasswordChangeEmail/",
             "/user-service/user/sendPasswordChangeEmail/*",
             "/user-service/user/changePassword",
-            "/configuration-service/country/all",
             "/hotel-service/hotel/image",
             "/hotel-service/hotel/image/*"
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",
+            "/configuration-service/currency/getCurrencyRates",
     };
 
     public final String[] regularAllowedUrlMatchers = {
