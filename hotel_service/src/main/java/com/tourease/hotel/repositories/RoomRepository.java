@@ -28,4 +28,17 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'FINISHED')
             """)
     List<Room> findAllTakenByHotelForDate(Long hotelId, LocalDate date);
+
+    @Query("""
+            SELECT r FROM Room r
+            LEFT jOIN r.reservations res
+            WHERE r.hotel.id = :hotelId
+            AND r NOT IN (
+                SELECT r FROM Room r
+                JOIN r.reservations res
+                WHERE cast(:date as date) BETWEEN res.checkIn AND res.checkOut
+                AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'FINISHED')
+            )
+            """)
+    List<Room> findAllFreeByHotelForDate(Long hotelId, LocalDate date);
 }

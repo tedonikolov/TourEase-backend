@@ -3,6 +3,7 @@ package com.tourease.hotel.controllers;
 import com.tourease.hotel.models.dto.requests.CustomerDTO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.requests.ReservationUpdateVO;
+import com.tourease.hotel.models.dto.response.ReservationListing;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.services.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,6 +52,16 @@ public class ReservationController {
     @GetMapping("/worker/getAllReservationsViewByHotel")
     public ResponseEntity<List<SchemaReservationsVO>> getAllReservationsViewByHotel(@RequestHeader Long hotelId, @RequestParam LocalDate date) {
         return ResponseEntity.ok(reservationService.getAllReservationsViewByHotel(hotelId, date));
+    }
+
+    @Operation(description = "Get all confirm reservations info for date",
+            summary = "Get all confirm reservations info for date")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully get all reservations")
+    })
+    @GetMapping("/worker/getAllReservationsForDate")
+    public ResponseEntity<List<ReservationListing>> getAllReservationsForDate(@RequestHeader Long hotelId, @RequestParam LocalDate date) {
+        return ResponseEntity.ok(reservationService.getAllReservationsForDate(hotelId, date));
     }
 
     @Operation(description = "Create/update customer",

@@ -19,7 +19,6 @@ public class RouteValidator {
             "/user-service/user/changePassword",
             "/hotel-service/hotel/image",
             "/hotel-service/hotel/image/*",
-            "/hotel-service/hotel/room/getFreeRoomCountByDatesForHotel",
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",
@@ -47,6 +46,7 @@ public class RouteValidator {
             "/hotel-service/hotel/customer/getCustomerByPassportId/*",
             "/hotel-service/hotel/types/getTypesByRoomId",
             "/hotel-service/hotel/payment/worker/**",
+            "/hotel-service/hotel/room/getFreeRoomCountByDatesForHotel",
     };
 
     public final String[] adminAllowedUrlMatchers = {

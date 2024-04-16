@@ -6,6 +6,7 @@ import com.tourease.hotel.models.dto.requests.CustomerDTO;
 import com.tourease.hotel.models.dto.requests.PaymentCreateVO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.requests.ReservationUpdateVO;
+import com.tourease.hotel.models.dto.response.ReservationListing;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.enums.PaidFor;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -34,7 +36,7 @@ public class ReservationService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
-        Customer customer = customerService.findByPassportId(reservationInfo.customer().passportId());
+        Customer customer = !reservationInfo.customer().passportId().isEmpty() ? customerService.findByPassportId(reservationInfo.customer().passportId()) : null;
         if (customer == null) {
             customer = customerService.createCustomer(reservationInfo.customer());
         }
@@ -61,7 +63,10 @@ public class ReservationService {
                     .build();
 
             if (reservation.getCheckIn().toLocalDate().isEqual(LocalDate.now())) {
-                reservation.setStatus(ReservationStatus.ACCOMMODATED);
+                if(reservationInfo.customer().passportId().isEmpty())
+                    reservation.setStatus(ReservationStatus.CONFIRMED);
+                else
+                    reservation.setStatus(ReservationStatus.ACCOMMODATED);
             } else {
                 if (worker.getWorkerType().equals(WorkerType.MANAGER)) {
                     reservation.setStatus(ReservationStatus.CONFIRMED);
@@ -93,6 +98,15 @@ public class ReservationService {
             default -> 0;
         }));
         return reservations.stream().map(SchemaReservationsVO::new).toList();
+    }
+
+    public List<ReservationListing> getAllReservationsForDate(Long hotelId, LocalDate date) {
+        List<Reservation> reservations = reservationRepository.findAllByHotelIdAndDate(hotelId, date, date.plusDays(1));
+        return reservations.stream().map(reservation -> new ReservationListing(reservation,
+                BigDecimal.valueOf(reservation.getCustomers().stream().findFirst().get()
+                        .getPayments().stream().filter(payment -> !payment.isPaid()).mapToDouble(payment -> payment.getPrice().doubleValue()).sum()),
+                reservation.getCustomers().stream().findFirst().get().getPayments().stream().filter(payment -> !payment.isPaid()).findFirst().get().getCurrency(),
+                reservation.getCustomers().stream().toList())).toList();
     }
 
     public void changeReservationStatusToEnding() {

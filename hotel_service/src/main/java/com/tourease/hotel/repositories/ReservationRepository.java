@@ -30,4 +30,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             AND r.status = 'ENDING'))
             """)
     List<Reservation> findAllByRoomHotelIdAndDate(Long hotelId, LocalDate date, LocalDate plusDay);
+
+    @Query("""
+            SELECT r FROM Reservation r
+            WHERE r.room.hotel.id = :hotelId
+            AND r.checkIn between cast(:date as date) AND cast(:plusDay as date)
+            AND r.status = 'CONFIRMED'
+            """)
+    List<Reservation> findAllByHotelIdAndDate(Long hotelId, LocalDate date, LocalDate plusDay);
 }

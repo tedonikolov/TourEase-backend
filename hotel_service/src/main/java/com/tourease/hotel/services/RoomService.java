@@ -139,4 +139,8 @@ public class RoomService {
 
         return typeCountMap;
     }
+
+    public List<Room> getFreeRoomsForDate(Long hotelId, LocalDate date) {
+        return roomRepository.findAllFreeByHotelForDate(hotelId, date.plusDays(1));
+    }
 }

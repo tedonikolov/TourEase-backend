@@ -94,4 +94,14 @@ public class RoomController {
     public ResponseEntity<List<FreeRoomCountVO>> getFreeRoomCountByDatesForHotel(@RequestHeader Long hotelId, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
         return ResponseEntity.ok(roomService.getFreeRoomCountByDatesForHotel(hotelId, fromDate, toDate));
     }
+
+    @Operation(description = "Get all free rooms by date for hotel",
+            summary = "Get room count between dates for hotel")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful returns reservations")
+    })
+    @GetMapping("/getFreeRoomsForDate")
+    public ResponseEntity<List<Room>> getFreeRoomsForDate(@RequestHeader Long hotelId, @RequestParam LocalDate date) {
+        return ResponseEntity.ok(roomService.getFreeRoomsForDate(hotelId, date));
+    }
 }
