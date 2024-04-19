@@ -5,6 +5,7 @@ import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.requests.ReservationUpdateVO;
 import com.tourease.hotel.models.dto.response.ReservationListing;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
+import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.services.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +61,8 @@ public class ReservationController {
             @ApiResponse(responseCode = "200", description = "Successfully get all reservations")
     })
     @GetMapping("/worker/getAllReservationsForDate")
-    public ResponseEntity<List<ReservationListing>> getAllReservationsForDate(@RequestHeader Long hotelId, @RequestParam LocalDate date) {
-        return ResponseEntity.ok(reservationService.getAllReservationsForDate(hotelId, date));
+    public ResponseEntity<List<ReservationListing>> getAllReservationsForDateAndStatus(@RequestHeader Long hotelId, @RequestParam LocalDate date, @RequestParam ReservationStatus status) {
+        return ResponseEntity.ok(reservationService.getAllReservationsForDateAndStatus(hotelId, date, status));
     }
 
     @Operation(description = "Create/update customer",
@@ -82,7 +83,29 @@ public class ReservationController {
     })
     @PutMapping("/worker/checkOutReservation")
     public ResponseEntity<Void> changeReservationStatusToFinished(@RequestHeader Long reservationId) {
-        reservationService.changeReservationStatusToFinished(reservationId);
+        reservationService.changeReservationStatus(reservationId, ReservationStatus.FINISHED);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Change status of reservation",
+            summary = "Change status of reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful mark reservation as cancel")
+    })
+    @PutMapping("/worker/cancelReservation")
+    public ResponseEntity<Void> changeReservationStatusToCancelled(@RequestHeader Long reservationId) {
+        reservationService.changeReservationStatus(reservationId, ReservationStatus.CANCELLED);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Change status of reservation",
+            summary = "Change status of reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful mark reservation as confirm")
+    })
+    @PutMapping("/worker/confirmReservation")
+    public ResponseEntity<Void> changeReservationStatusToConfirmed(@RequestHeader Long reservationId) {
+        reservationService.changeReservationStatus(reservationId, ReservationStatus.CONFIRMED);
         return ResponseEntity.ok().build();
     }
 }

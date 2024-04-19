@@ -7,9 +7,11 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 public record ReservationUpdateVO(Long id,
+                                  Long roomId,
                                   List<Long> customers,
                                   OffsetDateTime checkIn,
                                   OffsetDateTime checkOut,
+                                  Integer nights,
                                   BigDecimal price,
                                   Currency currency) {
 }

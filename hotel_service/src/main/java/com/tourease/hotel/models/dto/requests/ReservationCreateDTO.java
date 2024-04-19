@@ -9,6 +9,7 @@ public record ReservationCreateDTO(CustomerDTO customer,
                                    Long roomId,
                                    OffsetDateTime checkIn,
                                    OffsetDateTime checkOut,
+                                   Integer nights,
                                    BigDecimal price,
                                    Currency currency) {
 }

@@ -37,5 +37,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             AND r.checkIn between cast(:date as date) AND cast(:plusDay as date)
             AND r.status = 'CONFIRMED'
             """)
-    List<Reservation> findAllByHotelIdAndDate(Long hotelId, LocalDate date, LocalDate plusDay);
+    List<Reservation> findAllConfirmedByHotelIdAndDate(Long hotelId, LocalDate date, LocalDate plusDay);
+
+    @Query("""
+            SELECT r FROM Reservation r
+            WHERE r.room.hotel.id = :hotelId
+            AND r.creationDate between cast(:date as date) AND cast(:plusDay as date)
+            AND r.status = 'PENDING'
+            """)
+    List<Reservation> findAllPendingByHotelIdAndDate(Long hotelId, LocalDate date, LocalDate plusDay);
+
+    @Query("""
+            SELECT r FROM Reservation r
+            WHERE r.room.hotel.id = :hotelId
+            AND r.status = 'ENDING'
+            """)
+    List<Reservation> findAllEndingByHotelId(Long hotelId);
+
+    @Query("""
+            SELECT r FROM Reservation r
+            WHERE r.room.hotel.id = :hotelId
+            AND r.checkIn between cast(:date as date) AND cast(:plusDay as date)
+            AND (r.status = 'CANCELLED' OR r.status = 'NO_SHOW')
+            """)
+    List<Reservation> findAllCanceledByHotelId(Long hotelId, LocalDate date, LocalDate plusDay);
 }
