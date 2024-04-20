@@ -35,6 +35,7 @@ public class ReservationService {
     private final CustomerService customerService;
     private final WorkerService workerService;
     private final PaymentService paymentService;
+    private final TypeService typeService;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
@@ -42,6 +43,8 @@ public class ReservationService {
         if (customer == null) {
             customer = customerService.createCustomer(reservationInfo.customer());
         }
+
+        Type type = typeService.findById(reservationInfo.typeId());
 
         Worker worker = workerService.findById(userId);
         Set<Customer> customers = Set.of(customer);
@@ -61,6 +64,7 @@ public class ReservationService {
                     .checkOut(reservationInfo.checkOut())
                     .nights(reservationInfo.nights())
                     .worker(worker)
+                    .type(type)
                     .build();
 
             if (reservation.getCheckIn().toLocalDate().isEqual(LocalDate.now())) {
@@ -179,7 +183,7 @@ public class ReservationService {
 
     public void updateReservation(ReservationUpdateVO reservationInfo, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationInfo.id()).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
-        Room room = reservationInfo.roomId() != null ? roomService.findById(reservationInfo.roomId()) : reservation.getRoom();
+        Room room = reservationInfo.roomId() != null ? roomService.findByIdAndType(reservationInfo.roomId(), reservationInfo.typeId(), reservation.getType()) : reservation.getRoom();
 
         if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
 

@@ -44,4 +44,8 @@ public class Type {
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;
+
+    @OneToMany(mappedBy = "type", orphanRemoval = true)
+    @JsonIgnore
+    private Set<Reservation> reservations = new LinkedHashSet<>();
 }

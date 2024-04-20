@@ -48,4 +48,14 @@ public class TypeController {
     public ResponseEntity<List<TypeVO>> getTypesByRoomId(@RequestHeader Long roomId) {
         return ResponseEntity.ok(typeService.getTypesByRoomId(roomId));
     }
+
+    @Operation(description = "Get types for people count",
+            summary = "Get types for people count")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieve types")
+    })
+    @GetMapping("/getTypesForPeopleCount")
+    public ResponseEntity<List<TypeVO>> getTypesForPeopleCount(@RequestHeader Long hotelId, @RequestParam int peopleCount) {
+        return ResponseEntity.ok(typeService.getTypesForPeopleCount(hotelId, peopleCount));
+    }
 }

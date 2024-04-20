@@ -8,6 +8,7 @@ import java.util.List;
 
 public record ReservationUpdateVO(Long id,
                                   Long roomId,
+                                  Long typeId,
                                   List<Long> customers,
                                   OffsetDateTime checkIn,
                                   OffsetDateTime checkOut,

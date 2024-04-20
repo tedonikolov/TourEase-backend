@@ -51,4 +51,16 @@ public class TypeService {
 
         return types.stream().map(TypeVO::new).toList();
     }
+
+    public List<Type> findAllById(List<Long> types) {
+        return typeRepository.findAllById(types);
+    }
+
+    public List<TypeVO> getTypesForPeopleCount(Long hotelId, int peopleCount) {
+        List<Type> types = typeRepository.findByHotel_Id(hotelId);
+
+        return types.stream()
+                .filter(type -> type.getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum) >= peopleCount)
+                .map(TypeVO::new).toList();
+    }
 }

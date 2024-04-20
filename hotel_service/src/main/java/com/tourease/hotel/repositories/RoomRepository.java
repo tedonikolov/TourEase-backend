@@ -33,6 +33,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             SELECT r FROM Room r
             LEFT jOIN r.reservations res
             WHERE r.hotel.id = :hotelId
+            AND :typeId in (SELECT t.id FROM r.types t)
             AND r NOT IN (
                 SELECT r FROM Room r
                 JOIN r.reservations res
@@ -40,5 +41,5 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'FINISHED')
             )
             """)
-    List<Room> findAllFreeByHotelForDate(Long hotelId, LocalDate date);
+    List<Room> findAllFreeByHotelForDateAndType(Long hotelId, Long typeId, LocalDate date);
 }

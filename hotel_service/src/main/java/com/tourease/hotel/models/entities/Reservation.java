@@ -39,6 +39,10 @@ public class Reservation {
     @JsonIgnore
     private Room room;
 
+    @ManyToOne()
+    @JoinColumn(name = "type_id", nullable = false)
+    private Type type;
+
     @ManyToMany(mappedBy = "reservations")
     private Set<Customer> customers = new LinkedHashSet<>();
 

@@ -11,4 +11,7 @@ import java.util.List;
 public interface TypeRepository extends JpaRepository<Type, Long> {
     @Query("select t from Type t inner join t.rooms rooms where rooms.id = ?1")
     List<Type> findByRooms_Id(Long id);
+
+    @Query("select t from Type t where t.hotel.id = ?1")
+    List<Type> findByHotel_Id(Long id);
 }

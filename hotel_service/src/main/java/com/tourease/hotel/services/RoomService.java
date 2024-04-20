@@ -6,16 +6,12 @@ import com.tourease.hotel.models.dto.requests.RoomVO;
 import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
 import com.tourease.hotel.models.dto.response.RoomReservationVO;
 import com.tourease.hotel.models.dto.response.TypeCount;
-import com.tourease.hotel.models.entities.Hotel;
-import com.tourease.hotel.models.entities.Reservation;
-import com.tourease.hotel.models.entities.Room;
-import com.tourease.hotel.models.entities.Type;
+import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.RoomStatus;
 import com.tourease.hotel.models.mappers.RoomMapper;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.repositories.RoomRepository;
-import com.tourease.hotel.repositories.TypeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +24,11 @@ import java.util.*;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
-    private final TypeRepository typeRepository;
+    private final TypeService typeService;
 
     public void save(RoomVO roomVO) {
         Hotel hotel = hotelRepository.findById(roomVO.hotelId()).get();
-        List<Type> types = typeRepository.findAllById(roomVO.types());
+        List<Type> types = typeService.findAllById(roomVO.types());
         Room room;
 
         if (roomVO.id() == 0) {
@@ -55,6 +51,17 @@ public class RoomService {
 
     public Room findById(Long id) {
         return roomRepository.findById(id).orElseThrow(() -> new CustomException("Room not found", ErrorCode.EntityNotFound));
+    }
+
+    public Room findByIdAndType(Long id, Long typeId, Type type) {
+        Room room = findById(id);
+        Type newType = typeService.findById(typeId);
+        int people = newType.getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum);
+
+        if (people < type.getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum)){
+            throw new CustomException("Type not found", ErrorCode.EntityNotFound);
+        }
+        return room;
     }
 
     public void changeStatus(Long id) {
@@ -117,7 +124,15 @@ public class RoomService {
         // Get all room types count for the hotel
         List<Room> rooms = roomRepository.findAllByHotel_Id(hotelId);
         Map<Type,Integer> typesCount = new HashMap<>();
-        rooms.stream().map(Room::getTypes).forEach(types -> types.forEach(type -> typesCount.put(type, typesCount.getOrDefault(type,0)+1)));
+        rooms.forEach(
+                room -> {
+                    if(room.getTypes().size() == 1)
+                        room.getTypes().forEach(type -> typesCount.put(type, typesCount.getOrDefault(type, 0) + 1));
+                    else
+                        room.getTypes().stream().max(Comparator.comparing(type -> type.getBeds().stream().mapToInt(Bed::getPeople).sum()))
+                        .ifPresent(type -> typesCount.put(type, typesCount.getOrDefault(type, 0) + 1));
+                }
+        );
         List<TypeCount> typeCounts = new ArrayList<>();
         typesCount.forEach((type,count) -> typeCounts.add(new TypeCount(type.getId(),type.getName(),count)));
         typeCountMap.add(new FreeRoomCountVO(null,typeCounts));
@@ -130,17 +145,29 @@ public class RoomService {
             //Find the room count for each date
             List<Room> takenRooms = roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
 
-            takenRooms.stream().map(Room::getTypes).forEach(types -> types.forEach(type -> {
-                Optional<TypeCount> typeCount = freeRoomCountVO.typesCount().stream().filter(tc -> tc.getId().equals(type.getId())).findFirst();
-                typeCount.ifPresent(value -> value.setCount(value.getCount()-1));
-            }));
+            takenRooms.forEach(
+                    room -> {
+                        if(room.getTypes().size() == 1)
+                            room.getTypes().forEach(type -> {
+                                Optional<TypeCount> typeCount = freeRoomCountVO.typesCount().stream().filter(tc -> tc.getId().equals(type.getId())).findFirst();
+                                typeCount.ifPresent(value -> value.setCount(value.getCount()-1));
+                            });
+                        else
+                            room.getTypes().stream().max(Comparator.comparing(type -> type.getBeds().stream().mapToInt(Bed::getPeople).sum()))
+                                .ifPresent(type -> {
+                                    Optional<TypeCount> typeCount = freeRoomCountVO.typesCount().stream().filter(tc -> tc.getId().equals(type.getId())).findFirst();
+                                    typeCount.ifPresent(value -> value.setCount(value.getCount()-1));
+                                });
+                    }
+            );
+
             typeCountMap.add(freeRoomCountVO);
         }
 
         return typeCountMap;
     }
 
-    public List<Room> getFreeRoomsForDate(Long hotelId, LocalDate date) {
-        return roomRepository.findAllFreeByHotelForDate(hotelId, date.plusDays(1));
+    public List<Room> getFreeRoomsForDateByTypeId(Long hotelId, Long typeId, LocalDate date) {
+        return roomRepository.findAllFreeByHotelForDateAndType(hotelId, typeId, date.plusDays(1));
     }
 }

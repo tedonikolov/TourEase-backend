@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 
 public record ReservationCreateDTO(CustomerDTO customer,
                                    Long roomId,
+                                   Long typeId,
                                    OffsetDateTime checkIn,
                                    OffsetDateTime checkOut,
                                    Integer nights,
