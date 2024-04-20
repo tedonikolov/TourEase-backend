@@ -22,18 +22,18 @@
       <jdbc-url>jdbc:postgresql://localhost:5538/logger_serviceDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="hotel_serviceDB@localhost" uuid="ea91b4d6-da66-4031-8732-7d67c2230a6d">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5535/hotel_serviceDB</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="authentication_serviceDB@localhost" uuid="c4890ae4-fe1c-47dd-a55e-b16b7da553a8">
+    <data-source source="LOCAL" name="authentication_serviceDB@localhost" uuid="e32db901-03bb-42cb-8904-571c91e5575d">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5536/authentication_serviceDB</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="hotel_serviceDB@localhost" uuid="7c7c934a-9048-46f5-aa66-8a745d2f84f3">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5535/hotel_serviceDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

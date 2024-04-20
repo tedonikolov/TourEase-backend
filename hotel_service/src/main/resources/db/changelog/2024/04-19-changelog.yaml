@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: createMealTable
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: meal
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                 name: type
+                 type: VARCHAR(255)
+              - column:
+                  name: price
+                  type: DECIMAL
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_hotel_id
+                    nullable: false
+                    referencedTableName: hotel
+                    referencedColumnNames: id
+
+  - changeSet:
+      id: addRoomTypeToReservation
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: reservation
+            columns:
+              - column:
+                  name: type_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_type_id
+                    referencedTableName: type
+                    referencedColumnNames: id

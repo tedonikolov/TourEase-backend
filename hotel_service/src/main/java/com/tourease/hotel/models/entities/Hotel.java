@@ -45,6 +45,9 @@ public class Hotel {
     private Set<Facility> facilities = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Meal> meals = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Room> rooms = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
