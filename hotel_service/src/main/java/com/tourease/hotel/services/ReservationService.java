@@ -36,6 +36,7 @@ public class ReservationService {
     private final WorkerService workerService;
     private final PaymentService paymentService;
     private final TypeService typeService;
+    private final MealService mealService;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
@@ -45,7 +46,7 @@ public class ReservationService {
         }
 
         Type type = typeService.findById(reservationInfo.typeId());
-
+        Meal meal = mealService.findById(reservationInfo.mealId());
         Worker worker = workerService.findById(userId);
         Set<Customer> customers = Set.of(customer);
 
@@ -65,6 +66,8 @@ public class ReservationService {
                     .nights(reservationInfo.nights())
                     .worker(worker)
                     .type(type)
+                    .meal(meal)
+                    .peopleCount(reservationInfo.peopleCount())
                     .build();
 
             if (reservation.getCheckIn().toLocalDate().isEqual(LocalDate.now())) {
@@ -183,14 +186,19 @@ public class ReservationService {
 
     public void updateReservation(ReservationUpdateVO reservationInfo, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationInfo.id()).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
-        Room room = reservationInfo.roomId() != null ? roomService.findByIdAndType(reservationInfo.roomId(), reservationInfo.typeId(), reservation.getType()) : reservation.getRoom();
+        Room room = reservationInfo.roomId() != null ? roomService.findByIdAndType(reservationInfo.roomId(), reservationInfo.typeId(), reservationInfo.peopleCount()) : reservation.getRoom();
+        Type type = typeService.findById(reservationInfo.typeId());
 
         if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
+            Meal meal = mealService.findById(reservationInfo.mealId());
 
             reservation.setRoom(room);
             reservation.setCheckIn(reservationInfo.checkIn());
             reservation.setCheckOut(reservationInfo.checkOut());
             reservation.setNights(reservationInfo.nights());
+            reservation.setPeopleCount(reservationInfo.peopleCount());
+            reservation.setMeal(meal);
+            reservation.setType(type);
 
             paymentService.removeReservationPayment(reservationInfo.customers(), reservation.getRoom().getHotel().getId());
             paymentService.createPayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), reservation.getRoom().getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), userId);

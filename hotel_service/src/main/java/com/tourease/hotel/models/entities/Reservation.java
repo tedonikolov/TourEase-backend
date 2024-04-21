@@ -31,6 +31,7 @@ public class Reservation {
     private OffsetDateTime checkIn;
     private OffsetDateTime checkOut;
     private int nights;
+    private int peopleCount;
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
@@ -42,6 +43,10 @@ public class Reservation {
     @ManyToOne()
     @JoinColumn(name = "type_id", nullable = false)
     private Type type;
+
+    @ManyToOne()
+    @JoinColumn(name = "meal_id", nullable = false)
+    private Meal meal;
 
     @ManyToMany(mappedBy = "reservations")
     private Set<Customer> customers = new LinkedHashSet<>();

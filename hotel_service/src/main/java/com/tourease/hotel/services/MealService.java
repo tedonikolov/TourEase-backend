@@ -37,4 +37,8 @@ public class MealService {
     public void delete(Long id) {
         mealRepository.deleteById(id);
     }
+
+    public Meal findById(Long id) {
+        return mealRepository.findById(id).orElseThrow(() -> new CustomException("Meal not found", ErrorCode.EntityNotFound));
+    }
 }

@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: addMealToReservation
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: reservation
+            columns:
+              - column:
+                  name: people_count
+                  type: INT
+              - column:
+                  name: meal_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_meal_id
+                    referencedTableName: meal
+                    referencedColumnNames: id

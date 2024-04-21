@@ -11,10 +11,12 @@ import java.util.List;
 public record ReservationListing(
         Long id,
         Long reservationNumber,
+        OffsetDateTime createdDate,
         ReservationStatus status,
         Room room,
         Type type,
-        int people,
+        Meal meal,
+        int peopleCount,
         OffsetDateTime checkIn,
         OffsetDateTime checkOut,
         int nights,
@@ -24,6 +26,6 @@ public record ReservationListing(
         String workerName
 ) {
     public ReservationListing(Reservation reservation, BigDecimal price, Currency currency, List<Customer> customers) {
-        this(reservation.getId(), reservation.getReservationNumber(), reservation.getStatus(), reservation.getRoom(), reservation.getType(), reservation.getType().getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), price, currency, customers, reservation.getWorker().getFullName());
+        this(reservation.getId(), reservation.getReservationNumber(), reservation.getCreationDate(), reservation.getStatus(), reservation.getRoom(), reservation.getType(), reservation.getMeal(), reservation.getPeopleCount(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), price, currency, customers, reservation.getWorker().getFullName());
     }
 }

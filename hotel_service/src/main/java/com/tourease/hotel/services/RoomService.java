@@ -53,12 +53,11 @@ public class RoomService {
         return roomRepository.findById(id).orElseThrow(() -> new CustomException("Room not found", ErrorCode.EntityNotFound));
     }
 
-    public Room findByIdAndType(Long id, Long typeId, Type type) {
+    public Room findByIdAndType(Long id, Long typeId, int peopleCount) {
         Room room = findById(id);
         Type newType = typeService.findById(typeId);
-        int people = newType.getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum);
 
-        if (people < type.getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum)){
+        if (peopleCount > newType.getBeds().stream().map(Bed::getPeople).reduce(0, Integer::sum)){
             throw new CustomException("Type not found", ErrorCode.EntityNotFound);
         }
         return room;

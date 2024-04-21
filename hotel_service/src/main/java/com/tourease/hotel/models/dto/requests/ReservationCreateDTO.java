@@ -8,9 +8,11 @@ import java.time.OffsetDateTime;
 public record ReservationCreateDTO(CustomerDTO customer,
                                    Long roomId,
                                    Long typeId,
+                                   Long mealId,
                                    OffsetDateTime checkIn,
                                    OffsetDateTime checkOut,
                                    Integer nights,
                                    BigDecimal price,
+                                   Integer peopleCount,
                                    Currency currency) {
 }

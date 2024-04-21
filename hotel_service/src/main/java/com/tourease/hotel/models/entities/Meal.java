@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "meal", schema = "public")
@@ -31,4 +33,15 @@ public class Meal {
     @JoinColumn(name = "hotel_id")
     @JsonIgnore
     private Hotel hotel;
+
+    @OneToMany(mappedBy = "meal", orphanRemoval = true)
+    @JsonIgnore
+    private Set<Reservation> reservations = new LinkedHashSet<>();
+
+    public Meal(MealType type, BigDecimal price, Currency currency, Hotel hotel) {
+        this.type = type;
+        this.price = price;
+        this.currency = currency;
+        this.hotel = hotel;
+    }
 }
