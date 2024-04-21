@@ -5,6 +5,7 @@ import com.tourease.hotel.models.enums.Stars;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -22,6 +23,10 @@ public class Hotel {
     private Long id;
 
     private String name;
+
+    private LocalDate openingDate;
+
+    private LocalDate closingDate;
 
     @Enumerated(EnumType.STRING)
     private Stars stars;

@@ -3,6 +3,7 @@ package com.tourease.hotel.controllers;
 import com.tourease.hotel.models.custom.IndexVM;
 import com.tourease.hotel.models.dto.requests.FilterHotelListing;
 import com.tourease.hotel.models.dto.requests.HotelCreateVO;
+import com.tourease.hotel.models.dto.requests.HotelWorkingPeriodVO;
 import com.tourease.hotel.models.dto.response.HotelPreview;
 import com.tourease.hotel.services.HotelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,5 +47,19 @@ public class HotelController {
     public ResponseEntity<IndexVM<HotelPreview>> getHotelListing(@Parameter(name = "filter", in = ParameterIn.QUERY) FilterHotelListing filterHotelListing){
 
         return ResponseEntity.ok(hotelService.listing(filterHotelListing));
+    }
+
+    @Operation(description = "Change hotel working period",
+            summary = "Change hotel working period")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully update working period"),
+            @ApiResponse(responseCode = "400", description = "Hotel not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/changeWorkingPeriod")
+    public ResponseEntity<Void> changeWorkingPeriod(@RequestBody HotelWorkingPeriodVO hotelWorkingPeriodVO){
+        hotelService.changeWorkingPeriod(hotelWorkingPeriodVO);
+        return ResponseEntity.ok().build();
     }
 }

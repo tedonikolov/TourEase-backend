@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: addPeriodToHotel
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: hotel
+            columns:
+              - column:
+                  name: opening_date
+                  type: DATE
+              - column:
+                  name: closing_date
+                  type: DATE

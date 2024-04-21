@@ -5,6 +5,7 @@ import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.custom.IndexVM;
 import com.tourease.hotel.models.dto.requests.FilterHotelListing;
 import com.tourease.hotel.models.dto.requests.HotelCreateVO;
+import com.tourease.hotel.models.dto.requests.HotelWorkingPeriodVO;
 import com.tourease.hotel.models.dto.response.HotelPreview;
 import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.mappers.HotelMapper;
@@ -48,6 +49,13 @@ public class HotelService {
             hotelRepository.save(hotel);
             kafkaTemplate.send("hotel_service", hotel.getOwner().getEmail(), "Hotel updated with name:" + hotelCreateVO.name());
         }
+    }
+
+    public void changeWorkingPeriod(HotelWorkingPeriodVO hotelWorkingPeriodVO) {
+        Hotel hotel = findById(hotelWorkingPeriodVO.hotelId());
+        hotel.setOpeningDate(hotelWorkingPeriodVO.openingDate());
+        hotel.setClosingDate(hotelWorkingPeriodVO.closingDate());
+        hotelRepository.save(hotel);
     }
 
     public Hotel findById(Long id) {
