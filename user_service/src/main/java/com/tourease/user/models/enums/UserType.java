@@ -1,5 +1,5 @@
 package com.tourease.user.models.enums;
 
 public enum UserType {
-    ADMIN,REGULAR,HOTEL,MANAGER,RECEPTIONIST
+    ADMIN,REGULAR,OWNER,MANAGER,RECEPTIONIST
 }

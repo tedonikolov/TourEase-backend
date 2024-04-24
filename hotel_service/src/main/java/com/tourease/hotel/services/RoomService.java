@@ -134,6 +134,9 @@ public class RoomService {
         );
         List<TypeCount> typeCounts = new ArrayList<>();
         typesCount.forEach((type,count) -> typeCounts.add(new TypeCount(type.getId(),type.getName(),count)));
+
+        typeCounts.sort(Comparator.comparing(TypeCount::getId));
+
         typeCountMap.add(new FreeRoomCountVO(null,typeCounts));
 
         for (LocalDate date = fromDate; date.isBefore(toDate.plusDays(1)); date = date.plusDays(1)) {

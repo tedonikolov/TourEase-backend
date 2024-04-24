@@ -17,8 +17,8 @@ public class RouteValidator {
             "/user-service/user/sendPasswordChangeEmail/",
             "/user-service/user/sendPasswordChangeEmail/*",
             "/user-service/user/changePassword",
-            "/hotel-service/hotel/image",
-            "/hotel-service/hotel/image/*",
+            "/hotel-service/hotel/image/getForHotel",
+            "/hotel-service/hotel/image/getForHotel/*"
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",
@@ -29,26 +29,60 @@ public class RouteValidator {
             "/user-service/regular/**",
     };
 
-    public final String[] hotelAllowedUrlMatchers = {
+    public final String[] ownerAllowedUrlMatchers = {
             "/hotel-service/owner/**",
-            "/hotel-service/hotel/**",
+    };
+
+    public final String[] ownerAndManagerAllowedUrlMatchers = {
+            "/hotel-service/owner/**",
+            "/hotel-service/hotel/saveHotel",
+            "/hotel-service/hotel/image",
+            "/hotel-service/hotel/image/*",
+            "/hotel-service/hotel/facility",
+            "/hotel-service/hotel/facility/*",
+            "/hotel-service/hotel/meal",
+            "/hotel-service/hotel/meal/*",
+            "/hotel-service/hotel/bed",
+            "/hotel-service/hotel/bed/*",
+            "/hotel-service/hotel/type",
+            "/hotel-service/hotel/type/*",
+            "/hotel-service/hotel/room",
+            "/hotel-service/hotel/room/*",
+            "/hotel-service/worker/type",
+            "/hotel-service/worker/type/*"
+    };
+
+    public final String[] managerAllowedUrlMatchers = {
+            "/hotel-service/hotel/changeWorkingPeriod",
+            "/hotel-service/reservation/worker/cancelReservation",
+            "/hotel-service/reservation/worker/confirmReservation",
+            "/hotel-service/hotel/payment/worker/deletePaymentById/",
+            "/hotel-service/hotel/payment/worker/deletePaymentById/*",
     };
 
     public final String[] workingEndpointsAllowedUrlMatchers = {
-            "/hotel-service/worker/**",
-            "/hotel-service/reservation/worker/**",
+            "/hotel-service/hotel/worker/getWorker",
+            "/hotel-service/hotel/worker/getWorker/*",
+            "/hotel-service/reservation/worker/createReservation",
+            "/hotel-service/reservation/worker/updateReservation",
+            "/hotel-service/reservation/worker/getAllReservationsViewByHotel",
+            "/hotel-service/reservation/worker/getAllReservationsForDate",
+            "/hotel-service/reservation/worker/addCustomer",
+            "/hotel-service/reservation/worker/checkOutReservation",
             "/hotel-service/hotel/room/getRoomById",
+            "/hotel-service/hotel/room/getTakenDaysForRoom",
             "/hotel-service/hotel/room/getReservationForRoom",
             "/hotel-service/hotel/room/changeStatus",
             "/hotel-service/hotel/room/changeStatus/*",
-            "/hotel-service/hotel/room/getTakenDaysForRoom",
-            "/hotel-service/hotel/customer/getCustomerByPassportId",
-            "/hotel-service/hotel/customer/getCustomerByPassportId/*",
-            "/hotel-service/hotel/types/getTypesByRoomId",
-            "/hotel-service/hotel/types/getTypesForPeopleCount",
-            "/hotel-service/hotel/payment/worker/**",
             "/hotel-service/hotel/room/getFreeRoomCountByDatesForHotel",
             "/hotel-service/hotel/room/getFreeRoomsForDateByTypeId",
+            "/hotel-service/hotel/customer/getCustomerByPassportId",
+            "/hotel-service/hotel/customer/getCustomerByPassportId/*",
+            "/hotel-service/hotel/type/getTypesByRoomId",
+            "/hotel-service/hotel/type/getTypesForPeopleCount",
+            "/hotel-service/hotel/payment/worker/getAllPaymentsByCustomersForHotel",
+            "/hotel-service/hotel/payment/worker/createPayment",
+            "/hotel-service/hotel/payment/worker/markPaymentAsPaid",
     };
 
     public final String[] adminAllowedUrlMatchers = {

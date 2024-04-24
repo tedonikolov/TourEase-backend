@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,7 +68,7 @@ public class ReservationService {
                     .build();
 
             if (reservation.getCheckIn().toLocalDate().isEqual(LocalDate.now())) {
-                if(reservationInfo.customer().passportId().isEmpty())
+                if (reservationInfo.customer().passportId().isEmpty())
                     reservation.setStatus(ReservationStatus.CONFIRMED);
                 else
                     reservation.setStatus(ReservationStatus.ACCOMMODATED);
@@ -160,24 +157,43 @@ public class ReservationService {
 
         if (customer == null) {
             customer = customerService.findById(customerDTO.id());
-            if(customer == null)
+            if (customer == null)
                 customer = customerService.createCustomer(customerDTO);
             else
                 customerService.updateCustomer(customer, customerDTO);
         } else
             customerService.updateCustomer(customer, customerDTO);
 
-        if(LocalDate.now().isEqual(reservation.getCheckIn().toLocalDate())){
-            reservation.setStatus(ReservationStatus.ACCOMMODATED);
+        if (reservation.getStatus().equals(ReservationStatus.CONFIRMED)) {
+            if (LocalDate.now().isEqual(reservation.getCheckIn().toLocalDate())) {
+                reservation.setStatus(ReservationStatus.ACCOMMODATED);
+            }
+
+            Set<Customer> reservationCustomers = reservation.getCustomers();
+            reservation.setCustomers(new HashSet<>(Collections.singletonList(customer)));
+
+            Customer finalCustomer = customer;
+            reservationCustomers.forEach(c -> {
+                        c.getPayments().forEach(payment -> {
+                                    if (payment.getPaidFor().equals(PaidFor.RESERVATION) && !payment.isPaid() && payment.getHotel() == reservation.getRoom().getHotel()) {
+                                        payment.setCustomer(finalCustomer);
+                                    }
+                                }
+                        );
+                        c.setPayments(new HashSet<>());
+                    }
+            );
+
+            customerService.deleteAll(reservationCustomers);
+        } else if (reservation.getStatus().equals(ReservationStatus.ACCOMMODATED)) {
+            reservation.getCustomers().add(customer);
         }
 
-        reservation.getCustomers().add(customer);
         customer.getReservations().add(reservation);
-
         reservationRepository.save(reservation);
     }
 
-    public void changeReservationStatus(Long id, ReservationStatus status){
+    public void changeReservationStatus(Long id, ReservationStatus status) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
         reservation.setStatus(status);
 

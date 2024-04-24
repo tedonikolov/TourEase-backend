@@ -73,7 +73,7 @@ public class UserService {
                 user.setUserStatus(UserStatus.ACTIVE);
                 userRepository.save(user);
 
-                if (user.getUserType() == UserType.HOTEL) {
+                if (user.getUserType() == UserType.OWNER) {
                     hotelServiceClient.checkConnection();
                     hotelServiceClient.createHotelOwner(user.getId(), user.getEmail());
                 }

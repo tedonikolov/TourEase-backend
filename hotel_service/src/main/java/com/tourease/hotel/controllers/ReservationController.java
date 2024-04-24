@@ -40,7 +40,7 @@ public class ReservationController {
             @ApiResponse(responseCode = "200", description = "Successful check out reservation")
     })
     @PutMapping("/worker/updateReservation")
-    public ResponseEntity<Void> markPayment(@RequestHeader Long workerId, @RequestBody ReservationUpdateVO reservationInfo) {
+    public ResponseEntity<Void> updateReservation(@RequestHeader Long workerId, @RequestBody ReservationUpdateVO reservationInfo) {
         reservationService.updateReservation(reservationInfo, workerId);
         return ResponseEntity.ok().build();
     }
