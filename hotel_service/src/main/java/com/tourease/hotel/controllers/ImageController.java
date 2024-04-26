@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/hotel/image")
+@RequestMapping("/image")
 @AllArgsConstructor
 public class ImageController {
     private final ImageService imageService;
@@ -27,7 +27,7 @@ public class ImageController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully return the image")
     })
-    @GetMapping("/{imageId}")
+    @GetMapping("/getImage/{imageId}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long imageId){
         return ResponseEntity.ok().contentType(MediaType.parseMediaType("image/webp")).body(imageService.getImage(imageId));
     }
@@ -50,6 +50,7 @@ public class ImageController {
                     content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequestMapping("/hotel")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Image> addImage(@RequestParam MultipartFile image, @RequestParam Long hotelId){
         return ResponseEntity.ok(imageService.saveImage(image,hotelId));
@@ -60,7 +61,7 @@ public class ImageController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully removed image"),
     })
-    @DeleteMapping("/{imageId}")
+    @DeleteMapping("/hotel/{imageId}")
     public ResponseEntity<Void> deleteImage(@PathVariable Long imageId){
         imageService.deleteImage(imageId);
         return ResponseEntity.ok().build();

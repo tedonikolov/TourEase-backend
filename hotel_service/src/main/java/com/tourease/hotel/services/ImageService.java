@@ -62,7 +62,7 @@ public class ImageService {
     }
 
     private String getImageUrl(Long imageId) {
-        return BASE_URL + "/hotel/image/" + imageId;
+        return BASE_URL + "/image/getImage/" + imageId;
     }
 
     public void deleteImage(Long imageId) {

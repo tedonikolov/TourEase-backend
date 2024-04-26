@@ -17,8 +17,11 @@ public class RouteValidator {
             "/user-service/user/sendPasswordChangeEmail/",
             "/user-service/user/sendPasswordChangeEmail/*",
             "/user-service/user/changePassword",
-            "/hotel-service/hotel/image/getForHotel",
-            "/hotel-service/hotel/image/getForHotel/*"
+            "/hotel-service/image/getImage",
+            "/hotel-service/image/getImage/*",
+            "/hotel-service/image/getForHotel",
+            "/hotel-service/image/getForHotel/*",
+            "/hotel-service/hotel/listing"
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",
@@ -36,8 +39,8 @@ public class RouteValidator {
     public final String[] ownerAndManagerAllowedUrlMatchers = {
             "/hotel-service/owner/**",
             "/hotel-service/hotel/saveHotel",
-            "/hotel-service/hotel/image",
-            "/hotel-service/hotel/image/*",
+            "/hotel-service/image/hotel",
+            "/hotel-service/image/hotel/*",
             "/hotel-service/hotel/facility",
             "/hotel-service/hotel/facility/*",
             "/hotel-service/hotel/meal",

@@ -1,6 +1,8 @@
 package com.tourease.hotel.models.dto.response;
 
 import com.tourease.hotel.models.entities.Hotel;
+import com.tourease.hotel.models.entities.Location;
+import com.tourease.hotel.models.entities.Meal;
 import com.tourease.hotel.models.entities.Type;
 import com.tourease.hotel.models.enums.Stars;
 import lombok.AllArgsConstructor;
@@ -18,24 +20,22 @@ import java.util.Set;
 @NoArgsConstructor
 public class HotelPreview{
         private Long hotelId;
-        private String country;
-        private String city;
-        private String address;
+        private Location location;
         private String name;
         private Stars stars;
         private Set<Type> types;
+        private Set<Meal> meals;
         private List<String> images;
         private BigDecimal rating;
         private Long numberOfRates;
 
         public HotelPreview(Hotel hotel, Set<Type> types) {
             this.hotelId = hotel.getId();
-            this.country = hotel.getLocation().getCountry();
-            this.city = hotel.getLocation().getCity();
-            this.address = hotel.getLocation().getAddress();
+            this.location = hotel.getLocation();
             this.name = hotel.getName();
             this.stars = hotel.getStars();
             this.types = types;
+            this.meals = hotel.getMeals();
             this.rating = hotel.getRating() != null ? hotel.getRating().getRating() : null;
             this.numberOfRates = hotel.getRating() != null ? hotel.getRating().getNumberOfRates() : null;
         }
