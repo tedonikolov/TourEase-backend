@@ -20,9 +20,9 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             "LEFT JOIN t.beds tb " +
             "LEFT JOIN Rating r on h.id=r.hotel.id " +
             "WHERE (lower(l.country) LIKE concat('%',lower(:country),'%') OR :country IS NULL)" +
-            "AND ((lower(l.city) LIKE concat('%',lower(:city),'%') OR :city IS NULL)" +
-            "AND (lower(l.address) LIKE concat('%',lower(:address),'%') OR :address IS NULL))" +
-            "AND (lower(h.name) LIKE concat('%',lower(:name),'%') OR :name IS NULL) " +
+            "AND (((lower(l.city) LIKE concat('%',lower(:city),'%') OR :city IS NULL)" +
+            "OR (lower(l.address) LIKE concat('%',lower(:address),'%') OR :address IS NULL))" +
+            "OR (lower(h.name) LIKE concat('%',lower(:name),'%') OR :name IS NULL)) " +
             "AND (:stars IS NULL OR h.stars=:stars) " +
             "AND (:facilities IS NULL OR f.name in :facilities) " +
             "ORDER BY h.id")

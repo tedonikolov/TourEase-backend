@@ -18,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -63,10 +65,12 @@ public class HotelService {
     }
 
     public IndexVM<HotelPreview> listing(FilterHotelListing filterHotelListing) {
-        List<Hotel> hotelsList = hotelRepository.findHotelByFilter(filterHotelListing.country(),
-                filterHotelListing.city(), filterHotelListing.address(),
-                filterHotelListing.name(), filterHotelListing.stars(),
-                filterHotelListing.facilities());
+        filterHotelListing.decodeURL();
+
+        List<Hotel> hotelsList = hotelRepository.findHotelByFilter(filterHotelListing.getCountry(),
+                filterHotelListing.getCity(), filterHotelListing.getAddress(),
+                filterHotelListing.getName(), filterHotelListing.getStars(),
+                filterHotelListing.getFacilities());
 
         List<HotelPreview> hotels = new ArrayList<>();
 
@@ -82,11 +86,13 @@ public class HotelService {
         List<HotelPreview> listing = new ArrayList<>();
 
         if(hotels.size()>10) {
-            for (int i = filterHotelListing.pageNumber() * 10 - 10; i < hotels.size(); i++) {
-                if (filterHotelListing.fromDate() != null && filterHotelListing.toDate() != null) {
+            for (int i = filterHotelListing.getPageNumber() * 10 - 10; i < hotels.size(); i++) {
+                if (filterHotelListing.getFromPrice() != null && filterHotelListing.getToDate() != null) {
                     Set<Type> types = hotels.get(i).getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
-                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.fromDate(), filterHotelListing.fromDate().plusDays(1),
-                                            filterHotelListing.toDate(), filterHotelListing.toDate().minusDays(1)).isEmpty())
+                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
+                                            filterHotelListing.getFromDate().plusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
+                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
+                                            filterHotelListing.getToDate().minusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
                             .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
                     if (types.isEmpty())
                         continue;
@@ -103,10 +109,12 @@ public class HotelService {
             }
         } else {
             for (HotelPreview hotel : hotels) {
-                if (filterHotelListing.fromDate() != null && filterHotelListing.toDate() != null) {
+                if (filterHotelListing.getFromDate() != null && filterHotelListing.getToDate() != null) {
                     Set<Type> types = hotel.getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
-                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.fromDate(), filterHotelListing.fromDate().plusDays(1),
-                                            filterHotelListing.toDate(), filterHotelListing.toDate().minusDays(1)).isEmpty())
+                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
+                                            filterHotelListing.getFromDate().plusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
+                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
+                                            filterHotelListing.getToDate().minusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
                             .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
                     if (types.isEmpty())
                         continue;
@@ -118,26 +126,26 @@ public class HotelService {
             }
         }
 
-        return new IndexVM<>(new PageImpl<>(listing, PageRequest.of(filterHotelListing.pageNumber()-1, 10), hotels.size()));
+        return new IndexVM<>(new PageImpl<>(listing, PageRequest.of(filterHotelListing.getPageNumber()-1, 10), hotels.size()));
     }
 
     private boolean filterTypePrice(Type type, FilterHotelListing filter) {
-        if (filter.fromPrice() != null && filter.toPrice() != null && type.getPrice().doubleValue() >= filter.fromPrice().doubleValue() && type.getPrice().doubleValue() <= filter.toPrice().doubleValue())
+        if (filter.getFromPrice() != null && filter.getToPrice() != null && type.getPrice().doubleValue() >= filter.getFromPrice().doubleValue() && type.getPrice().doubleValue() <= filter.getToPrice().doubleValue())
             return true;
         else {
-            if (filter.fromPrice() != null && filter.toPrice() == null && type.getPrice().doubleValue() >= filter.fromPrice().doubleValue())
+            if (filter.getFromPrice() != null && filter.getToPrice() == null && type.getPrice().doubleValue() >= filter.getFromPrice().doubleValue())
                 return true;
-            else if (filter.toPrice() != null && filter.fromPrice() == null && type.getPrice().doubleValue() <= filter.toPrice().doubleValue())
+            else if (filter.getToPrice() != null && filter.getFromPrice() == null && type.getPrice().doubleValue() <= filter.getToPrice().doubleValue())
                 return true;
             else
-                return filter.fromPrice() == null && filter.toPrice() == null;
+                return filter.getFromPrice() == null && filter.getToPrice() == null;
         }
     }
 
     private boolean filterTypePeople(Type type, FilterHotelListing filter) {
-        if (filter.people() == null)
+        if (filter.getPeople() == null)
             return true;
         else
-            return type.getBeds().stream().mapToInt(Bed::getPeople).sum() >= filter.people();
+            return type.getBeds().stream().mapToInt(Bed::getPeople).sum() >= filter.getPeople();
     }
 }

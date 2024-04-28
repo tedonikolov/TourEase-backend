@@ -21,7 +21,7 @@ public class RouteValidator {
             "/hotel-service/image/getImage/*",
             "/hotel-service/image/getForHotel",
             "/hotel-service/image/getForHotel/*",
-            "/hotel-service/hotel/listing"
+            "/core-service/search/listing"
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",
