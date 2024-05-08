@@ -68,24 +68,32 @@ public class HotelService {
         filterHotelListing.decodeURL();
 
         List<Hotel> hotelsList = hotelRepository.findHotelByFilter(filterHotelListing.getCountry(),
-                filterHotelListing.getCity(), filterHotelListing.getAddress(),
+                filterHotelListing.getCity(),
                 filterHotelListing.getName(), filterHotelListing.getStars(),
-                filterHotelListing.getFacilities());
+                filterHotelListing.getFacilities(), filterHotelListing.getMealType());
 
         List<HotelPreview> hotels = new ArrayList<>();
+
+        if (filterHotelListing.getMealType() != null)
+            hotelsList = hotelsList.stream().peek(hotel -> {
+                        Set<Meal> newMeals = hotel.getMeals().stream().filter(meal -> meal.getType().equals(filterHotelListing.getMealType())).collect(Collectors.toSet());
+                        hotel.getMeals().clear();
+                        hotel.getMeals().addAll(newMeals);
+                    }
+            ).toList();
 
         for (Hotel hotel : hotelsList) {
             Set<Type> types = hotel.getTypes().stream().filter(type -> filterTypePrice(type, filterHotelListing) && filterTypePeople(type, filterHotelListing)).collect(Collectors.toSet());
 
             if (!types.isEmpty()) {
-                HotelPreview hotelPreview = new HotelPreview(hotel, types);
+                HotelPreview hotelPreview = new HotelPreview(hotel, types, filterHotelListing.getPeople() == null ? 1 : filterHotelListing.getPeople());
                 hotels.add(hotelPreview);
             }
         }
 
         List<HotelPreview> listing = new ArrayList<>();
 
-        if(hotels.size()>10) {
+        if (hotels.size() > 10) {
             for (int i = filterHotelListing.getPageNumber() * 10 - 10; i < hotels.size(); i++) {
                 if (filterHotelListing.getFromPrice() != null && filterHotelListing.getToDate() != null) {
                     Set<Type> types = hotels.get(i).getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
@@ -104,7 +112,7 @@ public class HotelService {
                 hotels.get(i).setImages(images.stream().map(Image::getUrl).collect(Collectors.toList()));
 
                 listing.add(hotels.get(i));
-                if(listing.size()==10)
+                if (listing.size() == 10)
                     break;
             }
         } else {
@@ -126,7 +134,7 @@ public class HotelService {
             }
         }
 
-        return new IndexVM<>(new PageImpl<>(listing, PageRequest.of(filterHotelListing.getPageNumber()-1, 10), hotels.size()));
+        return new IndexVM<>(new PageImpl<>(listing, PageRequest.of(filterHotelListing.getPageNumber() - 1, 10), hotels.size()));
     }
 
     private boolean filterTypePrice(Type type, FilterHotelListing filter) {

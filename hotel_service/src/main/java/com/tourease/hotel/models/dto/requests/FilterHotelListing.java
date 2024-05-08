@@ -1,6 +1,7 @@
 package com.tourease.hotel.models.dto.requests;
 
 import com.tourease.hotel.models.enums.FacilityEnum;
+import com.tourease.hotel.models.enums.MealType;
 import com.tourease.hotel.models.enums.Stars;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,10 +17,10 @@ import java.util.List;
 public class FilterHotelListing {
     private String country;
     private String city;
-    private String address;
     private String name;
     private Stars stars;
     private List<FacilityEnum> facilities;
+    private MealType mealType;
     private Integer people;
     private BigDecimal fromPrice;
     private BigDecimal toPrice;
@@ -31,9 +32,6 @@ public class FilterHotelListing {
         if(facilities.isEmpty()){
             facilities = null;
         }
-        if(address.isEmpty()){
-            address = null;
-        }
         if(name.isEmpty()){
             name = null;
         }
@@ -42,9 +40,6 @@ public class FilterHotelListing {
         }
         if(city.isEmpty()){
             city = null;
-        }
-        if (address != null) {
-            address = URLDecoder.decode(address, StandardCharsets.UTF_8);
         }
         if (name != null) {
             name = URLDecoder.decode(name, StandardCharsets.UTF_8);
