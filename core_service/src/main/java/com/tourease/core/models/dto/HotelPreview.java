@@ -1,5 +1,6 @@
 package com.tourease.core.models.dto;
 
+import com.tourease.core.models.enums.Facility;
 import com.tourease.core.models.enums.Stars;
 
 import java.math.BigDecimal;
@@ -14,7 +15,9 @@ public record HotelPreview(
         Set<TypeVO>types,
         Set<MealVO> meals,
         List<String> images,
+        List<Facility> facilities,
         BigDecimal rating,
-        Long numberOfRates
+        Long numberOfRates,
+        Integer people
 ) {
 }

@@ -1,6 +1,7 @@
 package com.tourease.core.models.dto;
 
 import com.tourease.core.models.enums.Facility;
+import com.tourease.core.models.enums.MealType;
 import com.tourease.core.models.enums.Stars;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +15,10 @@ import java.util.List;
 public class FilterHotelListing {
     private String country;
     private String city;
-    private String address;
     private String name;
     private Stars stars;
     private List<Facility> facilities;
+    private MealType mealType;
     private Integer people;
     private BigDecimal fromPrice;
     private BigDecimal toPrice;
