@@ -26,9 +26,6 @@ databaseChangeLog:
               - column:
                   name: status
                   type: VARCHAR(255)
-              - column:
-                  name: currency
-                  type: VARCHAR(255)
 
   - changeSet:
       id: addPhoneNumberToCustomer

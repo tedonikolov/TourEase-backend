@@ -30,7 +30,7 @@ public class BookingApiClient {
 
     public void getHotels() {
         ParameterizedTypeReference<ApiResponse<ListHotel>> listHotelResponseType = new ParameterizedTypeReference<>() {};
-        for (int i=1;i<=10;i++) {
+        for (int i=1;i<=20;i++) {
             ResponseEntity<ApiResponse<ListHotel>> hotels = rapidApiRestTemplate.exchange("https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=33&search_type=COUNTRY&arrival_date=2024-06-05&departure_date=2024-06-13&page_number="+i, HttpMethod.GET, null, listHotelResponseType);
 
             for (ApiHotel hotel : hotels.getBody().data().hotels()) {
@@ -73,7 +73,7 @@ public class BookingApiClient {
                 ParameterizedTypeReference<ApiResponse<RoomMapVO>> roomMapResponseType = new ParameterizedTypeReference<>() {
                 };
                 RoomMapVO roomMapVO = rapidApiRestTemplate.exchange("https://booking-com15.p.rapidapi.com/api/v1/hotels/getRoomList?hotel_id=" + hotel.hotel_id() + "&arrival_date=2024-06-06&departure_date=2024-06-12", HttpMethod.GET, null, roomMapResponseType).getBody().data();
-                if(roomMapVO!=null) {
+                if(roomMapVO!=null && roomMapVO.rooms()!=null) {
                     for (RoomVO room : roomMapVO.rooms().values()) {
                         if (room.bed_configurations() != null) {
                             //Zapazvane na vidovete legla na hotela
