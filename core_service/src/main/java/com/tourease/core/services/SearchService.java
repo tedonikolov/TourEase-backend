@@ -57,13 +57,16 @@ public class SearchService {
             if(!token.equalsIgnoreCase("breakfast"))
                 recognizeFacility(token, Facility.values(), facilities);
 
-            filterHotelListing.setMealType(recognizeMeal(token, MealType.values()));
+            if(token.equalsIgnoreCase("breakfast"))
+                filterHotelListing.setMealType(MealType.BREAKFAST);
 
             if (!tokenizer.hasMoreTokens()) {
                 break;
             }
 
             String nextToken = tokenizer.nextToken();
+
+            filterHotelListing.setMealType(recognizeMeal(token, nextToken, MealType.values()));
 
             if(Objects.equals(token, "hotel") && containsToken(nextToken, dataSet.names()) != null)
                 filterHotelListing.setName(nextToken);
@@ -175,9 +178,10 @@ public class SearchService {
         }
     }
 
-    private MealType recognizeMeal(String token, MealType[] items) {
+    private MealType recognizeMeal(String token, String nextToken, MealType[] items) {
+        String meal = token.equalsIgnoreCase("breakfast") ? token : token.concat(nextToken);
         for (MealType item : items) {
-            if (item.name().equalsIgnoreCase(token.toLowerCase())) {
+            if (item.name().equalsIgnoreCase(meal)) {
                 return item;
             }
         }

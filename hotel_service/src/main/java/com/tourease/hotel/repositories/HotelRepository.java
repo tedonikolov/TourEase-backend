@@ -16,7 +16,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             "JOIN FETCH h.types t " +
             "JOIN FETCH h.beds b " +
             "JOIN Location l on h.id=l.id " +
-            "JOIN Facility f on h.id=f.hotel.id " +
+            "LEFT JOIN Facility f on h.id=f.hotel.id " +
             "JOIN Meal m on h.id=m.hotel.id " +
             "LEFT JOIN b.types bt " +
             "LEFT JOIN t.beds tb " +

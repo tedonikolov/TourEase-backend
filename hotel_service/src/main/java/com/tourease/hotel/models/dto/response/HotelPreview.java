@@ -28,13 +28,13 @@ public class HotelPreview{
         private Long numberOfRates;
         private Integer people;
 
-        public HotelPreview(Hotel hotel, Set<Type> types, int people) {
+        public HotelPreview(Hotel hotel, Set<Meal> meals, Set<Type> types, int people) {
             this.hotelId = hotel.getId();
             this.location = hotel.getLocation();
             this.name = hotel.getName();
             this.stars = hotel.getStars();
             this.types = types;
-            this.meals = hotel.getMeals();
+            this.meals = meals;
             this.facilities = hotel.getFacilities();
             this.rating = hotel.getRating() != null ? hotel.getRating().getRating() : null;
             this.numberOfRates = hotel.getRating() != null ? hotel.getRating().getNumberOfRates() : null;

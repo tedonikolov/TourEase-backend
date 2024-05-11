@@ -74,19 +74,14 @@ public class HotelService {
 
         List<HotelPreview> hotels = new ArrayList<>();
 
-        if (filterHotelListing.getMealType() != null)
-            hotelsList = hotelsList.stream().peek(hotel -> {
-                        Set<Meal> newMeals = hotel.getMeals().stream().filter(meal -> meal.getType().equals(filterHotelListing.getMealType())).collect(Collectors.toSet());
-                        hotel.getMeals().clear();
-                        hotel.getMeals().addAll(newMeals);
-                    }
-            ).toList();
-
         for (Hotel hotel : hotelsList) {
             Set<Type> types = hotel.getTypes().stream().filter(type -> filterTypePrice(type, filterHotelListing) && filterTypePeople(type, filterHotelListing)).collect(Collectors.toSet());
+            Set<Meal> meals = filterHotelListing.getMealType() != null ?
+                    hotel.getMeals().stream().filter(meal -> meal.getType().equals(filterHotelListing.getMealType())).collect(Collectors.toSet())
+                    : hotel.getMeals();
 
             if (!types.isEmpty()) {
-                HotelPreview hotelPreview = new HotelPreview(hotel, types, filterHotelListing.getPeople() == null ? 1 : filterHotelListing.getPeople());
+                HotelPreview hotelPreview = new HotelPreview(hotel, meals, types, filterHotelListing.getPeople() == null ? 1 : filterHotelListing.getPeople());
                 hotels.add(hotelPreview);
             }
         }
