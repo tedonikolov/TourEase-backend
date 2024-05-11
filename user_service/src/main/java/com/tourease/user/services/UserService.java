@@ -155,4 +155,11 @@ public class UserService {
         userRepository.save(user);
         kafkaTemplate.send("user_service", user.getEmail(), "Profile activated!");
     }
+
+    public UserVO getCustomerDetails(Long id) {
+        User user = userRepository.findById(id).get();
+        kafkaTemplate.send("user_service", user.getEmail(), "Customer details retrieved!");
+
+        return new UserVO(user);
+    }
 }

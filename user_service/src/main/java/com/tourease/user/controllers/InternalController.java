@@ -1,6 +1,7 @@
 package com.tourease.user.controllers;
 
 import com.tourease.user.models.dto.request.WorkerVO;
+import com.tourease.user.models.dto.response.UserVO;
 import com.tourease.user.models.enums.UserType;
 import com.tourease.user.models.enums.WorkerType;
 import com.tourease.user.services.UserService;
@@ -37,5 +38,10 @@ public class InternalController {
     public ResponseEntity<Void> changeUserType(@PathVariable Long id, @RequestBody WorkerType workerType){
         userService.changeUserType(id, UserType.valueOf(workerType.name()));
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/getCustomerDetails/{id}")
+    public ResponseEntity<UserVO> getCustomerDetails(@PathVariable Long id){
+        return ResponseEntity.ok(userService.getCustomerDetails(id));
     }
 }
