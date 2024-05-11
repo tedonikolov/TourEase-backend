@@ -31,6 +31,7 @@ public class RouteValidator {
     public final String[] regularAllowedUrlMatchers = {
             "/user-service/regular/**",
             "/core-service/search/getNotAvailableDates",
+            "/core-service/reservation/createReservation",
     };
 
     public final String[] ownerAllowedUrlMatchers = {

@@ -4,13 +4,14 @@ import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
 import com.tourease.configuration.exception.InternalServiceException;
 import com.tourease.core.models.custom.IndexVM;
-import com.tourease.core.models.dto.DataSet;
-import com.tourease.core.models.dto.FilterHotelListing;
-import com.tourease.core.models.dto.HotelPreview;
+import com.tourease.core.models.dto.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -47,5 +48,19 @@ public class HotelServiceClient {
                 .queryParam("pageNumber", filterHotelListing.getPageNumber());
 
         return defaultRestTemplate.getForObject(builder.toUriString(), IndexVM.class);
+    }
+
+    public List<LocalDate> getNotAvailableDates(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(hotelServiceUrl + "/internal/getNotAvailableDates")
+                .queryParam("hotelId", hotelId)
+                .queryParam("typeId", typeId)
+                .queryParam("fromDate", fromDate)
+                .queryParam("toDate", toDate);
+
+        return defaultRestTemplate.getForObject(builder.toUriString(), List.class);
+    }
+
+    public void createReservation(ReservationCreateDTO reservationCreateDTO, UserVO userVO) {
+        defaultRestTemplate.postForObject(hotelServiceUrl + "/internal/createReservation", new ReservationVO(reservationCreateDTO, userVO), ReservationVO.class);
     }
 }
