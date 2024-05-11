@@ -30,6 +30,7 @@ public class RouteValidator {
 
     public final String[] regularAllowedUrlMatchers = {
             "/user-service/regular/**",
+            "/core-service/search/getNotAvailableDates",
     };
 
     public final String[] ownerAllowedUrlMatchers = {
@@ -52,7 +53,8 @@ public class RouteValidator {
             "/hotel-service/hotel/room",
             "/hotel-service/hotel/room/*",
             "/hotel-service/worker/type",
-            "/hotel-service/worker/type/*"
+            "/hotel-service/worker/type/*",
+            "/hotel-service/hotel/worker/save",
     };
 
     public final String[] managerAllowedUrlMatchers = {

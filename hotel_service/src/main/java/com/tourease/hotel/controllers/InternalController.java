@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
 @RequestMapping("/internal")
 @AllArgsConstructor
@@ -35,4 +38,14 @@ public class InternalController {
     public ResponseEntity<DataSet> getDataSet(){
         return ResponseEntity.ok(internalService.getDataSet());
     }
+
+    @Operation(summary = "Retrieve not available dates.",
+            description = "Returns not available dates for a given hotel and type.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully, created owner.")})
+    @GetMapping("/getNotAvailableDates")
+    public ResponseEntity<List<LocalDate>> getNotAvailableDates(@RequestParam Long hotelId, @RequestParam Long typeId, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate){
+        return ResponseEntity.ok(internalService.getNotAvailableDates(hotelId, typeId, fromDate, toDate));
+    }
+
 }
