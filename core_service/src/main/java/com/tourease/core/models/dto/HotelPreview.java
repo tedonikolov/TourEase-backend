@@ -4,6 +4,7 @@ import com.tourease.core.models.enums.Facility;
 import com.tourease.core.models.enums.Stars;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ public record HotelPreview(
         List<Facility> facilities,
         BigDecimal rating,
         Long numberOfRates,
-        Integer people
+        Integer people,
+        LocalDate openingDate,
+        LocalDate closingDate
 ) {
 }

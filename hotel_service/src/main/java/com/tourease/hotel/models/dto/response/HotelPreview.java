@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +28,8 @@ public class HotelPreview{
         private BigDecimal rating;
         private Long numberOfRates;
         private Integer people;
+        private LocalDate openingDate;
+        private LocalDate closingDate;
 
         public HotelPreview(Hotel hotel, Set<Meal> meals, Set<Type> types, int people) {
             this.hotelId = hotel.getId();
@@ -39,6 +42,8 @@ public class HotelPreview{
             this.rating = hotel.getRating() != null ? hotel.getRating().getRating() : null;
             this.numberOfRates = hotel.getRating() != null ? hotel.getRating().getNumberOfRates() : null;
             this.people = people;
+            this.openingDate = hotel.getOpeningDate();
+            this.closingDate = hotel.getClosingDate();
         }
 
     public void setImages(List<String> images) {
