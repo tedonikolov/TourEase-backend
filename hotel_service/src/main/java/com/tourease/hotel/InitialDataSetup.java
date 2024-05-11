@@ -65,8 +65,8 @@ public class InitialDataSetup implements CommandLineRunner {
             BigDecimal price = BigDecimal.valueOf(random.nextInt(30) + 10);
 
             meals.add(new Meal(MealType.BREAKFAST, price, Currency.EUR, hotel));
-            meals.add(new Meal(MealType.HALFBORD, price.add(new BigDecimal(10)), Currency.EUR, hotel));
-            meals.add(new Meal(MealType.FULLBORD, price.add(new BigDecimal(15)), Currency.EUR, hotel));
+            meals.add(new Meal(MealType.HALFBOARD, price.add(new BigDecimal(10)), Currency.EUR, hotel));
+            meals.add(new Meal(MealType.FULLBOARD, price.add(new BigDecimal(15)), Currency.EUR, hotel));
             meals.add(new Meal(MealType.ALLINCLUSIVE, price.add(new BigDecimal(20)), Currency.EUR, hotel));
             hotel.setMeals(meals);
             hotelRepository.save(hotel);
