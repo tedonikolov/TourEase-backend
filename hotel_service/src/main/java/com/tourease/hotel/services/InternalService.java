@@ -31,7 +31,6 @@ public class InternalService {
     public DataSet getDataSet() {
         List<Hotel> hotels = hotelRepository.findAll();
 
-
         return new DataSet(
                 hotels.stream().map(hotel -> hotel.getLocation().getCountry()).distinct().toList(),
                 hotels.stream().map(hotel -> hotel.getLocation().getCity()).distinct().toList(),
@@ -54,4 +53,37 @@ public class InternalService {
         return notAvailableDates;
     }
 
+    public void createReservation(ReservationCreateDTO reservationInfo) {
+
+        Customer customer = customerService.findByPassportId(reservationInfo.customer().passportId());
+
+        if (customer == null) {
+            customer = customerService.createCustomer(reservationInfo.customer());
+        }
+
+        Type type = typeService.findById(reservationInfo.typeId());
+        Meal meal = mealService.findById(reservationInfo.mealId());
+        Set<Customer> customers = Set.of(customer);
+
+        Reservation reservation = Reservation.builder()
+                .reservationNumber(reservationInfo.checkIn().getYear() * 10000000L +
+                        reservationInfo.checkIn().getMonthValue() * 100000 +
+                        reservationInfo.checkIn().getDayOfMonth() * 10000 +
+                        reservationInfo.hotelId() * 10 + customer.getId())
+                .customers(customers)
+                .checkIn(reservationInfo.checkIn())
+                .checkOut(reservationInfo.checkOut())
+                .nights(reservationInfo.nights())
+                .type(type)
+                .meal(meal)
+                .peopleCount(reservationInfo.peopleCount())
+                .status(ReservationStatus.PENDING)
+                .build();
+
+            reservation.getCustomers().forEach(c -> c.getReservations().add(reservation));
+
+            reservationRepository.save(reservation);
+
+            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), null);
+        }
 }

@@ -197,6 +197,8 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
         reservation.setStatus(status);
 
+        paymentService.removeReservationPayment(reservation.getCustomers().stream().map(Customer::getId).toList(), reservation.getRoom().getHotel().getId());
+
         reservationRepository.save(reservation);
     }
 

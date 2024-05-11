@@ -28,7 +28,7 @@ public class PaymentService {
     public Payment createPayment(PaymentCreateVO paymentCreateVO, Long workerId) {
         Customer customer = customerRepository.getReferenceById(paymentCreateVO.customerId());
         Hotel hotel = hotelRepository.getReferenceById(paymentCreateVO.hotelId());
-        Worker worker = workerRepository.findById(workerId).orElseThrow(() -> new IllegalArgumentException("Worker not found"));
+        Worker worker = workerId==null ? null : workerRepository.findById(workerId).orElse(null);
 
         Payment payment = Payment.builder()
                 .customer(customer)

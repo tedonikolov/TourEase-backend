@@ -26,6 +26,6 @@ public record ReservationListing(
         String workerName
 ) {
     public ReservationListing(Reservation reservation, BigDecimal price, Currency currency, List<Customer> customers) {
-        this(reservation.getId(), reservation.getReservationNumber(), reservation.getCreationDate(), reservation.getStatus(), reservation.getRoom(), reservation.getType(), reservation.getMeal(), reservation.getPeopleCount(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), price, currency, customers, reservation.getWorker().getFullName());
+        this(reservation.getId(), reservation.getReservationNumber(), reservation.getCreationDate(), reservation.getStatus(), reservation.getRoom(), reservation.getType(), reservation.getMeal(), reservation.getPeopleCount(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), price, currency, customers,  reservation.getWorker() !=null ? reservation.getWorker().getFullName() : "Tourease");
     }
 }

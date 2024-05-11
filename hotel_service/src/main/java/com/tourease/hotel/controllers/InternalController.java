@@ -1,5 +1,6 @@
 package com.tourease.hotel.controllers;
 
+import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.DataSet;
 import com.tourease.hotel.services.InternalService;
 import com.tourease.hotel.services.OwnerService;
@@ -48,4 +49,14 @@ public class InternalController {
         return ResponseEntity.ok(internalService.getNotAvailableDates(hotelId, typeId, fromDate, toDate));
     }
 
+    @Operation(description = "Create reservation",
+            summary = "Create reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful created reservation")
+    })
+    @PostMapping("/createReservation")
+    public ResponseEntity<Void> createReservation(@RequestBody ReservationCreateDTO reservationInfo) {
+        internalService.createReservation(reservationInfo);
+        return ResponseEntity.ok().build();
+    }
 }
