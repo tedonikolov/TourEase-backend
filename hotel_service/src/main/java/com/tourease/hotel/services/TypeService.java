@@ -13,6 +13,7 @@ import com.tourease.hotel.repositories.TypeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,7 +25,7 @@ public class TypeService {
 
     public void save(TypeVO typeVO){
         Hotel hotel = hotelRepository.findById(typeVO.hotelId()).get();
-        List<Bed> bedList = bedRepository.findAllById(typeVO.beds());
+        List<Bed> bedList = bedRepository.findByHotel_Id(typeVO.hotelId());
         Type type;
 
         if(typeVO.id()==0){
@@ -34,7 +35,13 @@ public class TypeService {
             TypeMapper.updateEntity(type,typeVO);
         }
 
-        type.setBeds(bedList);
+        List<Bed> beds = new ArrayList<>();
+
+        typeVO.beds().forEach(bedId ->
+                beds.add(bedList.stream().filter(bed -> bed.getId().equals(bedId)).findFirst().get())
+        );
+
+        type.setBeds(beds);
         typeRepository.save(type);
     }
 
