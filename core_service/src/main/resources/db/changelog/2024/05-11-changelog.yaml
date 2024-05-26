@@ -1,0 +1,76 @@
+databaseChangeLog:
+  - changeSet:
+      id: createReservation
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: reservation
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_reservation
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: reservation_number
+                  type: BIGINT
+              - column:
+                  name: check_in
+                  type: DATETIME
+              - column:
+                  name: check_out
+                  type: DATETIME
+              - column:
+                  name: creation_date
+                  type: DATETIME
+              - column:
+                  name: price
+                  type: DECIMAL
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+              - column:
+                  name: paid
+                  type: boolean
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: people_count
+                  type: INT
+              - column:
+                  name: nights
+                  type: integer
+
+  - changeSet:
+      id: createRating
+      author: Tedo
+      changes:
+        - createTable:
+            tableName: rating
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_rating
+                    nullable: false
+                    foreignKeyName: fk_reservation_id
+                    referencedTableName: reservation
+                    referencedColumnNames: id
+              - column:
+                  name: hotel_id
+                  type: BIGINT
+              - column:
+                  name: rate
+                  type: INT
+              - column:
+                  name: comment
+                  type: VARCHAR(255)

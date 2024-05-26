@@ -67,4 +67,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             AND (r.status = 'CANCELLED' OR r.status = 'NO_SHOW')
             """)
     List<Reservation> findAllCanceledByHotelId(Long hotelId, LocalDate date, LocalDate plusDay);
+
+    @Query("select r from Reservation r where r.reservationNumber = ?1")
+    Reservation findByReservationNumber(Long reservationNumber);
 }

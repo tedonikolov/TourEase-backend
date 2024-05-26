@@ -14,6 +14,7 @@ import com.tourease.hotel.models.enums.PaidFor;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.WorkerType;
 import com.tourease.hotel.repositories.ReservationRepository;
+import com.tourease.hotel.services.communication.CoreServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class ReservationService {
     private final TypeService typeService;
     private final MealService mealService;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final CoreServiceClient coreServiceClient;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
         Customer customer = !reservationInfo.customer().passportId().isEmpty() ? customerService.findByPassportId(reservationInfo.customer().passportId()) : null;
@@ -134,8 +136,7 @@ public class ReservationService {
         for (Reservation reservation : reservations) {
             if (reservation.getStatus().equals(ReservationStatus.ACCOMMODATED) &&
                     reservation.getCheckOut().isBefore(OffsetDateTime.from(OffsetDateTime.now().plusDays(1)))) {
-                reservation.setStatus(ReservationStatus.ENDING);
-                reservationRepository.save(reservation);
+                changeReservationStatus(reservation.getId(), ReservationStatus.ENDING);
             }
         }
     }
@@ -145,8 +146,8 @@ public class ReservationService {
         for (Reservation reservation : reservations) {
             if ((reservation.getStatus().equals(ReservationStatus.PENDING) || reservation.getStatus().equals(ReservationStatus.CONFIRMED))
                     && reservation.getCheckIn().isBefore(OffsetDateTime.from(OffsetDateTime.now()))) {
-                reservation.setStatus(ReservationStatus.NO_SHOW);
-                reservationRepository.save(reservation);
+
+                changeReservationStatus(reservation.getId(), ReservationStatus.NO_SHOW);
             }
         }
     }
@@ -197,33 +198,37 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
         reservation.setStatus(status);
 
-        paymentService.removeReservationPayment(reservation.getCustomers().stream().map(Customer::getId).toList(), reservation.getRoom().getHotel().getId());
+        if(status.equals(ReservationStatus.CANCELLED))
+            paymentService.removeReservationPayment(reservation.getCustomers().stream().map(Customer::getId).toList(), reservation.getType().getHotel().getId());
 
         reservationRepository.save(reservation);
+
+        coreServiceClient.checkConnection();
+        coreServiceClient.changeStatus(reservation.getReservationNumber(), status);
     }
 
     public void updateReservation(ReservationUpdateVO reservationInfo, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationInfo.id()).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
         Room room = reservationInfo.roomId() != null ? roomService.findByIdAndType(reservationInfo.roomId(), reservationInfo.typeId(), reservationInfo.peopleCount()) : reservation.getRoom();
         Type type = typeService.findById(reservationInfo.typeId());
+        Meal meal = mealService.findById(reservationInfo.mealId());
 
-        if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
-            Meal meal = mealService.findById(reservationInfo.mealId());
+        reservation.setCheckIn(reservationInfo.checkIn());
+        reservation.setCheckOut(reservationInfo.checkOut());
+        reservation.setNights(reservationInfo.nights());
+        reservation.setPeopleCount(reservationInfo.peopleCount());
+        reservation.setMeal(meal);
+        reservation.setType(type);
 
+        if (room != null && reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
             reservation.setRoom(room);
-            reservation.setCheckIn(reservationInfo.checkIn());
-            reservation.setCheckOut(reservationInfo.checkOut());
-            reservation.setNights(reservationInfo.nights());
-            reservation.setPeopleCount(reservationInfo.peopleCount());
-            reservation.setMeal(meal);
-            reservation.setType(type);
-
-            paymentService.removeReservationPayment(reservationInfo.customers(), reservation.getRoom().getHotel().getId());
-            paymentService.createPayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), reservation.getRoom().getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), userId);
-
-            reservationRepository.save(reservation);
         } else {
             throw new CustomException("Room is already reserved", ErrorCode.AlreadyExists);
         }
+
+        paymentService.removeReservationPayment(reservationInfo.customers(), reservation.getRoom().getHotel().getId());
+        paymentService.createPayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), reservation.getRoom().getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), userId);
+
+        reservationRepository.save(reservation);
     }
 }

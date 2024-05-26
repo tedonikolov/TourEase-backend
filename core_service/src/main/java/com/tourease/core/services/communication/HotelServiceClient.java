@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -57,10 +58,18 @@ public class HotelServiceClient {
                 .queryParam("fromDate", fromDate)
                 .queryParam("toDate", toDate);
 
-        return defaultRestTemplate.getForObject(builder.toUriString(), List.class);
+        return Arrays.stream(defaultRestTemplate.getForObject(builder.toUriString(), LocalDate[].class)).toList();
     }
 
-    public void createReservation(ReservationCreateDTO reservationCreateDTO, UserVO userVO) {
-        defaultRestTemplate.postForObject(hotelServiceUrl + "/internal/createReservation", new ReservationVO(reservationCreateDTO, userVO), ReservationVO.class);
+    public Long createReservation(ReservationCreateDTO reservationCreateDTO, UserVO userVO) {
+        return defaultRestTemplate.postForObject(hotelServiceUrl + "/internal/createReservation", new ReservationVO(reservationCreateDTO, userVO), Long.class);
+    }
+
+    public HotelVO getHotel(Long number) {
+        return defaultRestTemplate.getForObject(hotelServiceUrl + "/internal/getHotelByReservationNumber/" + number, HotelVO.class);
+    }
+
+    public void cancelReservation(Long reservationNumber) {
+        defaultRestTemplate.put(hotelServiceUrl + "/internal/cancelReservation/"+reservationNumber, Void.class);
     }
 }

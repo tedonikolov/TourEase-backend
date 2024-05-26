@@ -2,6 +2,8 @@ package com.tourease.hotel.controllers;
 
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.DataSet;
+import com.tourease.hotel.models.dto.response.HotelVO;
+import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.services.InternalService;
 import com.tourease.hotel.services.OwnerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +20,7 @@ import java.util.List;
 @RequestMapping("/internal")
 @AllArgsConstructor
 public class InternalController {
-    private final OwnerService service;
+    private final OwnerService ownerService;
     private final InternalService internalService;
 
     @Operation(summary = "Creates owner.",
@@ -27,7 +29,7 @@ public class InternalController {
             @ApiResponse(responseCode = "200", description = "Successfully, created owner.")})
     @PostMapping("/createOwner")
     public ResponseEntity<Void> createOwner(@RequestParam Long id, @RequestHeader(value = "user") String email){
-        service.createOwner(id,email);
+        ownerService.createOwner(id,email);
         return ResponseEntity.ok().build();
     }
 
@@ -55,8 +57,23 @@ public class InternalController {
             @ApiResponse(responseCode = "200", description = "Successful created reservation")
     })
     @PostMapping("/createReservation")
-    public ResponseEntity<Void> createReservation(@RequestBody ReservationCreateDTO reservationInfo) {
-        internalService.createReservation(reservationInfo);
+    public ResponseEntity<Long> createReservation(@RequestBody ReservationCreateDTO reservationInfo) {
+        return ResponseEntity.ok(internalService.createReservation(reservationInfo));
+    }
+
+    @GetMapping("/getHotelByReservationNumber/{reservationNumber}")
+    public ResponseEntity<HotelVO> getHotelByReservationNumber(@PathVariable Long reservationNumber){
+        return ResponseEntity.ok(internalService.getHotelByReservationNumber(reservationNumber));
+    }
+
+    @Operation(description = "Change status of reservation",
+            summary = "Change status of reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful mark reservation as cancel")
+    })
+    @PutMapping("/cancelReservation/{reservationNumber}")
+    public ResponseEntity<Void> changeReservationStatusToCancelled(@PathVariable Long reservationNumber) {
+        internalService.changeReservationStatus(reservationNumber, ReservationStatus.CANCELLED);
         return ResponseEntity.ok().build();
     }
 }
