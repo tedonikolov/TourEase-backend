@@ -2,7 +2,7 @@ package com.tourease.core.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
-import com.tourease.core.ReservationRepository;
+import com.tourease.core.repositories.ReservationRepository;
 import com.tourease.core.models.custom.IndexVM;
 import com.tourease.core.models.dto.*;
 import com.tourease.core.models.entities.Reservation;

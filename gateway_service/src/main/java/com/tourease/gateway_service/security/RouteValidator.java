@@ -33,6 +33,8 @@ public class RouteValidator {
             "/core-service/search/getNotAvailableDates",
             "/core-service/reservation/",
             "/core-service/reservation/*",
+            "/core-service/rating",
+            "/core-service/rating/*",
     };
 
     public final String[] ownerAllowedUrlMatchers = {

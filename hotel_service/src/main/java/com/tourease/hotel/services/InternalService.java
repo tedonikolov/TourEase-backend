@@ -1,6 +1,7 @@
 package com.tourease.hotel.services;
 
 import com.tourease.hotel.models.dto.requests.PaymentCreateVO;
+import com.tourease.hotel.models.dto.requests.RatingVO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.DataSet;
 import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
@@ -9,10 +10,12 @@ import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.enums.PaidFor;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.repositories.HotelRepository;
+import com.tourease.hotel.repositories.RatingRepository;
 import com.tourease.hotel.repositories.ReservationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +32,7 @@ public class InternalService {
     private final PaymentService paymentService;
     private final TypeService typeService;
     private final MealService mealService;
+    private final RatingRepository ratingRepository;
 
     public DataSet getDataSet() {
         List<Hotel> hotels = hotelRepository.findAll();
@@ -97,7 +101,7 @@ public class InternalService {
             return null;
         }
 
-        return new HotelVO(reservation.getType().getHotel().getName(), reservation.getType().getHotel().getStars(),
+        return new HotelVO(reservation.getType().getHotel().getId(), reservation.getType().getHotel().getName(), reservation.getType().getHotel().getStars(),
                 reservation.getType().getHotel().getLocation().getCountry(), reservation.getType().getHotel().getLocation().getCity(), reservation.getType().getHotel().getLocation().getAddress());
     }
 
@@ -108,5 +112,25 @@ public class InternalService {
             reservation.setStatus(status);
             reservationRepository.save(reservation);
         }
+    }
+
+    public void rateHotel(RatingVO ratingVO) {
+        hotelRepository.findById(ratingVO.hotelId()).ifPresent(hotel -> {
+            Rating rating = hotel.getRating();
+            if (rating == null) {
+                rating = new Rating();
+                rating.setId(hotel.getId());
+                rating.setNumberOfRates(1L);
+                rating.setHotel(hotel);
+                rating.setRating(BigDecimal.valueOf(ratingVO.rating()));
+                rating.setTotalRating(BigDecimal.valueOf(ratingVO.rating()));
+            } else {
+                rating.setNumberOfRates(rating.getNumberOfRates() + 1);
+                rating.setTotalRating(BigDecimal.valueOf(rating.getTotalRating().doubleValue() + ratingVO.rating()));
+                rating.setRating(BigDecimal.valueOf(rating.getTotalRating().doubleValue() / rating.getNumberOfRates()));
+            }
+            hotel.setRating(rating);
+            hotelRepository.save(hotel);
+        });
     }
 }

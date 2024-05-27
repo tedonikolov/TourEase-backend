@@ -1,4 +1,4 @@
-package com.tourease.core;
+package com.tourease.core.repositories;
 
 import com.tourease.core.models.entities.Reservation;
 import org.springframework.data.domain.Page;

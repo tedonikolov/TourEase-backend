@@ -18,7 +18,7 @@ public class Rating {
     @Column(name = "hotel_id", nullable = false)
     private Long id;
 
-    private Long totalRating;
+    private BigDecimal totalRating;
     private Long numberOfRates;
     private BigDecimal rating;
 

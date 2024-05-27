@@ -60,7 +60,7 @@ public class BookingApiClient {
                         .id(newHotel.getId())
                         .rating(hotel.property().reviewScore())
                         .numberOfRates(hotel.property().reviewCount())
-                        .totalRating(BigDecimal.valueOf(hotel.property().reviewCount() * hotel.property().reviewScore().floatValue()).longValue())
+                        .totalRating(BigDecimal.valueOf(hotel.property().reviewCount() * hotel.property().reviewScore().floatValue()))
                         .build();
 
                 newHotel.setRating(rating);

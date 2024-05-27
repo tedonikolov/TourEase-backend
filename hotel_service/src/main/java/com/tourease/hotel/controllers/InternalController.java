@@ -1,5 +1,6 @@
 package com.tourease.hotel.controllers;
 
+import com.tourease.hotel.models.dto.requests.RatingVO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.DataSet;
 import com.tourease.hotel.models.dto.response.HotelVO;
@@ -74,6 +75,17 @@ public class InternalController {
     @PutMapping("/cancelReservation/{reservationNumber}")
     public ResponseEntity<Void> changeReservationStatusToCancelled(@PathVariable Long reservationNumber) {
         internalService.changeReservationStatus(reservationNumber, ReservationStatus.CANCELLED);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Change status of reservation",
+            summary = "Change status of reservation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful mark reservation as cancel")
+    })
+    @PostMapping("/rate")
+    public ResponseEntity<Void> rateHotel(@RequestBody RatingVO ratingVO) {
+        internalService.rateHotel(ratingVO);
         return ResponseEntity.ok().build();
     }
 }

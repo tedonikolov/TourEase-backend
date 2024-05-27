@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeTotalRatingType
+      author: Tedo
+      changes:
+        - modifyDataType:
+            columnName: total_rating
+            newDataType: DECIMAL
+            tableName: rating

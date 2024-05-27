@@ -72,4 +72,8 @@ public class HotelServiceClient {
     public void cancelReservation(Long reservationNumber) {
         defaultRestTemplate.put(hotelServiceUrl + "/internal/cancelReservation/"+reservationNumber, Void.class);
     }
+
+    public void rateHotel(RatingVO rating) {
+        defaultRestTemplate.postForObject(hotelServiceUrl + "/internal/rate", rating, Void.class);
+    }
 }
