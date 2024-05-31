@@ -145,7 +145,7 @@ public class RoomService {
             FreeRoomCountVO freeRoomCountVO = new FreeRoomCountVO(date,dateCounts);
 
             //Find the room count for each date
-            List<Room> takenRooms = roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
+            List<Room> takenRooms = date.isBefore(LocalDate.now()) ? roomRepository.findAllFinishedByHotelForDate(hotelId, date.plusDays(1)) : roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
 
             takenRooms.forEach(
                     room -> {
@@ -166,10 +166,16 @@ public class RoomService {
             typeCountMap.add(freeRoomCountVO);
         }
 
+        typeCountMap.forEach(freeRoomCountVO -> freeRoomCountVO.typesCount().sort(Comparator.comparing(TypeCount::getId)));
+
         return typeCountMap;
     }
 
     public List<Room> getFreeRoomsForDateByTypeId(Long hotelId, Long typeId, LocalDate date) {
         return roomRepository.findAllFreeByHotelForDateAndType(hotelId, typeId, date.plusDays(1));
+    }
+
+    public List<Room> getFreeRoomsBetweenDateByTypeId(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
+        return roomRepository.findAllFreeByHotelBetweenDateAndType(hotelId, typeId, fromDate, fromDate.plusDays(1), toDate, toDate.plusDays(1));
     }
 }

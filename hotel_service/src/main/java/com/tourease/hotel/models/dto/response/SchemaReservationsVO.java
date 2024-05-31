@@ -8,6 +8,6 @@ public record SchemaReservationsVO(Long reservationId,
                                    ReservationStatus status
 ) {
     public SchemaReservationsVO(Reservation reservation) {
-        this(reservation.getId(), reservation.getRoom().getId(), reservation.getStatus());
+        this(reservation.getId(), reservation.getRoom()!=null ? reservation.getRoom().getId() : null, reservation.getStatus());
     }
 }

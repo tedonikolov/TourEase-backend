@@ -1,38 +1,37 @@
 package com.tourease.hotel.services;
 
+import com.tourease.configuration.exception.CustomException;
+import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.dto.requests.PaymentCreateVO;
 import com.tourease.hotel.models.dto.requests.RatingVO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.DataSet;
-import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
 import com.tourease.hotel.models.dto.response.HotelVO;
 import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.enums.PaidFor;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.repositories.HotelRepository;
-import com.tourease.hotel.repositories.RatingRepository;
 import com.tourease.hotel.repositories.ReservationRepository;
+import com.tourease.hotel.repositories.RoomRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 public class InternalService {
     private final HotelRepository hotelRepository;
     private final ReservationRepository reservationRepository;
+    private final RoomRepository roomRepository;
     private final RoomService roomService;
     private final CustomerService customerService;
     private final PaymentService paymentService;
     private final TypeService typeService;
     private final MealService mealService;
-    private final RatingRepository ratingRepository;
 
     public DataSet getDataSet() {
         List<Hotel> hotels = hotelRepository.findAll();
@@ -48,11 +47,23 @@ public class InternalService {
     public List<LocalDate> getNotAvailableDates(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
         List<LocalDate> notAvailableDates = new ArrayList<>();
 
-        List<FreeRoomCountVO> freeRoomCount = roomService.getFreeRoomCountByDatesForHotel(hotelId, fromDate, toDate);
+        int roomsCount = roomRepository.findAllByType(typeId).size();
 
-        for (FreeRoomCountVO freeRoom : freeRoomCount) {
-            if (freeRoom.typesCount().stream().anyMatch(typeCount -> typeCount.getId().equals(typeId) && typeCount.getCount() == 0)) {
-                notAvailableDates.add(freeRoom.date());
+        for (LocalDate date = fromDate; date.isBefore(toDate.plusDays(1)); date = date.plusDays(1)) {
+            int freeRoomsCount = roomsCount;
+            List<Room> takenRooms = roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
+
+            for (Room room : takenRooms){
+                for (Type type : room.getTypes()){
+                    if (type.getId().equals(typeId)){
+                        freeRoomsCount--;
+                        break;
+                    }
+                }
+            }
+
+            if (freeRoomsCount == 0){
+                notAvailableDates.add(date);
             }
         }
 
@@ -60,6 +71,9 @@ public class InternalService {
     }
 
     public Long createReservation(ReservationCreateDTO reservationInfo) {
+        if(roomService.getFreeRoomsBetweenDateByTypeId(reservationInfo.hotelId(), reservationInfo.typeId(), reservationInfo.checkIn().toLocalDate(), reservationInfo.checkOut().toLocalDate()).isEmpty()){
+            throw new CustomException("No available rooms", ErrorCode.Failed);
+        }
 
         Customer customer = customerService.findByPassportId(reservationInfo.customer().passportId());
 
@@ -90,7 +104,7 @@ public class InternalService {
 
             reservationRepository.save(reservation);
 
-            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), null);
+            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), null);
             return reservation.getReservationNumber();
     }
 

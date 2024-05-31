@@ -2,14 +2,10 @@ package com.tourease.hotel.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
-import com.tourease.hotel.models.dto.requests.CustomerDTO;
-import com.tourease.hotel.models.dto.requests.PaymentCreateVO;
-import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
-import com.tourease.hotel.models.dto.requests.ReservationUpdateVO;
+import com.tourease.hotel.models.dto.requests.*;
 import com.tourease.hotel.models.dto.response.ReservationListing;
 import com.tourease.hotel.models.dto.response.SchemaReservationsVO;
 import com.tourease.hotel.models.entities.*;
-import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.PaidFor;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.WorkerType;
@@ -19,7 +15,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -86,7 +81,7 @@ public class ReservationService {
 
             reservationRepository.save(reservation);
 
-            paymentService.createPayment(new PaymentCreateVO(customer.getId(), room.getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), userId);
+            paymentService.createPayment(new PaymentCreateVO(customer.getId(), room.getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
 
             kafkaTemplate.send("hotel_service", worker.getEmail(), "New reservation created for hotel with name:" + worker.getHotel().getName());
         } else {
@@ -117,17 +112,9 @@ public class ReservationService {
         };
 
         return reservations.stream().map(reservation -> {
-            Customer firstCustomer = reservation.getCustomers().stream().findFirst().orElse(null);
-            Payment firstPayment = firstCustomer != null ? firstCustomer.getPayments().stream().filter(payment -> !payment.isPaid()).findFirst().orElse(null) : null;
+            Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
 
-            BigDecimal totalPayment = BigDecimal.ZERO;
-            Currency paymentCurrency = null;
-            if (firstPayment != null) {
-                totalPayment = BigDecimal.valueOf(firstCustomer.getPayments().stream().filter(payment -> !payment.isPaid()).mapToDouble(payment -> payment.getPrice().doubleValue()).sum());
-                paymentCurrency = firstPayment.getCurrency();
-            }
-
-            return new ReservationListing(reservation, totalPayment, paymentCurrency, reservation.getCustomers().stream().toList());
+            return new ReservationListing(reservation, payment.getPrice(), payment.getCurrency(), reservation.getCustomers().stream().toList());
         }).collect(Collectors.toList());
     }
 
@@ -170,22 +157,6 @@ public class ReservationService {
                 reservation.setStatus(ReservationStatus.ACCOMMODATED);
             }
 
-            Set<Customer> reservationCustomers = reservation.getCustomers();
-            reservation.setCustomers(new HashSet<>(Collections.singletonList(customer)));
-
-            Customer finalCustomer = customer;
-            reservationCustomers.forEach(c -> {
-                        c.getPayments().forEach(payment -> {
-                                    if (payment.getPaidFor().equals(PaidFor.RESERVATION) && !payment.isPaid() && payment.getHotel() == reservation.getRoom().getHotel()) {
-                                        payment.setCustomer(finalCustomer);
-                                    }
-                                }
-                        );
-                        c.setPayments(new HashSet<>());
-                    }
-            );
-
-            customerService.deleteAll(reservationCustomers);
         } else if (reservation.getStatus().equals(ReservationStatus.ACCOMMODATED)) {
             reservation.getCustomers().add(customer);
         }
@@ -199,7 +170,7 @@ public class ReservationService {
         reservation.setStatus(status);
 
         if(status.equals(ReservationStatus.CANCELLED))
-            paymentService.removeReservationPayment(reservation.getCustomers().stream().map(Customer::getId).toList(), reservation.getType().getHotel().getId());
+            paymentService.removeReservationPayment(reservation.getReservationNumber());
 
         reservationRepository.save(reservation);
 
@@ -222,12 +193,18 @@ public class ReservationService {
 
         if (room != null && reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
             reservation.setRoom(room);
-        } else {
+        } else if (room != null) {
             throw new CustomException("Room is already reserved", ErrorCode.AlreadyExists);
         }
 
-        paymentService.removeReservationPayment(reservationInfo.customers(), reservation.getRoom().getHotel().getId());
-        paymentService.createPayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), reservation.getRoom().getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION), userId);
+        Worker worker = workerService.findById(userId);
+        if(worker.getWorkerType().equals(WorkerType.MANAGER)){
+            Payment payment = paymentService.updatePayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), type.getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
+            if(coreServiceClient.checkReservation(reservation.getReservationNumber()))
+            {
+                coreServiceClient.updateReservation(new ReservationClientUpdateVO(reservation.getReservationNumber(), reservationInfo.checkIn(), reservationInfo.checkOut(), reservationInfo.nights(), reservationInfo.peopleCount(), payment.getPrice(), payment.getCurrency()));
+            }
+        }
 
         reservationRepository.save(reservation);
     }

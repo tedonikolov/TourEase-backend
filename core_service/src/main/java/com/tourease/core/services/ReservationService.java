@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -27,24 +28,31 @@ public class ReservationService {
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
         userServiceClient.checkConnection();
         UserVO userVO = userServiceClient.getCustomerDetails(userId);
-        if (userVO.regular() == null || userVO.regular().passport() == null || userVO.regular().passport().expired()) {
+        if (userVO.regular() == null || userVO.regular().passport() == null) {
             throw new CustomException("Invalid user personal info", ErrorCode.Failed);
+        } else if (userVO.regular().passport().expired()) {
+            throw new CustomException("Expired passport", ErrorCode.Failed);
         }
 
         hotelServiceClient.checkConnection();
-        Long number = hotelServiceClient.createReservation(reservationInfo, userVO);
+        try {
+            Long number = hotelServiceClient.createReservation(reservationInfo, userVO);
 
-        reservationRepository.save(Reservation.builder()
-                .reservationNumber(number)
-                .userId(userId)
-                .nights(reservationInfo.nights())
-                .peopleCount(reservationInfo.peopleCount())
-                .checkIn(reservationInfo.checkIn())
-                .checkOut(reservationInfo.checkOut())
-                .price(reservationInfo.price())
-                .currency(reservationInfo.currency())
-                .status(ReservationStatus.PENDING)
-                .build());
+            reservationRepository.save(Reservation.builder()
+                    .reservationNumber(number)
+                    .userId(userId)
+                    .nights(reservationInfo.nights())
+                    .peopleCount(reservationInfo.peopleCount())
+                    .checkIn(reservationInfo.checkIn())
+                    .checkOut(reservationInfo.checkOut())
+                    .price(reservationInfo.price())
+                    .currency(reservationInfo.currency())
+                    .status(ReservationStatus.PENDING)
+                    .build());
+
+        } catch (CustomException e) {
+            throw new CustomException("No available rooms", ErrorCode.Failed);
+        }
     }
 
     public void changeReservationStatus(ReservationStatusDTO reservationStatus) {
@@ -55,11 +63,12 @@ public class ReservationService {
     }
 
     public void cancelReservation(Long reservationId) {
-        reservationRepository.findById(reservationId).ifPresent((reservation -> {
-            reservation.setStatus(ReservationStatus.CANCELLED);
-            reservationRepository.save(reservation);
-        }));
-        hotelServiceClient.cancelReservation(reservationId);
+        Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+        if (reservation.isPresent()) {
+            reservation.get().setStatus(ReservationStatus.CANCELLED);
+            reservationRepository.save(reservation.get());
+            hotelServiceClient.cancelReservation(reservation.get().getReservationNumber());
+        }
     }
 
     public IndexVM<ReservationDTO> getReservations(Long userId, Integer page, Integer size) {
@@ -75,5 +84,21 @@ public class ReservationService {
         IndexVM indexVM = new IndexVM<>(reservations);
         indexVM.setItems(reservationDTOs);
         return indexVM;
+    }
+
+    public Boolean checkReservation(Long reservationNumber) {
+        return reservationRepository.findByReservationNumber(reservationNumber).isPresent();
+    }
+
+    public void updateReservation(ReservationUpdateVO reservationUpdateVO) {
+        reservationRepository.findByReservationNumber(reservationUpdateVO.reservationNumber()).ifPresent((reservation -> {
+            reservation.setCheckIn(reservationUpdateVO.checkIn());
+            reservation.setCheckOut(reservationUpdateVO.checkOut());
+            reservation.setNights(reservationUpdateVO.nights());
+            reservation.setPeopleCount(reservationUpdateVO.peopleCount());
+            reservation.setPrice(reservationUpdateVO.price());
+            reservation.setCurrency(reservationUpdateVO.currency());
+            reservationRepository.save(reservation);
+        }));
     }
 }
