@@ -12,6 +12,7 @@ public record NewPaymentVO(
         BigDecimal price,
         Currency currency,
         PaidFor paidFor,
-        PaymentType paymentType
+        PaymentType paymentType,
+        Long reservationNumber
 ) {
 }

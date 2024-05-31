@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: addReservationNumberToPayment
+      author: Tedo
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: reservation_number
+                  type: BIGINT
+            tableName: payment

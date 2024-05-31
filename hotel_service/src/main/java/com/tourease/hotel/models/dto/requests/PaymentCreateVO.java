@@ -10,9 +10,10 @@ public record PaymentCreateVO(
         Long hotelId,
         BigDecimal price,
         Currency currency,
-        PaidFor paidFor
+        PaidFor paidFor,
+        Long reservationNumber
 ) {
     public PaymentCreateVO (NewPaymentVO newPaymentVO){
-        this(newPaymentVO.customerId(), newPaymentVO.hotelId(), newPaymentVO.price(), newPaymentVO.currency(), newPaymentVO.paidFor());
+        this(newPaymentVO.customerId(), newPaymentVO.hotelId(), newPaymentVO.price(), newPaymentVO.currency(), newPaymentVO.paidFor(), newPaymentVO.reservationNumber());
     }
 }

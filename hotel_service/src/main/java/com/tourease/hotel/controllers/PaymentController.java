@@ -36,8 +36,8 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "Successful get all payments by customer")
     })
     @GetMapping("/worker/getAllPaymentsByCustomersForHotel")
-    public ResponseEntity<List<Payment>> getAllPaymentsByCustomersForHotel(@RequestHeader List<Long> customers, @RequestHeader Long hotelId, @RequestParam Boolean isPaid) {
-        return ResponseEntity.ok(paymentService.getAllPaymentsByCustomersForHotel(customers, hotelId, isPaid));
+    public ResponseEntity<List<Payment>> getAllPaymentsByCustomersForHotel(@RequestHeader List<Long> customers, @RequestHeader Long hotelId, @RequestHeader Long reservationNumber, @RequestParam Boolean isPaid) {
+        return ResponseEntity.ok(paymentService.getAllPaymentsByCustomersForHotel(customers, hotelId, reservationNumber, isPaid));
     }
 
     @Operation(description = "Mark payment as paid",

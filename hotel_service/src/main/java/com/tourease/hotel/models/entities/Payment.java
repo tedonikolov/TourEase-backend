@@ -31,6 +31,7 @@ public class Payment {
     private PaymentType paymentType;
     @Enumerated(EnumType.STRING)
     private PaidFor paidFor;
+    private Long reservationNumber;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

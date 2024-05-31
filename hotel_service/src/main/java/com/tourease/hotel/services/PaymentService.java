@@ -36,6 +36,7 @@ public class PaymentService {
                 .price(paymentCreateVO.price())
                 .currency(paymentCreateVO.currency())
                 .paidFor(paymentCreateVO.paidFor())
+                .reservationNumber(paymentCreateVO.reservationNumber())
                 .worker(worker)
                 .build();
 
@@ -44,8 +45,8 @@ public class PaymentService {
         return payment;
     }
 
-    public List<Payment> getAllPaymentsByCustomersForHotel(List<Long> customers, Long hotelId, boolean isPaid) {
-        return paymentRepository.findByCustomer_IdInAndHotel_IdAndPaid(customers, hotelId, isPaid);
+    public List<Payment> getAllPaymentsByCustomersForHotel(List<Long> customers, Long hotelId, Long reservationNumber, boolean isPaid) {
+        return paymentRepository.findByCustomer_IdInAndHotel_IdAndPaid(customers, hotelId, isPaid, reservationNumber);
     }
 
     public void markPaymentAsPaid(MarkPaymentVO paymentVO, Long workerId) {
@@ -73,20 +74,30 @@ public class PaymentService {
         }
     }
 
-    public void removeReservationPayment(List<Long> customers, Long hotelId) {
-        for (Long id : customers) {
-            Customer customer = customerRepository.findById(id).orElse(null);
-            if (customer != null) {
-                List<Payment> payments = paymentRepository.findByCustomer_IdAndPaidForAndPaidAndHotel_Id(customer.getId(), PaidFor.RESERVATION, false, hotelId);
-                paymentRepository.deleteAll(payments);
-            }
-        }
+    public void removeReservationPayment(Long reservationNumber) {
+        List<Payment> payments = paymentRepository.findByReservationNumber(reservationNumber);
+        paymentRepository.deleteAll(payments);
     }
 
     public void createNewPayment(NewPaymentVO newPayment, Long userId) {
         Payment payment = createPayment(new PaymentCreateVO(newPayment), userId);
         if(newPayment.paymentType()!=null){
             markPaymentAsPaid(new MarkPaymentVO(payment, newPayment.paymentType()), userId);
+        }
+    }
+
+    public Payment getPaymentByReservationNumber(Long reservationNumber) {
+        return paymentRepository.findByReservationNumber(reservationNumber).stream().findFirst().orElse(null);
+    }
+
+    public Payment updatePayment(PaymentCreateVO paymentCreateVO, Long userId) {
+        Payment payment = paymentRepository.findByReservationNumberAndPaidForAndPaid(paymentCreateVO.reservationNumber(), PaidFor.RESERVATION, false);
+        if(payment!=null){
+            payment.setPrice(paymentCreateVO.price());
+            payment.setCurrency(paymentCreateVO.currency());
+            return paymentRepository.save(payment);
+        } else {
+            return createPayment(paymentCreateVO, userId);
         }
     }
 }
