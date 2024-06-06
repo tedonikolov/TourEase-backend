@@ -14,8 +14,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -71,14 +75,21 @@ public class ReservationService {
         }
     }
 
-    public IndexVM<ReservationDTO> getReservations(Long userId, Integer page, Integer size) {
-        Page<Reservation> reservations = reservationRepository.findByUserId(userId, PageRequest.of(page, size));
-
+    public IndexVM<ReservationDTO> getReservations(Long userId, ReservationsFilter reservationsFilter, Integer page, Integer size) {
+        Page<Reservation> reservations = reservationRepository.findByUserId(userId, reservationsFilter.getReservationNumber(),
+                reservationsFilter.getCreationDate() != null ? OffsetDateTime.of(reservationsFilter.getCreationDate(), LocalTime.MIN, ZoneOffset.UTC) : null,
+                reservationsFilter.getCreationDate() != null ? OffsetDateTime.of(reservationsFilter.getCreationDate(), LocalTime.MAX, ZoneOffset.UTC) : null,
+                reservationsFilter.getCheckIn() != null ? OffsetDateTime.of(reservationsFilter.getCheckIn(), LocalTime.MIN, ZoneOffset.UTC) : null,
+                reservationsFilter.getCheckIn() != null ? OffsetDateTime.of(reservationsFilter.getCheckIn(), LocalTime.MAX, ZoneOffset.UTC) : null,
+                reservationsFilter.getStatus(), PageRequest.of(page, size));
         List<ReservationDTO> reservationDTOs = new ArrayList<>();
 
         for (Reservation reservation : reservations) {
             HotelVO hotel = hotelServiceClient.getHotel(reservation.getReservationNumber());
-            reservationDTOs.add(new ReservationDTO(reservation, hotel));
+            if(reservationsFilter.getHotel() != null && Objects.equals(hotel.name(), reservationsFilter.getHotel()))
+                reservationDTOs.add(new ReservationDTO(reservation, hotel));
+            else if(reservationsFilter.getHotel() == null)
+                reservationDTOs.add(new ReservationDTO(reservation, hotel));
         }
 
         IndexVM indexVM = new IndexVM<>(reservations);

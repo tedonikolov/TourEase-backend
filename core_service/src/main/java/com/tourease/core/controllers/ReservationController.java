@@ -3,6 +3,8 @@ package com.tourease.core.controllers;
 import com.tourease.core.models.custom.IndexVM;
 import com.tourease.core.models.dto.ReservationCreateDTO;
 import com.tourease.core.models.dto.ReservationDTO;
+import com.tourease.core.models.dto.ReservationsFilter;
+import com.tourease.core.models.enums.ReservationStatus;
 import com.tourease.core.services.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/reservation")
@@ -34,8 +38,11 @@ public class ReservationController {
             @ApiResponse(responseCode = "200", description = "Successful created reservation"),
     })
     @GetMapping("/getReservations")
-    public ResponseEntity<IndexVM<ReservationDTO>> getReservations(@RequestHeader Long userId, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
-        return ResponseEntity.ok(reservationService.getReservations(userId, page-1, size));
+    public ResponseEntity<IndexVM<ReservationDTO>> getReservations(@RequestHeader Long userId, @RequestParam(required = false) String hotel,
+                                                                   @RequestParam(required = false) Long reservationNumber, @RequestParam(required = false) ReservationStatus status,
+                                                                   @RequestParam(required = false) LocalDate creationDate, @RequestParam(required = false) LocalDate checkIn,
+                                                                   @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(reservationService.getReservations(userId, new ReservationsFilter(hotel, reservationNumber, status, creationDate, checkIn), page-1, size));
     }
 
     @Operation(description = "Change status of reservation",
