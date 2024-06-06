@@ -4,6 +4,7 @@ import com.tourease.hotel.models.dto.response.*;
 import com.tourease.hotel.models.entities.*;
 import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.FacilityEnum;
+import com.tourease.hotel.models.enums.RoomStatus;
 import com.tourease.hotel.models.enums.Stars;
 import com.tourease.hotel.repositories.*;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class BookingApiClient {
     private final RestTemplate rapidApiRestTemplate;
     private final HotelRepository hotelRepository;
     private final BedRepository bedRepository;
+    private final RoomRepository roomRepository;
     private final TypeRepository typeRepository;
     private final ImageRepository imageRepository;
     private final FacilityRepository facilityRepository;
@@ -31,7 +33,7 @@ public class BookingApiClient {
     public void getHotels() {
         ParameterizedTypeReference<ApiResponse<ListHotel>> listHotelResponseType = new ParameterizedTypeReference<>() {};
         for (int i=1;i<=20;i++) {
-            ResponseEntity<ApiResponse<ListHotel>> hotels = rapidApiRestTemplate.exchange("https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=33&search_type=COUNTRY&arrival_date=2024-06-05&departure_date=2024-06-13&page_number="+i, HttpMethod.GET, null, listHotelResponseType);
+            ResponseEntity<ApiResponse<ListHotel>> hotels = rapidApiRestTemplate.exchange("https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=33&search_type=COUNTRY&arrival_date=2024-06-07&departure_date=2024-06-08&page_number="+i, HttpMethod.GET, null, listHotelResponseType);
 
             for (ApiHotel hotel : hotels.getBody().data().hotels()) {
                 //Vzemane na dobulnitelna informaciq za hotelite
@@ -73,21 +75,36 @@ public class BookingApiClient {
                 ParameterizedTypeReference<ApiResponse<RoomMapVO>> roomMapResponseType = new ParameterizedTypeReference<>() {
                 };
                 RoomMapVO roomMapVO = rapidApiRestTemplate.exchange("https://booking-com15.p.rapidapi.com/api/v1/hotels/getRoomList?hotel_id=" + hotel.hotel_id() + "&arrival_date=2024-06-06&departure_date=2024-06-12", HttpMethod.GET, null, roomMapResponseType).getBody().data();
-                if(roomMapVO!=null && roomMapVO.rooms()!=null) {
-                    for (RoomVO room : roomMapVO.rooms().values()) {
-                        if (room.bed_configurations() != null) {
+                if(roomMapVO!=null && roomMapVO.rooms()!=null && roomMapVO.block()!=null) {
+                    Map<String,ApiTypeVO> rooms = new HashMap<>();
+                    for (RoomTypeVO roomType : roomMapVO.block()) {
+                        if (rooms.containsKey(roomType.room_id())) {
+                            ApiTypeVO typeCount = rooms.get(roomType.room_id());
+                            typeCount.setCount(typeCount.getCount() + roomType.room_count());
+                            if (roomType.nr_adults() + roomType.nr_children() > typeCount.getPeople())
+                                typeCount.setPeople(roomType.nr_adults() + roomType.nr_children());
+                            rooms.put(roomType.room_id(), typeCount);
+                        } else {
+                            rooms.put(roomType.room_id(), new ApiTypeVO(roomType.room_name(), roomType.room_count(), roomType.nr_adults()+roomType.nr_children()));
+                        }
+                    }
+
+                    List<Type> types = new ArrayList<>();
+
+                    for(Map.Entry<String,RoomVO> entry : roomMapVO.rooms().entrySet()) {
+                        if (entry.getValue().bed_configurations() != null) {
                             //Zapazvane na vidovete legla na hotela
-                            List<BedVO> beds = room.bed_configurations().stream().flatMap(bedConfiguration -> bedConfiguration.bed_types().stream()).toList();
+                            List<BedVO> beds = entry.getValue().bed_configurations().stream().flatMap(bedConfiguration -> bedConfiguration.bed_types().stream()).toList();
                             for (BedVO bed : beds) {
-                                if (bedRepository.findByNameAndHotel_Id(bed.name(), newHotel.getId()).isEmpty()) {
+                                if (bedRepository.findByNameAndHotel_Id(recoginzeName(bed.bed_type()), newHotel.getId()).isEmpty()) {
                                     Random random = new Random();
                                     int price = random.nextInt(71) + 30; // Generates a random number between 0 and 70, then adds 30
 
                                     Bed newBed = Bed.builder()
-                                            .people(1)
+                                            .people(recoginzePeople(bed.bed_type()))
                                             .price(BigDecimal.valueOf(price))
                                             .currency(Currency.EUR)
-                                            .name(bed.name())
+                                            .name(recoginzeName(bed.bed_type()))
                                             .hotel(newHotel)
                                             .build();
 
@@ -96,16 +113,14 @@ public class BookingApiClient {
                             }
 
                             //Zapazvane na vidovete stai na hotela
-                            for (BedConfiguration bedConfiguration : room.bed_configurations()) {
+                            for (BedConfiguration bedConfiguration : entry.getValue().bed_configurations()) {
 
-                                String typeName = "";
                                 List<Bed> bedsList = new ArrayList<>();
                                 BigDecimal price = BigDecimal.valueOf(0);
 
                                 for (BedVO bedVO : bedConfiguration.bed_types()) {
-                                    typeName = typeName.concat(bedVO.name_with_count() + "| ");
 
-                                    Bed bed = bedRepository.findByNameAndHotel_Id(bedVO.name(), newHotel.getId()).get();
+                                    Bed bed = bedRepository.findByNameAndHotel_Id(recoginzeName(bedVO.bed_type()), newHotel.getId()).get();
                                     for (int j = 0; j < bedVO.count(); j++) {
                                         bedsList.add(bed);
 
@@ -114,17 +129,18 @@ public class BookingApiClient {
                                 }
 
                                 Type type = Type.builder()
-                                        .name(typeName)
+                                        .name(rooms.get(entry.getKey()).getName())
                                         .price(price)
                                         .currency(Currency.EUR)
                                         .beds(bedsList)
                                         .hotel(newHotel)
                                         .build();
 
+                                types.add(type);
                                 typeRepository.save(type);
                             }
 
-                            for (PhotosVO photosVO : room.photos()) {
+                            for (PhotosVO photosVO : entry.getValue().photos().size()>2 ? entry.getValue().photos().subList(0,2) : entry.getValue().photos()) {
                                 if (imageRepository.findByUrlAndHotel_Id(photosVO.url_original(), newHotel.getId()).isEmpty()) {
                                     Image image = Image.builder()
                                             .url(photosVO.url_original())
@@ -135,12 +151,45 @@ public class BookingApiClient {
                                 }
                             }
 
-                            room.facilities().forEach(facilityVO -> saveFacility(facilityVO.name(), newHotel));
+                            entry.getValue().facilities().forEach(facilityVO -> saveFacility(facilityVO.name(), newHotel));
                         }
+                    }
+
+                    int j = 1;
+                    for (ApiTypeVO apiTypeVO : rooms.values()) {
+                        for (int k = 0; k < apiTypeVO.getCount(); k++) {
+                            if(k==50)
+                                break;
+                            int number = (j*100+k);
+                            List<Type> typeRoom = types.stream().filter(type -> type.getName().equals(apiTypeVO.getName())).toList();
+
+                            roomRepository.save(new Room(Integer.toString(number), RoomStatus.FREE, typeRoom, newHotel));
+                        }
+                        j++;
                     }
                 }
             }
         }
+    }
+
+    private int recoginzePeople(Integer integer) {
+        return switch (integer) {
+            case 2, 3, 6 -> 2;
+            default -> 1;
+        };
+    }
+
+    private String recoginzeName(Integer integer) {
+        return switch (integer) {
+            case 1 -> "SINGLE BED";
+            case 2 -> "DOUBLE BED";
+            case 3 -> "KING SIZE BED";
+            case 4 -> "DOUBLE";
+            case 5 -> "SOFA";
+            case 6 -> "LARGE BED";
+            case 7 -> "FUTON BED";
+            default -> "SINGLE BED";
+        };
     }
 
     private void saveFacility(String name, Hotel hotel) {
