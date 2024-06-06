@@ -101,6 +101,7 @@ public class RouteValidator {
             "/configuration-service/swagger",
             "/configuration-service/admin/**",
             "/logger-service/swagger",
-            "/logger-service/admin/**"
+            "/logger-service/admin/**",
+            "/core-service/swagger",
     };
 }
