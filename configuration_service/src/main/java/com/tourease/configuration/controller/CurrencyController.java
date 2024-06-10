@@ -1,6 +1,6 @@
 package com.tourease.configuration.controller;
 
-import com.tourease.configuration.models.entities.CurrencyRate;
+import com.tourease.configuration.models.collections.CurrencyRate;
 import com.tourease.configuration.services.CurrencyRateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

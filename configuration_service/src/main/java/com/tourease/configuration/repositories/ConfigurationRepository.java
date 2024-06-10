@@ -1,11 +1,11 @@
 package com.tourease.configuration.repositories;
 
-import com.tourease.configuration.models.entities.Configuration;
+import com.tourease.configuration.models.collections.Configuration;
 import com.tourease.configuration.models.enums.Field;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConfigurationRepository extends JpaRepository<Configuration, Long> {
+public interface ConfigurationRepository extends MongoRepository<Configuration, Long> {
     Configuration findByName(Field name);
 }

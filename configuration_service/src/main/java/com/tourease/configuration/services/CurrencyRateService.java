@@ -1,7 +1,7 @@
 package com.tourease.configuration.services;
 
 import com.tourease.configuration.models.dto.response.CurrencyRates;
-import com.tourease.configuration.models.entities.CurrencyRate;
+import com.tourease.configuration.models.collections.CurrencyRate;
 import com.tourease.configuration.models.enums.Currency;
 import com.tourease.configuration.repositories.CurrencyRateRepository;
 import lombok.AllArgsConstructor;

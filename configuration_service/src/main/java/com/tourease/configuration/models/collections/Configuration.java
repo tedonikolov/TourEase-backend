@@ -1,24 +1,18 @@
-package com.tourease.configuration.models.entities;
+package com.tourease.configuration.models.collections;
 
 import com.tourease.configuration.models.enums.Field;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Table(name = "configuration")
-@Entity
+@Document(collection = "configuration")
 @Setter
 @Getter
 @NoArgsConstructor
 public class Configuration {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(unique = true)
     private Field name;
     private String value;
 

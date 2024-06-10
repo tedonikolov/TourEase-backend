@@ -1,4 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: init
-      author: Tedo

@@ -1,7 +1,7 @@
 package com.tourease.configuration.services;
 
 import com.tourease.configuration.models.dto.response.EmailInfoVO;
-import com.tourease.configuration.models.entities.Configuration;
+import com.tourease.configuration.models.collections.Configuration;
 import com.tourease.configuration.models.enums.Field;
 import com.tourease.configuration.repositories.ConfigurationRepository;
 import lombok.AllArgsConstructor;

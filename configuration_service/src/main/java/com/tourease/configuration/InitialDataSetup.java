@@ -1,7 +1,7 @@
 package com.tourease.configuration;
 
-import com.tourease.configuration.models.entities.Configuration;
-import com.tourease.configuration.models.entities.CurrencyRate;
+import com.tourease.configuration.models.collections.Configuration;
+import com.tourease.configuration.models.collections.CurrencyRate;
 import com.tourease.configuration.models.enums.Currency;
 import com.tourease.configuration.models.enums.Field;
 import com.tourease.configuration.repositories.ConfigurationRepository;

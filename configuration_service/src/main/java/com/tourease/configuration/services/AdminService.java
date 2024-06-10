@@ -2,7 +2,7 @@ package com.tourease.configuration.services;
 
 import com.tourease.configuration.models.dto.request.UpdateConfigurationDTO;
 import com.tourease.configuration.models.dto.response.AllConfigurations;
-import com.tourease.configuration.models.entities.Configuration;
+import com.tourease.configuration.models.collections.Configuration;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

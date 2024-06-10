@@ -1,24 +1,22 @@
-package com.tourease.configuration.models.entities;
+package com.tourease.configuration.models.collections;
 
 import com.tourease.configuration.models.enums.Currency;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "currency_rate")
+@Document(collection = "currency_rate")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CurrencyRate {
     @Id
-    @Column(name = "id", nullable = false)
-    @Enumerated(EnumType.STRING)
     private Currency currency;
     private BigDecimal rateBGN;
     private BigDecimal rateEUR;
