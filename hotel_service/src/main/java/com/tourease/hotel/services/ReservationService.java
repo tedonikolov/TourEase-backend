@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -114,7 +115,7 @@ public class ReservationService {
         return reservations.stream().map(reservation -> {
             Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
 
-            return new ReservationListing(reservation, payment.getPrice(), payment.getCurrency(), reservation.getCustomers().stream().toList());
+            return new ReservationListing(reservation, payment == null ? BigDecimal.valueOf(0) : payment.getPrice(), payment == null ? null : payment.getCurrency(), reservation.getCustomers().stream().toList());
         }).collect(Collectors.toList());
     }
 
