@@ -1,14 +1,14 @@
 package com.tourease.logger.models.dto;
 
-import com.tourease.logger.models.entities.Chronology;
+import com.tourease.logger.models.collections.Chronology;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public record MessageLog(
-        Long id,
+        String id,
         String email,
         String message,
-        OffsetDateTime date
+        LocalDateTime date
 ) {
     public MessageLog(Chronology chronology) {
         this(chronology.getId(), chronology.getEmail(), chronology.getLog(), chronology.getCreatedOn());

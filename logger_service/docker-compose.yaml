@@ -1,15 +1,5 @@
 version: '2'
 services:
-  postgres:
-    image: postgres:latest
-    container_name: tourease_logger_serviceDB
-    environment:
-      - POSTGRES_DB=logger_serviceDB
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_USER=postgres
-    ports:
-      - 5538:5432
-
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:

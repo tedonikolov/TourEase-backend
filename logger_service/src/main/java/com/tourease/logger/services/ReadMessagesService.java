@@ -1,6 +1,6 @@
 package com.tourease.logger.services;
 
-import com.tourease.logger.models.entities.Chronology;
+import com.tourease.logger.models.collections.Chronology;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -55,7 +55,7 @@ public class ReadMessagesService {
         Chronology chronology = new Chronology();
         chronology.setEmail(record.key());
         chronology.setLog(record.value());
-        chronology.setCreatedOn(Instant.ofEpochMilli(record.timestamp()).atZone(ZoneId.systemDefault()).toOffsetDateTime());
+        chronology.setCreatedOn(Instant.ofEpochMilli(record.timestamp()).atZone(ZoneId.systemDefault()).toLocalDateTime());
 
         chronologyService.saveChronology(chronology);
 

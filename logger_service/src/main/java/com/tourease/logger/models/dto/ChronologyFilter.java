@@ -2,13 +2,13 @@ package com.tourease.logger.models.dto;
 
 import com.tourease.logger.models.enums.Type;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public record ChronologyFilter (
         String email,
         Type type,
-        OffsetDateTime createdAfter,
-        OffsetDateTime createdBefore,
+        LocalDateTime createdAfter,
+        LocalDateTime createdBefore,
         int page,
         int pageSize
 ) {
