@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: AddCurrencyToHotel
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: hotel
+            columns:
+              - column:
+                  name: currency
+                  type: varchar(255)

@@ -1,6 +1,7 @@
 package com.tourease.hotel.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.Stars;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,8 @@ public class Hotel {
     private LocalDate openingDate;
 
     private LocalDate closingDate;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @Enumerated(EnumType.STRING)
     private Stars stars;

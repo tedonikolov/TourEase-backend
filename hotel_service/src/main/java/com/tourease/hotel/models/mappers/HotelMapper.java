@@ -8,6 +8,7 @@ public class HotelMapper {
     public static Hotel toEntity(HotelCreateVO hotelCreateVO, Owner owner){
         return Hotel.builder()
                 .name(hotelCreateVO.name())
+                .currency(hotelCreateVO.currency())
                 .stars(hotelCreateVO.stars())
                 .owner(owner)
                 .build();
@@ -15,6 +16,7 @@ public class HotelMapper {
 
     public static void updateEntity(Hotel hotel, HotelCreateVO vo){
         hotel.setName(vo.name());
+        hotel.setCurrency(vo.currency());
         hotel.setStars(vo.stars());
         hotel.getLocation().setCity(vo.location().getCity());
         hotel.getLocation().setCountry(vo.location().getCountry());
