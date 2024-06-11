@@ -2,11 +2,13 @@ package com.tourease.core.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
+import com.tourease.core.models.enums.Currency;
 import com.tourease.core.repositories.ReservationRepository;
 import com.tourease.core.models.custom.IndexVM;
 import com.tourease.core.models.dto.*;
 import com.tourease.core.models.entities.Reservation;
 import com.tourease.core.models.enums.ReservationStatus;
+import com.tourease.core.services.communication.ConfigServiceClient;
 import com.tourease.core.services.communication.HotelServiceClient;
 import com.tourease.core.services.communication.UserServiceClient;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -27,6 +31,7 @@ import java.util.Optional;
 public class ReservationService {
     private final UserServiceClient userServiceClient;
     private final HotelServiceClient hotelServiceClient;
+    private final ConfigServiceClient configServiceClient;
     private final ReservationRepository reservationRepository;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
@@ -107,9 +112,25 @@ public class ReservationService {
             reservation.setCheckOut(reservationUpdateVO.checkOut());
             reservation.setNights(reservationUpdateVO.nights());
             reservation.setPeopleCount(reservationUpdateVO.peopleCount());
-            reservation.setPrice(reservationUpdateVO.price());
-            reservation.setCurrency(reservationUpdateVO.currency());
+            if (!Objects.equals(reservationUpdateVO.price(), reservation.getPrice())) {
+                configServiceClient.checkConnection();
+                List<CurrencyRateVO> currencyRates = configServiceClient.getCurrencyRates();
+                CurrencyRateVO currencyRate = currencyRates.stream().filter(rate -> rate.currency().equals(reservation.getCurrency())).findFirst().orElseThrow(() -> new CustomException("Invalid currency", ErrorCode.Failed));
+                reservation.setPrice(convertPrice(reservationUpdateVO.price(), reservationUpdateVO.currency() ,currencyRate));
+            }
             reservationRepository.save(reservation);
         }));
+    }
+
+    private BigDecimal convertPrice(BigDecimal price, Currency currency, CurrencyRateVO currencyRate) {
+        return switch (currency) {
+            case BGN -> price.divide(currencyRate.rateBGN(), 2, RoundingMode.HALF_UP);
+            case EUR -> price.divide(currencyRate.rateEUR(), 2, RoundingMode.HALF_UP);
+            case RUB -> price.divide(currencyRate.rateRUB(), 2, RoundingMode.HALF_UP);
+            case USD -> price.divide(currencyRate.rateUSD(), 2, RoundingMode.HALF_UP);
+            case GBP -> price.divide(currencyRate.rateGBP(), 2, RoundingMode.HALF_UP);
+            case RON -> price.divide(currencyRate.rateRON(), 2, RoundingMode.HALF_UP);
+            case TRY -> price.divide(currencyRate.rateTRY(), 2, RoundingMode.HALF_UP);
+        };
     }
 }
