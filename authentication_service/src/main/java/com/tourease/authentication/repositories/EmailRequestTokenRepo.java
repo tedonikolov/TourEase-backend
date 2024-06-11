@@ -1,12 +1,11 @@
 package com.tourease.authentication.repositories;
 
-import com.tourease.authentication.entity.EmailRequestToken;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import com.tourease.authentication.collections.EmailRequestToken;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EmailRequestTokenRepo extends JpaRepository<EmailRequestToken, Long> {
-    @Query("select e from EmailRequestToken e where e.token = ?1")
+public interface EmailRequestTokenRepo extends MongoRepository<EmailRequestToken, String> {
     EmailRequestToken findByToken(String token);
 }
+

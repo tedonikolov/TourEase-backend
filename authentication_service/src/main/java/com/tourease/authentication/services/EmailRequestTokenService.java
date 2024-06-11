@@ -1,11 +1,11 @@
 package com.tourease.authentication.services;
 
-import com.tourease.authentication.entity.EmailRequestToken;
+import com.tourease.authentication.collections.EmailRequestToken;
 import com.tourease.authentication.repositories.EmailRequestTokenRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -20,14 +20,14 @@ private final EmailRequestTokenRepo emailRequestTokenRepo;
 
         emailRequestToken.setEmail(encodedEmail);
         emailRequestToken.setToken(UUID.randomUUID().toString());
-        emailRequestToken.setExpirationDate(OffsetDateTime.now().plusMinutes(10));
+        emailRequestToken.setExpirationDate(LocalDateTime.now().plusMinutes(10));
         emailRequestTokenRepo.save(emailRequestToken);
         return emailRequestToken.getToken();
     }
 
     public String retrieveEmail(String token) {
         EmailRequestToken emailRequestToken = emailRequestTokenRepo.findByToken(token);
-        if (emailRequestToken == null || emailRequestToken.getExpirationDate().isBefore(OffsetDateTime.now())) {
+        if (emailRequestToken == null || emailRequestToken.getExpirationDate().isBefore(LocalDateTime.now())) {
             return null;
         }
         //emailRequestTokenRepo.delete(emailRequestToken);
