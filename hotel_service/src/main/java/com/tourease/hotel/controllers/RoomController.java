@@ -101,7 +101,7 @@ public class RoomController {
             @ApiResponse(responseCode = "200", description = "Successful returns reservations")
     })
     @GetMapping("/getFreeRoomsForDateByTypeId")
-    public ResponseEntity<List<Room>> getFreeRoomsForDateByTypeId(@RequestHeader Long hotelId, @RequestHeader Long typeId, @RequestParam LocalDate date) {
-        return ResponseEntity.ok(roomService.getFreeRoomsForDateByTypeId(hotelId, typeId, date));
+    public ResponseEntity<List<Room>> getFreeRoomsForDateByTypeId(@RequestHeader Long hotelId, @RequestHeader Long typeId, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
+        return ResponseEntity.ok(roomService.getFreeRoomsBetweenDateByTypeId(hotelId, typeId, fromDate, toDate));
     }
 }

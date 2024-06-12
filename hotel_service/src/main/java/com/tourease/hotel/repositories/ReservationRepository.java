@@ -46,10 +46,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             LEFT JOIN FETCH r.worker
             LEFT JOIN FETCH r.room
             WHERE r.type.hotel.id = :hotelId
-            AND r.creationDate between cast(:date as date) AND cast(:plusDay as date)
             AND r.status = 'PENDING'
             """)
-    List<Reservation> findAllPendingByHotelIdAndDate(Long hotelId, LocalDate date, LocalDate plusDay);
+    List<Reservation> findAllPendingByHotelId(Long hotelId);
 
     @Query("""
             SELECT r FROM Reservation r

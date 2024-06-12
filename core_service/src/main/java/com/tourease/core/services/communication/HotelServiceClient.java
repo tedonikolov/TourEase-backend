@@ -76,4 +76,14 @@ public class HotelServiceClient {
     public void rateHotel(RatingVO rating) {
         defaultRestTemplate.postForObject(hotelServiceUrl + "/internal/rate", rating, Void.class);
     }
+
+    public List<RoomVO> getFreeRoomsBetweenDateByTypeId(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(hotelServiceUrl + "/internal/getFreeRoomsForDateByTypeId")
+                .queryParam("hotelId", hotelId)
+                .queryParam("typeId", typeId)
+                .queryParam("fromDate", fromDate)
+                .queryParam("toDate", toDate);
+
+        return Arrays.stream(defaultRestTemplate.getForObject(builder.toUriString(), RoomVO[].class)).toList();
+    }
 }

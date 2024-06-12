@@ -4,6 +4,7 @@ import com.tourease.hotel.models.dto.requests.RatingVO;
 import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
 import com.tourease.hotel.models.dto.response.DataSet;
 import com.tourease.hotel.models.dto.response.HotelVO;
+import com.tourease.hotel.models.entities.Room;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.services.InternalService;
 import com.tourease.hotel.services.OwnerService;
@@ -87,5 +88,15 @@ public class InternalController {
     public ResponseEntity<Void> rateHotel(@RequestBody RatingVO ratingVO) {
         internalService.rateHotel(ratingVO);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "Get all free rooms by date for hotel",
+            summary = "Get room count between dates for hotel")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful returns rooms")
+    })
+    @GetMapping("/getFreeRoomsForDateByTypeId")
+    public ResponseEntity<List<Room>> getFreeRoomsForDateByTypeId(@RequestParam Long hotelId, @RequestParam Long typeId, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
+        return ResponseEntity.ok(internalService.getFreeRoomsBetweenDateByTypeId(hotelId, typeId, fromDate, toDate));
     }
 }

@@ -21,16 +21,17 @@ public class RouteValidator {
             "/hotel-service/image/getImage/*",
             "/hotel-service/image/getForHotel",
             "/hotel-service/image/getForHotel/*",
-            "/core-service/search/listing"
+            "/core-service/search/listing",
+            "/configuration-service/currency/getCurrencyRates",
     };
     public final String[] allowedUrlMatchers = {
             "/user-service/user/getLoggedUser/*",
-            "/configuration-service/currency/getCurrencyRates",
     };
 
     public final String[] regularAllowedUrlMatchers = {
             "/user-service/regular/**",
             "/core-service/search/getNotAvailableDates",
+            "/core-service/search/getFreeRoomsForDateByTypeId",
             "/core-service/reservation/",
             "/core-service/reservation/*",
             "/core-service/rating",

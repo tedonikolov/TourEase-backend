@@ -106,7 +106,7 @@ public class ReservationService {
     public List<ReservationListing> getAllReservationsForDateAndStatus(Long hotelId, LocalDate date, ReservationStatus status) {
         List<Reservation> reservations = switch (status) {
             case CONFIRMED -> reservationRepository.findAllConfirmedByHotelIdAndDate(hotelId, date, date.plusDays(1));
-            case PENDING -> reservationRepository.findAllPendingByHotelIdAndDate(hotelId, date, date.plusDays(1));
+            case PENDING -> reservationRepository.findAllPendingByHotelId(hotelId);
             case ENDING -> reservationRepository.findAllEndingByHotelId(hotelId);
             case CANCELLED -> reservationRepository.findAllCanceledByHotelId(hotelId, date, date.plusDays(1));
             default -> new ArrayList<>();

@@ -37,23 +37,9 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             jOIN r.reservations res
             WHERE r.hotel.id = :hotelId
             AND cast(:date as date) BETWEEN res.checkIn AND res.checkOut
-            AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED')
+            AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'PENDING')
             """)
     List<Room> findAllTakenByHotelForDate(Long hotelId, LocalDate date);
-
-    @Query("""
-            SELECT r FROM Room r
-            LEFT jOIN r.reservations res
-            WHERE r.hotel.id = :hotelId
-            AND :typeId in (SELECT t.id FROM r.types t)
-            AND r NOT IN (
-                SELECT r FROM Room r
-                JOIN r.reservations res
-                WHERE cast(:date as date) BETWEEN res.checkIn AND res.checkOut
-                AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'FINISHED')
-            )
-            """)
-    List<Room> findAllFreeByHotelForDateAndType(Long hotelId, Long typeId, LocalDate date);
 
     @Query("""
             SELECT r FROM Room r
@@ -66,7 +52,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 WHERE (res.checkIn BETWEEN cast(:fromDate as date) AND cast(:toMinusDay as date)
                 OR res.checkOut BETWEEN cast(:fromPlusDay as date) AND cast(:toDate as date))
                 OR (res.checkIn < cast(:fromDate as date) AND res.checkOut > cast(:toDate as date))
-                AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED')
+                AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'PENDING')
             )
             """)
     List<Room> findAllFreeByHotelBetweenDateAndType(Long hotelId, Long typeId, LocalDate fromDate, LocalDate fromPlusDay, LocalDate toDate, LocalDate toMinusDay);

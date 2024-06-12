@@ -171,10 +171,6 @@ public class RoomService {
         return typeCountMap;
     }
 
-    public List<Room> getFreeRoomsForDateByTypeId(Long hotelId, Long typeId, LocalDate date) {
-        return roomRepository.findAllFreeByHotelForDateAndType(hotelId, typeId, date.plusDays(1));
-    }
-
     public List<Room> getFreeRoomsBetweenDateByTypeId(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
         return roomRepository.findAllFreeByHotelBetweenDateAndType(hotelId, typeId, fromDate, fromDate.plusDays(1), toDate, toDate.plusDays(1));
     }

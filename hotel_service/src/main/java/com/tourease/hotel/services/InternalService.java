@@ -147,4 +147,8 @@ public class InternalService {
             hotelRepository.save(hotel);
         });
     }
+
+    public List<Room> getFreeRoomsBetweenDateByTypeId(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
+        return roomService.getFreeRoomsBetweenDateByTypeId(hotelId, typeId, fromDate, toDate);
+    }
 }
