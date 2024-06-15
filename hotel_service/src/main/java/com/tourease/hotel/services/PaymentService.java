@@ -1,19 +1,23 @@
 package com.tourease.hotel.services;
 
 import com.tourease.hotel.models.dto.requests.*;
+import com.tourease.hotel.models.dto.response.CurrencyRateVO;
 import com.tourease.hotel.models.entities.Customer;
 import com.tourease.hotel.models.entities.Hotel;
 import com.tourease.hotel.models.entities.Payment;
 import com.tourease.hotel.models.entities.Worker;
+import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.PaidFor;
 import com.tourease.hotel.models.enums.WorkerType;
 import com.tourease.hotel.repositories.CustomerRepository;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.repositories.PaymentRepository;
 import com.tourease.hotel.repositories.WorkerRepository;
+import com.tourease.hotel.services.communication.ConfigServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -24,17 +28,27 @@ public class PaymentService {
     private final CustomerRepository customerRepository;
     private final HotelRepository hotelRepository;
     private final WorkerRepository workerRepository;
+    private final ConfigServiceClient configServiceClient;
 
     public Payment createPayment(PaymentCreateVO paymentCreateVO, Long workerId) {
+        configServiceClient.checkConnection();
+        List<CurrencyRateVO> currencyRates = configServiceClient.getCurrencyRates();
+
         Customer customer = customerRepository.getReferenceById(paymentCreateVO.customerId());
         Hotel hotel = hotelRepository.getReferenceById(paymentCreateVO.hotelId());
-        Worker worker = workerId==null ? null : workerRepository.findById(workerId).orElse(null);
+        Worker worker = workerId == null ? null : workerRepository.findById(workerId).orElse(null);
 
         Payment payment = Payment.builder()
                 .customer(customer)
                 .hotel(hotel)
                 .price(paymentCreateVO.price())
                 .currency(paymentCreateVO.currency())
+                .hotelCurrency(hotel.getCurrency())
+                .mealPrice(paymentCreateVO.mealPrice())
+                .nightPrice(paymentCreateVO.nightPrice())
+                .discount(paymentCreateVO.discount())
+                .advancedPayment(paymentCreateVO.advancedPayment())
+                .hotelPrice(paymentCreateVO.price().multiply(getRate(hotel.getCurrency(),currencyRates)).setScale(2))
                 .paidFor(paymentCreateVO.paidFor())
                 .reservationNumber(paymentCreateVO.reservationNumber())
                 .worker(worker)
@@ -67,21 +81,16 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("Payment not found"));
         Worker worker = workerRepository.findById(workerId).orElseThrow(() -> new IllegalArgumentException("Worker not found"));
 
-        if(worker.getWorkerType().equals(WorkerType.MANAGER) && !payment.isPaid()) {
+        if (worker.getWorkerType().equals(WorkerType.MANAGER) && !payment.isPaid()) {
             paymentRepository.delete(payment);
         } else {
             throw new IllegalArgumentException("You don't have permission to delete this payment");
         }
     }
 
-    public void removeReservationPayment(Long reservationNumber) {
-        List<Payment> payments = paymentRepository.findByReservationNumber(reservationNumber);
-        paymentRepository.deleteAll(payments);
-    }
-
     public void createNewPayment(NewPaymentVO newPayment, Long userId) {
         Payment payment = createPayment(new PaymentCreateVO(newPayment), userId);
-        if(newPayment.paymentType()!=null){
+        if (newPayment.paymentType() != null) {
             markPaymentAsPaid(new MarkPaymentVO(payment, newPayment.paymentType()), userId);
         }
     }
@@ -92,12 +101,41 @@ public class PaymentService {
 
     public Payment updatePayment(PaymentCreateVO paymentCreateVO, Long userId) {
         Payment payment = paymentRepository.findByReservationNumberAndPaidForAndPaid(paymentCreateVO.reservationNumber(), PaidFor.RESERVATION, false);
-        if(payment!=null){
+        if (payment != null) {
+            configServiceClient.checkConnection();
+            List<CurrencyRateVO> currencyRates = configServiceClient.getCurrencyRates();
+
             payment.setPrice(paymentCreateVO.price());
             payment.setCurrency(paymentCreateVO.currency());
+            payment.setHotelCurrency(payment.getHotel().getCurrency());
+            payment.setHotelPrice(paymentCreateVO.price().multiply(getRate(payment.getHotel().getCurrency(),currencyRates)).setScale(2));
+            payment.setMealPrice(paymentCreateVO.mealPrice());
+            payment.setNightPrice(paymentCreateVO.nightPrice());
+            payment.setDiscount(paymentCreateVO.discount());
+            payment.setAdvancedPayment(paymentCreateVO.advancedPayment());
+
             return paymentRepository.save(payment);
         } else {
             return createPayment(paymentCreateVO, userId);
         }
+    }
+
+    private BigDecimal getRate(Currency hotelCurrency, List<CurrencyRateVO> currencyRates) {
+        return switch (hotelCurrency) {
+            case BGN ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.BGN)).findFirst().orElseThrow().rateBGN();
+            case USD ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.USD)).findFirst().orElseThrow().rateUSD();
+            case EUR ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.EUR)).findFirst().orElseThrow().rateEUR();
+            case GBP ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.GBP)).findFirst().orElseThrow().rateGBP();
+            case RUB ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.RUB)).findFirst().orElseThrow().rateRUB();
+            case RON ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.RON)).findFirst().orElseThrow().rateRON();
+            case TRY ->
+                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.TRY)).findFirst().orElseThrow().rateTRY();
+        };
     }
 }

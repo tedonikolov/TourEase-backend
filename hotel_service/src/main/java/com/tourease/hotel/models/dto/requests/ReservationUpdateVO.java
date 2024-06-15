@@ -16,5 +16,9 @@ public record ReservationUpdateVO(Long id,
                                   Integer nights,
                                   Integer peopleCount,
                                   BigDecimal price,
+                                  BigDecimal mealPrice,
+                                  BigDecimal nightPrice,
+                                  BigDecimal discount,
+                                  BigDecimal advancedPayment,
                                   Currency currency) {
 }

@@ -11,11 +11,11 @@ import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.WorkerType;
 import com.tourease.hotel.repositories.ReservationRepository;
 import com.tourease.hotel.services.communication.CoreServiceClient;
+import com.tourease.hotel.services.communication.UserServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -33,6 +33,7 @@ public class ReservationService {
     private final MealService mealService;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final CoreServiceClient coreServiceClient;
+    private final UserServiceClient userServiceClient;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
         Customer customer = !reservationInfo.customer().passportId().isEmpty() ? customerService.findByPassportId(reservationInfo.customer().passportId()) : null;
@@ -82,7 +83,12 @@ public class ReservationService {
 
             reservationRepository.save(reservation);
 
-            paymentService.createPayment(new PaymentCreateVO(customer.getId(), room.getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
+            Payment payment = paymentService.createPayment(new PaymentCreateVO(customer.getId(), room.getHotel().getId(), reservationInfo.price(), reservationInfo.mealPrice(), reservationInfo.nightPrice(), reservationInfo.discount(), reservationInfo.advancedPayment(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
+
+            if (reservation.getStatus().equals(ReservationStatus.CONFIRMED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
+                userServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
+                        new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
+            }
 
             kafkaTemplate.send("hotel_service", worker.getEmail(), "New reservation created for hotel with name:" + worker.getHotel().getName());
         } else {
@@ -115,7 +121,7 @@ public class ReservationService {
         return reservations.stream().map(reservation -> {
             Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
 
-            return new ReservationListing(reservation, payment == null ? BigDecimal.valueOf(0) : payment.getPrice(), payment == null ? null : payment.getCurrency(), reservation.getCustomers().stream().toList());
+            return new ReservationListing(reservation, payment, reservation.getCustomers().stream().toList());
         }).collect(Collectors.toList());
     }
 
@@ -124,7 +130,7 @@ public class ReservationService {
         for (Reservation reservation : reservations) {
             if (reservation.getStatus().equals(ReservationStatus.ACCOMMODATED) &&
                     reservation.getCheckOut().isBefore(OffsetDateTime.from(OffsetDateTime.now().plusDays(1)))) {
-                changeReservationStatus(reservation.getId(), ReservationStatus.ENDING);
+                changeReservationStatus(reservation.getId(), null, ReservationStatus.ENDING);
             }
         }
     }
@@ -135,7 +141,7 @@ public class ReservationService {
             if ((reservation.getStatus().equals(ReservationStatus.PENDING) || reservation.getStatus().equals(ReservationStatus.CONFIRMED))
                     && reservation.getCheckIn().isBefore(OffsetDateTime.from(OffsetDateTime.now()))) {
 
-                changeReservationStatus(reservation.getId(), ReservationStatus.NO_SHOW);
+                changeReservationStatus(reservation.getId(), null, ReservationStatus.NO_SHOW);
             }
         }
     }
@@ -166,14 +172,23 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
-    public void changeReservationStatus(Long id, ReservationStatus status) {
+    public void changeReservationStatus(Long id, Long userId, ReservationStatus status) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.EntityNotFound));
         reservation.setStatus(status);
 
-        if(status.equals(ReservationStatus.CANCELLED))
-            paymentService.removeReservationPayment(reservation.getReservationNumber());
+        if(status.equals(ReservationStatus.CANCELLED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
+            userServiceClient.sendDeclinedReservation(new ReservationDeclinedVO(reservation.getReservationNumber(), reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getFullName()));
+        }
 
         reservationRepository.save(reservation);
+
+        Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
+
+        if (status.equals(ReservationStatus.CONFIRMED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
+            Worker worker = workerService.findById(userId);
+            userServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
+                    new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
+        }
 
         coreServiceClient.checkConnection();
         coreServiceClient.changeStatus(reservation.getReservationNumber(), status);
@@ -200,10 +215,12 @@ public class ReservationService {
 
         Worker worker = workerService.findById(userId);
         if(worker.getWorkerType().equals(WorkerType.MANAGER)){
-            Payment payment = paymentService.updatePayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), type.getHotel().getId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
+            Payment payment = paymentService.updatePayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), type.getHotel().getId(), reservationInfo.price(), reservationInfo.mealPrice(), reservationInfo.nightPrice(), reservationInfo.discount(), reservationInfo.advancedPayment(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
             if(coreServiceClient.checkReservation(reservation.getReservationNumber()))
             {
-                coreServiceClient.updateReservation(new ReservationClientUpdateVO(reservation.getReservationNumber(), reservationInfo.checkIn(), reservationInfo.checkOut(), reservationInfo.nights(), reservationInfo.peopleCount(), payment.getPrice(), payment.getCurrency()));
+                coreServiceClient.updateReservation(new ReservationClientUpdateVO(reservation.getReservationNumber(), reservationInfo.checkIn(), reservationInfo.checkOut(),
+                        reservationInfo.nights(), reservationInfo.peopleCount(), payment.getPrice(), payment.getCurrency(),
+                        reservation.getCustomers().stream().findFirst().get().getFullName(), reservation.getCustomers().stream().findFirst().get().getEmail()));
             }
         }
 

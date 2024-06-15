@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -43,9 +42,5 @@ public class CustomerService {
 
     public Customer findById(Long id) {
         return customerRepository.findById(id).orElse(null);
-    }
-
-    public void deleteAll(Set<Customer> customers) {
-        customerRepository.deleteAll(customers);
     }
 }

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public record CustomerDTO(Long id,
                           String fullName,
                           String phoneNumber,
+                          String email,
                           String passportId,
                           LocalDate birthDate,
                           LocalDate creationDate,

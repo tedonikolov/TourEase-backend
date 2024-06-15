@@ -13,5 +13,7 @@ public record ReservationClientUpdateVO(
                                   Integer nights,
                                   Integer peopleCount,
                                   BigDecimal price,
-                                  Currency currency) {
+                                  Currency currency,
+                                  String name,
+                                  String email) {
 }

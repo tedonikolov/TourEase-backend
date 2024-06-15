@@ -26,6 +26,7 @@ public class Customer {
     private String country;
     private String gender;
     private String phoneNumber;
+    private String email;
     private LocalDate creationDate;
     private LocalDate expirationDate;
 

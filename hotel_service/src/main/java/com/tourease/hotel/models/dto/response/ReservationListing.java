@@ -21,11 +21,18 @@ public record ReservationListing(
         OffsetDateTime checkOut,
         int nights,
         BigDecimal price,
+        BigDecimal priceForMeal,
+        BigDecimal pricePerNight,
+        BigDecimal discount,
+        BigDecimal sub,
         Currency currency,
         List<Customer> customers,
         String workerName
 ) {
-    public ReservationListing(Reservation reservation, BigDecimal price, Currency currency, List<Customer> customers) {
-        this(reservation.getId(), reservation.getReservationNumber(), reservation.getCreationDate(), reservation.getStatus(), reservation.getRoom(), reservation.getType(), reservation.getMeal(), reservation.getPeopleCount(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), price, currency, customers,  reservation.getWorker() !=null ? reservation.getWorker().getFullName() : "TourEase");
+    public ReservationListing(Reservation reservation, Payment payment, List<Customer> customers) {
+        this(reservation.getId(), reservation.getReservationNumber(), reservation.getCreationDate(), reservation.getStatus(),
+                reservation.getRoom(), reservation.getType(), reservation.getMeal(), reservation.getPeopleCount(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(),
+                payment.getPrice(), payment.getMealPrice(), payment.getNightPrice(), payment.getDiscount(), payment.getAdvancedPayment(), payment.getCurrency(),
+                customers,  reservation.getWorker() !=null ? reservation.getWorker().getFullName() : "TourEase");
     }
 }

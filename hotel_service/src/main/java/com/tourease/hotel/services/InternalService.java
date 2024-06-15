@@ -83,6 +83,8 @@ public class InternalService {
 
         Type type = typeService.findById(reservationInfo.typeId());
         Meal meal = mealService.findById(reservationInfo.mealId());
+        Room room = roomService.findById(reservationInfo.roomId());
+
         Set<Customer> customers = Set.of(customer);
 
         Reservation reservation = Reservation.builder()
@@ -96,6 +98,7 @@ public class InternalService {
                 .nights(reservationInfo.nights())
                 .type(type)
                 .meal(meal)
+                .room(room)
                 .peopleCount(reservationInfo.peopleCount())
                 .status(ReservationStatus.PENDING)
                 .build();
@@ -104,7 +107,7 @@ public class InternalService {
 
             reservationRepository.save(reservation);
 
-            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), null);
+            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), meal.getPrice(), type.getPrice(), BigDecimal.valueOf(0), BigDecimal.valueOf(0), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), null);
             return reservation.getReservationNumber();
     }
 

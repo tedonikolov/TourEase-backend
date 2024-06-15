@@ -83,7 +83,7 @@ public class ReservationController {
     })
     @PutMapping("/worker/checkOutReservation")
     public ResponseEntity<Void> changeReservationStatusToFinished(@RequestHeader Long reservationId) {
-        reservationService.changeReservationStatus(reservationId, ReservationStatus.FINISHED);
+        reservationService.changeReservationStatus(reservationId, null ,ReservationStatus.FINISHED);
         return ResponseEntity.ok().build();
     }
 
@@ -94,7 +94,7 @@ public class ReservationController {
     })
     @PutMapping("/worker/cancelReservation")
     public ResponseEntity<Void> changeReservationStatusToCancelled(@RequestHeader Long reservationId) {
-        reservationService.changeReservationStatus(reservationId, ReservationStatus.CANCELLED);
+        reservationService.changeReservationStatus(reservationId, null, ReservationStatus.CANCELLED);
         return ResponseEntity.ok().build();
     }
 
@@ -104,8 +104,8 @@ public class ReservationController {
             @ApiResponse(responseCode = "200", description = "Successful mark reservation as confirm")
     })
     @PutMapping("/worker/confirmReservation")
-    public ResponseEntity<Void> changeReservationStatusToConfirmed(@RequestHeader Long reservationId) {
-        reservationService.changeReservationStatus(reservationId, ReservationStatus.CONFIRMED);
+    public ResponseEntity<Void> changeReservationStatusToConfirmed(@RequestHeader Long reservationId, @RequestHeader Long userId) {
+        reservationService.changeReservationStatus(reservationId, userId, ReservationStatus.CONFIRMED);
         return ResponseEntity.ok().build();
     }
 }

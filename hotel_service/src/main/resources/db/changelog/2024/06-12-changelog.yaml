@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: addCurrencyAndPriceForHotelPayment
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: payment
+            columns:
+              - column:
+                  name: hotel_currency
+                  type: varchar(255)
+              - column:
+                  name: hotel_price
+                  type: DECIMAL
+  - changeSet:
+      id: addMorePayment
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: payment
+            columns:
+              - column:
+                  name: night_price
+                  type: DECIMAL
+              - column:
+                  name: meal_price
+                  type: DECIMAL
+              - column:
+                  name: discount
+                  type: DECIMAL
+              - column:
+                  name: advanced_payment
+                  type: DECIMAL
+  - changeSet:
+      id: addEmailToCustomer
+      author: Tedo
+      changes:
+        - addColumn:
+            tableName: customer
+            columns:
+              - column:
+                  name: email
+                  type: varchar(255)

@@ -9,6 +9,7 @@ public class CustomerMapper {
                 .id(customerDTO.id())
                 .fullName(customerDTO.fullName())
                 .phoneNumber(customerDTO.phoneNumber())
+                .email(customerDTO.email())
                 .passportId(customerDTO.passportId())
                 .birthDate(customerDTO.birthDate())
                 .creationDate(customerDTO.creationDate())
@@ -23,6 +24,7 @@ public class CustomerMapper {
                 customer.getId(),
                 customer.getFullName(),
                 customer.getPhoneNumber(),
+                customer.getEmail(),
                 customer.getPassportId(),
                 customer.getBirthDate(),
                 customer.getCreationDate(),
@@ -36,6 +38,7 @@ public class CustomerMapper {
         customer.setId(customerDTO.id());
         customer.setFullName(customerDTO.fullName());
         customer.setPhoneNumber(customerDTO.phoneNumber());
+        customer.setEmail(customerDTO.email());
         customer.setPassportId(customerDTO.passportId());
         customer.setBirthDate(customerDTO.birthDate());
         customer.setCreationDate(customerDTO.creationDate());

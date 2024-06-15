@@ -25,6 +25,13 @@ public class Payment {
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private Currency currency;
+    private BigDecimal hotelPrice;
+    @Enumerated(EnumType.STRING)
+    private Currency hotelCurrency;
+    private BigDecimal nightPrice;
+    private BigDecimal mealPrice;
+    private BigDecimal discount;
+    private BigDecimal advancedPayment;
     private boolean paid;
     private OffsetDateTime paymentDate;
     @Enumerated(EnumType.STRING)
