@@ -1,9 +1,13 @@
 package com.tourease.user.controllers;
 
+import com.tourease.user.models.dto.request.PaymentChangeReservationVO;
+import com.tourease.user.models.dto.request.ReservationConfirmationVO;
+import com.tourease.user.models.dto.request.ReservationDeclinedVO;
 import com.tourease.user.models.dto.request.WorkerVO;
 import com.tourease.user.models.dto.response.UserVO;
 import com.tourease.user.models.enums.UserType;
 import com.tourease.user.models.enums.WorkerType;
+import com.tourease.user.services.EmailSenderService;
 import com.tourease.user.services.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Hidden
 public class InternalController {
     private final UserService userService;
+    private final EmailSenderService emailSenderService;
 
     @PostMapping("/createUserForWorker")
     public ResponseEntity<Long> createUserForWorker(@RequestBody WorkerVO workerVO){
@@ -43,5 +48,22 @@ public class InternalController {
     @GetMapping("/getCustomerDetails/{id}")
     public ResponseEntity<UserVO> getCustomerDetails(@PathVariable Long id){
         return ResponseEntity.ok(userService.getCustomerDetails(id));
+    }
+
+    @PostMapping("/sendReservationConfirmation")
+    public ResponseEntity<Void> sendReservationConfirmation(@RequestBody ReservationConfirmationVO reservationConfirmationVO){
+        emailSenderService.sendReservationConfirmation(reservationConfirmationVO);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/sendDeclinedReservation")
+    public ResponseEntity<Void> sendDeclinedReservation(@RequestBody ReservationDeclinedVO reservationDeclinedVO){
+        emailSenderService.sendDeclinedReservation(reservationDeclinedVO.email(), reservationDeclinedVO.name(), reservationDeclinedVO.reservationNumber());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/sendPaymentChangeReservation")
+    public ResponseEntity<Void> sendPaymentChangeReservation(@RequestBody PaymentChangeReservationVO paymentChangeReservationVO){
+        emailSenderService.sendPaymentChangeReservation(paymentChangeReservationVO);
+        return ResponseEntity.ok().build();
     }
 }

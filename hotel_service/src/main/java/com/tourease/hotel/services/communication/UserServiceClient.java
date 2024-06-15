@@ -5,6 +5,8 @@ import com.netflix.discovery.shared.Application;
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.configuration.exception.InternalServiceException;
+import com.tourease.hotel.models.dto.requests.ReservationConfirmationVO;
+import com.tourease.hotel.models.dto.requests.ReservationDeclinedVO;
 import com.tourease.hotel.models.dto.requests.WorkerRegisterVO;
 import com.tourease.hotel.models.enums.WorkerType;
 import lombok.AllArgsConstructor;
@@ -48,4 +50,11 @@ public class UserServiceClient {
         defaultRestTemplate.postForLocation(userServiceUrl + "/internal/changeUserType/"+id, new HttpEntity<>(workerType));
     }
 
+    public void sendReservationConfirmation(ReservationConfirmationVO reservationConfirmationVO) {
+        defaultRestTemplate.postForLocation(userServiceUrl + "/internal/sendReservationConfirmation", new HttpEntity<>(reservationConfirmationVO));
+    }
+
+    public void sendDeclinedReservation(ReservationDeclinedVO reservationDeclinedVO) {
+        defaultRestTemplate.postForLocation(userServiceUrl + "/internal/sendDeclinedReservation", new HttpEntity<>(reservationDeclinedVO));
+    }
 }

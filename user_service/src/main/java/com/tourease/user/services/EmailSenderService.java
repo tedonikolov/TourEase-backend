@@ -120,6 +120,21 @@ public class EmailSenderService {
         kafkaTemplate.send("email_sender", email, "Password change email send!");
     }
 
+    public void sendDeclinedReservation(String email, String fullname, Long reservationNumber) {
+        configurationServiceClient.checkConnection();
+        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+
+        String subject = "Declined reservation with number:"+reservationNumber;
+        String body = "Dear "+fullname+",<br>"
+                + "Your reservation with number:"+reservationNumber+" has been declined.<br>"
+                + "Thank you for the understanding,<br>"
+                + "TourEase.";
+
+        sendEmail(emailInfoVO, email, subject, body);
+
+        kafkaTemplate.send("email_sender", email, "Reservation declined!");
+    }
+
     public void sendPaymentChangeReservation(PaymentChangeReservationVO paymentChangeReservationVO) {
         configurationServiceClient.checkConnection();
         EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
