@@ -43,9 +43,10 @@ public class EmailSenderService {
         String senderName = "TourEase";
 
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
+        MimeMessageHelper helper;
 
         try {
+            helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
             helper.setFrom(emailInfoVO.emailFrom(), senderName);
             helper.setTo(toEmail);
             helper.setSubject(subject);
@@ -117,5 +118,22 @@ public class EmailSenderService {
         sendEmail(emailInfoVO, email, subject, body);
 
         kafkaTemplate.send("email_sender", email, "Password change email send!");
+    }
+
+    public void sendPaymentChangeReservation(PaymentChangeReservationVO paymentChangeReservationVO) {
+        configurationServiceClient.checkConnection();
+        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+
+        String subject = "Payment changed for reservation with number:"+paymentChangeReservationVO.reservationNumber();
+        String body = "Dear "+paymentChangeReservationVO.name()+",<br>"
+                + "The price of your reservation with number:"+paymentChangeReservationVO.reservationNumber()+" has been changed.<br>"
+                + "Old price: "+paymentChangeReservationVO.oldPrice()+" "+paymentChangeReservationVO.currency()+"<br>"
+                + "<b>New price: "+paymentChangeReservationVO.newPrice()+" "+paymentChangeReservationVO.currency()+"</b><br>"
+                + "Thank you for the understanding,<br>"
+                + "TourEase.";
+
+        sendEmail(emailInfoVO, paymentChangeReservationVO.email(), subject, body);
+
+        kafkaTemplate.send("email_sender", paymentChangeReservationVO.email(), "Reservation payment change!");
     }
 }
