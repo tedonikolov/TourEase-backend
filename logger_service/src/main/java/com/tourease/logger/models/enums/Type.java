@@ -28,7 +28,11 @@ public enum Type {
     HOTEL_CREATED("Hotel created"),
     HOTEL_UPDATED("Hotel updated"),
     CONFIG_UPDATED("Configurations updated!"),
-    PASSWORD_CHANGED("Password Changed!");
+    PASSWORD_CHANGED("Password Changed!"),
+    RESERVATION_CONFIRMATION("Reservation confirmation email send!"),
+    RESERVATION_CHANGED("Reservation payment change!"),
+    CUSTOMER_DETAILS("Customer details retrieved!"),
+    NEW_RESERVATION("New reservation created for hotel with name"),;
 
     private final String label;
 
