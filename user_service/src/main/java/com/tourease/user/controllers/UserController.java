@@ -5,8 +5,8 @@ import com.tourease.user.models.dto.request.ChangePasswordVO;
 import com.tourease.user.models.dto.request.UserRegistration;
 import com.tourease.user.models.dto.response.LoginResponse;
 import com.tourease.user.models.dto.response.UserVO;
-import com.tourease.user.services.EmailSenderService;
 import com.tourease.user.services.UserService;
+import com.tourease.user.services.communication.EmailServiceClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
-    private final EmailSenderService emailSenderService;
+    private final EmailServiceClient emailServiceClient;
 
     @Operation(hidden = true)
     @PostMapping("/login")
@@ -50,7 +50,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Successfully send email.")})
     @PostMapping("/sendActivateEmail/{email}")
     public ResponseEntity<Void> sendActivateEmail(@PathVariable String email) {
-        emailSenderService.sendActivationMail(email);
+        emailServiceClient.checkConnection("Couldn't send activation email.");
+        emailServiceClient.sendActivationMail(email);
         return ResponseEntity.ok().build();
     }
 

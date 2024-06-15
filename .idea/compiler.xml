@@ -11,6 +11,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="com.tourease.email_service" target="21" />
+      <module name="com.tourease.email_service.main" target="21" />
+      <module name="com.tourease.email_service.test" target="21" />
       <module name="service-registry.main" target="20" />
       <module name="service-registry.test" target="20" />
       <module name="user-service" target="20" />

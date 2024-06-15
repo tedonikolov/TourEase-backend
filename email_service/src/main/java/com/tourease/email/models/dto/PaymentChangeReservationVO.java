@@ -1,4 +1,4 @@
-package com.tourease.user.models.dto.request;
+package com.tourease.email.models.dto;
 
 import java.math.BigDecimal;
 

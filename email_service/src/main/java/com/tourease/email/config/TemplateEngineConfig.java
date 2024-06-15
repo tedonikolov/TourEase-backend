@@ -1,4 +1,4 @@
-package com.tourease.user.config;
+package com.tourease.email.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

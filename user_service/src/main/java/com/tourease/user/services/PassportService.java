@@ -6,6 +6,7 @@ import com.tourease.user.models.dto.request.PassportVO;
 import com.tourease.user.models.entities.Passport;
 import com.tourease.user.models.entities.User;
 import com.tourease.user.repositories.PassportRepository;
+import com.tourease.user.services.communication.EmailServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class PassportService {
     private final PassportRepository passportRepository;
     private final UserService userService;
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final EmailSenderService emailSenderService;
+    private final EmailServiceClient emailServiceClient;
 
     public void save(PassportVO passportVO) {
         User user = userService.findEntity(passportVO.email());
@@ -47,7 +48,7 @@ public class PassportService {
         for(Passport passport : passports){
             passport.setExpired(true);
             kafkaTemplate.send("user_service", passport.getRegular().getUser().getEmail(), "Passport date expired!");
-            emailSenderService.sendPassportDateExpiredNotify(passport.getRegular().getUser().getEmail(),passport.getRegular().getFirstName()+" "+passport.getRegular().getLastName());
+            emailServiceClient.sendPassportDateExpiredNotify(passport.getRegular().getUser().getEmail(),passport.getRegular().getFirstName()+" "+passport.getRegular().getLastName());
         }
 
         passportRepository.saveAll(passports);

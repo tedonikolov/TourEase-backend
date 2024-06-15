@@ -9,6 +9,7 @@ import com.tourease.core.models.dto.*;
 import com.tourease.core.models.entities.Reservation;
 import com.tourease.core.models.enums.ReservationStatus;
 import com.tourease.core.services.communication.ConfigServiceClient;
+import com.tourease.core.services.communication.EmailServiceClient;
 import com.tourease.core.services.communication.HotelServiceClient;
 import com.tourease.core.services.communication.UserServiceClient;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ReservationService {
     private final UserServiceClient userServiceClient;
+    private final EmailServiceClient emailServiceClient;
     private final HotelServiceClient hotelServiceClient;
     private final ConfigServiceClient configServiceClient;
     private final ReservationRepository reservationRepository;
@@ -117,8 +119,8 @@ public class ReservationService {
                 List<CurrencyRateVO> currencyRates = configServiceClient.getCurrencyRates();
                 CurrencyRateVO currencyRate = currencyRates.stream().filter(rate -> rate.currency().equals(reservation.getCurrency())).findFirst().orElseThrow(() -> new CustomException("Invalid currency", ErrorCode.Failed));
                 BigDecimal newPrice = convertPrice(reservationUpdateVO.price(), reservationUpdateVO.currency() ,currencyRate);
-                if (newPrice.compareTo(reservationUpdateVO.price()) != 0){
-                    userServiceClient.sendPaymentChangeReservation(new PaymentChangeReservationVO(reservationUpdateVO.reservationNumber(), reservationUpdateVO.name(), reservationUpdateVO.email(), newPrice, reservation.getPrice(), reservation.getCurrency()));
+                if (newPrice.compareTo(reservation.getPrice()) != 0){
+                    emailServiceClient.sendPaymentChangeReservation(new PaymentChangeReservationVO(reservationUpdateVO.reservationNumber(), reservationUpdateVO.name(), reservationUpdateVO.email(), newPrice, reservation.getPrice(), reservation.getCurrency()));
 
                     reservation.setPrice(newPrice);
                 }

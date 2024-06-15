@@ -1,10 +1,10 @@
-package com.tourease.user.services;
+package com.tourease.email.services;
 
-import com.tourease.user.models.dto.request.EmailInfoVO;
-import com.tourease.user.models.dto.request.PaymentChangeReservationVO;
-import com.tourease.user.models.dto.request.ReservationConfirmationVO;
-import com.tourease.user.services.communication.AuthenticationServiceClient;
-import com.tourease.user.services.communication.ConfigurationServiceClient;
+import com.tourease.email.models.dto.EmailInfoVO;
+import com.tourease.email.models.dto.PaymentChangeReservationVO;
+import com.tourease.email.models.dto.ReservationConfirmationVO;
+import com.tourease.email.services.communication.AuthenticationServiceClient;
+import com.tourease.email.services.communication.ConfigurationServiceClient;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;

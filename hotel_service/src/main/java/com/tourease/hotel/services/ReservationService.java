@@ -11,6 +11,7 @@ import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.WorkerType;
 import com.tourease.hotel.repositories.ReservationRepository;
 import com.tourease.hotel.services.communication.CoreServiceClient;
+import com.tourease.hotel.services.communication.EmailServiceClient;
 import com.tourease.hotel.services.communication.UserServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -34,6 +35,7 @@ public class ReservationService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final CoreServiceClient coreServiceClient;
     private final UserServiceClient userServiceClient;
+    private final EmailServiceClient emailServiceClient;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
         Customer customer = !reservationInfo.customer().passportId().isEmpty() ? customerService.findByPassportId(reservationInfo.customer().passportId()) : null;
@@ -86,7 +88,7 @@ public class ReservationService {
             Payment payment = paymentService.createPayment(new PaymentCreateVO(customer.getId(), room.getHotel().getId(), reservationInfo.price(), reservationInfo.mealPrice(), reservationInfo.nightPrice(), reservationInfo.discount(), reservationInfo.advancedPayment(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
 
             if (reservation.getStatus().equals(ReservationStatus.CONFIRMED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
-                userServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
+                emailServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
                         new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
             }
 
@@ -177,7 +179,7 @@ public class ReservationService {
         reservation.setStatus(status);
 
         if(status.equals(ReservationStatus.CANCELLED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
-            userServiceClient.sendDeclinedReservation(new ReservationDeclinedVO(reservation.getReservationNumber(), reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getFullName()));
+            emailServiceClient.sendDeclinedReservation(new ReservationDeclinedVO(reservation.getReservationNumber(), reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getFullName()));
         }
 
         reservationRepository.save(reservation);
@@ -186,7 +188,7 @@ public class ReservationService {
 
         if (status.equals(ReservationStatus.CONFIRMED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
             Worker worker = workerService.findById(userId);
-            userServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
+            emailServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
                     new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
         }
 

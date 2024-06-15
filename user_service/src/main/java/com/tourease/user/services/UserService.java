@@ -12,6 +12,7 @@ import com.tourease.user.models.enums.UserStatus;
 import com.tourease.user.models.enums.UserType;
 import com.tourease.user.repositories.UserRepository;
 import com.tourease.user.services.communication.AuthenticationServiceClient;
+import com.tourease.user.services.communication.EmailServiceClient;
 import com.tourease.user.services.communication.HotelServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -23,8 +24,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailSenderService emailSenderService;
     private final HotelServiceClient hotelServiceClient;
+    private final EmailServiceClient emailServiceClient;
     private final AuthenticationServiceClient authenticationServiceClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -55,7 +56,8 @@ public class UserService {
 
         kafkaTemplate.send("user_service", user.getEmail(), "Registration created!");
 
-        emailSenderService.sendActivationMail(user.getEmail());
+        emailServiceClient.checkConnection("Couldn't send activation email.");
+        emailServiceClient.sendActivationMail(user.getEmail());
     }
 
     public void activateUser(String token) {
@@ -101,7 +103,7 @@ public class UserService {
 
     public void sendPasswordChangeLink(String email) {
         userRepository.findByEmail(email).orElseThrow(() -> new CustomException("Profile don't exist", ErrorCode.Failed));
-        emailSenderService.sendPasswordChangeLink(email);
+        emailServiceClient.sendPasswordChangeLink(email);
     }
 
     public void changePassword(ChangePasswordVO changePasswordVO) {
@@ -130,7 +132,7 @@ public class UserService {
         user.setUserType(UserType.valueOf(workerVO.workerType().name()));
         user.setUserStatus(UserStatus.PENDING);
 
-        emailSenderService.sendPasswordChangeLink(user.getEmail());
+        emailServiceClient.sendPasswordChangeLink(user.getEmail());
         kafkaTemplate.send("user_service", user.getEmail(), "Registration created!");
 
         return userRepository.save(user).getId();

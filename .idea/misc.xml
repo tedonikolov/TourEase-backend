@@ -1,9 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/authentication_service" />
     <file type="web" url="file://$PROJECT_DIR$/configuration_service" />
     <file type="web" url="file://$PROJECT_DIR$/core_service" />
+    <file type="web" url="file://$PROJECT_DIR$/email_service" />
     <file type="web" url="file://$PROJECT_DIR$/gateway_service" />
     <file type="web" url="file://$PROJECT_DIR$/hotel_service" />
     <file type="web" url="file://$PROJECT_DIR$/logger_service" />
