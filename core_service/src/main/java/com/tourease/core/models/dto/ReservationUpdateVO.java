@@ -11,5 +11,8 @@ public record ReservationUpdateVO(Long reservationNumber,
                                   Integer nights,
                                   Integer peopleCount,
                                   BigDecimal price,
-                                  Currency currency) {
+                                  Currency currency,
+                                  String name,
+                                  String email
+) {
 }

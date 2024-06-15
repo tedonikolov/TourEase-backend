@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public record CustomerVO(String fullName,
                          String phoneNumber,
+                         String email,
                          String passportId,
                          LocalDate birthDate,
                          LocalDate creationDate,
@@ -13,6 +14,7 @@ public record CustomerVO(String fullName,
     public CustomerVO(UserVO userVO) {
         this(   userVO.regular().firstName()+" "+userVO.regular().lastName(),
                 userVO.regular().phone(),
+                userVO.email(),
                 userVO.regular().passport().passportId(),
                 userVO.regular().birthDate(),
                 userVO.regular().passport().creationDate(),
