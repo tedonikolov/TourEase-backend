@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title th:text="${title}"></title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <style>
+        .spaced div {
+            margin: 3px 0;
+        }
+
+        .data {
+            padding: 20px;
+            border: 2px solid black;
+            border-collapse: collapse;
+            width: 85%;
+            height: 85%;
+            margin: auto;
+        }
+
+        .data div {
+            margin: 3px 0;
+        }
+
+        img {
+            display: inline;
+            width: 70%;
+        }
+
+        body {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div style="display:flex">
+        <div style="flex:1">
+            <h2 style="text-align: center">TourEase <span th:text="${title}"></span></h2>
+        </div>
+    </div>
+    <div style="display:flex">
+        <div style="flex:1">
+            <div class="data">
+                <p style="margin: 0; margin-left: 5px"><b>Information of reservation:</b></p>
+                <div>Check in: <br><b><span th:text="${checkIn}"></span></b></div>
+                <div>Check out: <br><b><span th:text="${checkOut}"></span></b></div>
+                <div>Length of stay: <br><span th:text="${nights}"></span> nights</div>
+                <div>Number of guests: <br><span th:text="${people}"></span></div>
+                <div>Room type: <br><b><span th:text="${type}"></span></b></div>
+                <div>Meal plan: <br><b><span th:text="${meal}"></span></b></div>
+                <div>Price: <br><b><span th:text="${currency}"></span> <span th:text="${price}"></span></b></div>
+            </div>
+        </div>
+
+        <div style="flex:1">
+            <div class="data" style="margin-bottom: 50px">
+                <p style="margin: 0; margin-left: 5px"><b>Information of hotel:</b></p>
+                <div>Name: <br><b><span th:text="${name}"></span></b></div>
+                <div>Country: <br><span th:text="${country}"></span></div>
+                <div>City: <br><span th:text="${city}"></span></div>
+                <div>Address: <br><span th:text="${address}"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<footer>
+    <div style="text-align: left; margin-top: 50px">
+        <div>
+            Prepared by: <b><span th:text="${workerName}"></span></b>
+            ; <b><span th:text="${workerPhone}"></span></b>
+            ; email:<span th:text="${workerEmail}"></span>
+        </div>
+        <hr>
+        <span th:text="${timestamp}"></span>
+    </div>
+</footer>
+</html>

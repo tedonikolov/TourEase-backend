@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title th:text="${title}"></title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <style>
+        .spaced div {
+            margin: 3px 0;
+        }
+
+        .data {
+            padding: 20px;
+            border: 2px solid black;
+            border-collapse: collapse;
+            width: 85%;
+            height: 85%;
+            margin: auto;
+        }
+
+        .data div {
+            margin: 5% 0;
+        }
+
+        img {
+            display: inline;
+            width: 70%;
+        }
+
+        body {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div style="display:flex">
+        <div style="flex:1">
+            <h2 style="text-align: center">TourEase <span th:text="${title}"></span></h2>
+        </div>
+    </div>
+    <div style="display:flex">
+        <div style="flex:1">
+            <div class="data">
+                <p style="margin: 0; margin-left: 5px"><b>Информация за резервацията:</b></p>
+                <div>Настаняване: <br><b><span th:text="${checkIn}"></span></b></div>
+                <div>Напускане: <br><b><span th:text="${checkOut}"></span></b></div>
+                <div>Дължина на престоя: <br><span th:text="${nights}"></span> нощувки</div>
+                <div>Общо гости: <br><span th:text="${people}"></span></div>
+                <div>Тип стая: <br><b><span th:text="${type}"></span></b></div>
+                <div>Изхранване: <br><b><span th:text="${meal}"></span></b></div>
+                <div>Цена: <br><b><span th:text="${currency}"></span> <span th:text="${price}"></span></b></div>
+            </div>
+        </div>
+
+        <div style="flex:1">
+            <div class="data" style="margin-bottom: 50px">
+                <p style="margin: 0; margin-left: 5px"><b>Информация за хотела:</b></p>
+                <div>Име: <br><b><span th:text="${name}"></span></b></div>
+                <div>Държава: <br><span th:text="${country}"></span></div>
+                <div>Град: <br><span th:text="${city}"></span></div>
+                <div>Адрес: <br><span th:text="${address}"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<footer>
+    <div style="text-align: left; margin-top: 50px">
+        <div>
+            Изготвил: <b><span th:text="${workerName}"></span></b>
+            ; <b><span th:text="${workerPhone}"></span></b>
+            ; email:<span th:text="${workerEmail}"></span>
+        </div>
+        <hr>
+        <span th:text="${timestamp}"></span>
+    </div>
+</footer>
+</html>

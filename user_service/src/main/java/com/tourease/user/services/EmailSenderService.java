@@ -1,6 +1,8 @@
 package com.tourease.user.services;
 
 import com.tourease.user.models.dto.request.EmailInfoVO;
+import com.tourease.user.models.dto.request.PaymentChangeReservationVO;
+import com.tourease.user.models.dto.request.ReservationConfirmationVO;
 import com.tourease.user.services.communication.AuthenticationServiceClient;
 import com.tourease.user.services.communication.ConfigurationServiceClient;
 import jakarta.mail.MessagingException;
@@ -11,8 +13,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.TemplateSpec;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
 
 import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 @Service
@@ -21,6 +30,7 @@ public class EmailSenderService {
     private final ConfigurationServiceClient configurationServiceClient;
     private final AuthenticationServiceClient authenticationServiceClient;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final TemplateEngine templateEngine;
 
     private JavaMailSender getMailSender(EmailInfoVO emailInfoVO){
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -118,6 +128,65 @@ public class EmailSenderService {
         sendEmail(emailInfoVO, email, subject, body);
 
         kafkaTemplate.send("email_sender", email, "Password change email send!");
+    }
+
+    public void sendReservationConfirmation(ReservationConfirmationVO reservationConfirmationVO) {
+        configurationServiceClient.checkConnection();
+        EmailInfoVO emailInfoVO = configurationServiceClient.getEmailInfo();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+        TemplateSpec templateSpec = new TemplateSpec(reservationConfirmationVO.country()!=null && reservationConfirmationVO.country().equals("Bulgaria") ? "reservationBG" : "reservationEN", TemplateMode.HTML);
+
+        Context context = new Context();
+        context.setVariable("checkIn", reservationConfirmationVO.reservationVO().checkIn().format(dateFormatter));
+        context.setVariable("checkOut", reservationConfirmationVO.reservationVO().checkOut().format(dateFormatter));
+        context.setVariable("nights", reservationConfirmationVO.reservationVO().nights());
+        context.setVariable("people", reservationConfirmationVO.reservationVO().people());
+        context.setVariable("currency", reservationConfirmationVO.reservationVO().currency());
+        context.setVariable("price", reservationConfirmationVO.reservationVO().price().setScale(2, RoundingMode.HALF_UP));
+
+        context.setVariable("type", reservationConfirmationVO.reservationVO().roomType());
+
+        if (reservationConfirmationVO.country()!=null && reservationConfirmationVO.country().equals("Bulgaria")) {
+            context.setVariable("title","РЕЗЕРВАЦИЯ №:" + (reservationConfirmationVO.reservationVO().reservationNumber()));
+
+            switch (reservationConfirmationVO.reservationVO().meal()) {
+                case "BREAKFAST" -> context.setVariable("meal", "Закуска");
+                case "HALFBOARD" -> context.setVariable("meal", "Закуска и вечеря");
+                case "FULLBOARD" -> context.setVariable("meal", "Закуска, обяд и вечеря");
+                case "ALLINCLUSIVE" -> context.setVariable("meal", "Ол инклузив");
+                default -> context.setVariable("meal", "Нощувка");
+            }
+        } else {
+            context.setVariable("title","RESERVATION №:" + reservationConfirmationVO.reservationVO().reservationNumber());
+
+            switch (reservationConfirmationVO.reservationVO().meal()) {
+                case "BREAKFAST" -> context.setVariable("meal", "Breakfast");
+                case "HALFBOARD" -> context.setVariable("meal", "Breakfast and dinner");
+                case "FULLBOARD" -> context.setVariable("meal", "Breakfast, lunch and dinner");
+                case "ALLINCLUSIVE" -> context.setVariable("meal", "All inclusive");
+                default -> context.setVariable("meal", "Нощувка");
+            }
+        }
+
+        context.setVariable("name", reservationConfirmationVO.reservationVO().hotelName());
+        context.setVariable("country", reservationConfirmationVO.reservationVO().hotelCountry());
+        context.setVariable("city", reservationConfirmationVO.reservationVO().hotelCity());
+        context.setVariable("address", reservationConfirmationVO.reservationVO().hotelAddress());
+
+        context.setVariable("workerName", reservationConfirmationVO.reservationVO().workerName());
+        context.setVariable("workerEmail", reservationConfirmationVO.reservationVO().workerEmail());
+        context.setVariable("workerPhone", reservationConfirmationVO.reservationVO().workerPhone());
+
+        context.setVariable("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
+
+        String body = templateEngine.process(templateSpec, context);
+
+        String subject = "Reservation confirmation with number:"+reservationConfirmationVO.reservationVO().reservationNumber();
+
+        sendEmail(emailInfoVO, reservationConfirmationVO.email(), subject, body);
+
+        kafkaTemplate.send("email_sender", reservationConfirmationVO.email(), "Reservation confirmation email send!");
     }
 
     public void sendDeclinedReservation(String email, String fullname, Long reservationNumber) {

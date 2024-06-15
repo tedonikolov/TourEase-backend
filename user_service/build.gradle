@@ -44,6 +44,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    //    Export PDF
+    implementation 'com.ibm.icu:icu4j:71.1'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.6'
+    implementation 'com.itextpdf:kernel:8.0.2'
+    implementation 'com.itextpdf:html2pdf:4.0.1'
 }
 
 tasks.named('test') {
