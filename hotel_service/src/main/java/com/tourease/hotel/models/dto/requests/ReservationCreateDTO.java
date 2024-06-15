@@ -14,6 +14,10 @@ public record ReservationCreateDTO(CustomerDTO customer,
                                    OffsetDateTime checkOut,
                                    Integer nights,
                                    BigDecimal price,
+                                   BigDecimal mealPrice,
+                                   BigDecimal nightPrice,
+                                   BigDecimal discount,
+                                   BigDecimal advancedPayment,
                                    Integer peopleCount,
                                    Currency currency) {
 }

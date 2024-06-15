@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title th:text="${title}"></title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <style>
+        .spaced div {
+            margin: 3px 0;
+        }
+
+        .bordered, .bordered tr, .bordered td {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+
+        .bordered {
+            width: 100%;
+            margin: auto;
+        }
+
+        .data {
+            padding: 20px;
+            border: 2px solid black;
+            border-collapse: collapse;
+            width: 85%;
+            height: 75%;
+            margin: auto;
+        }
+
+        .data div {
+            margin: 3px 0;
+        }
+
+        img {
+            display: inline;
+            width: 70%;
+        }
+
+        body {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div style="display:flex">
+        <div style="flex:1">
+            <img alt="Logo" src="hotel_service/src/main/resources/templates/images/Logo.png"
+                 style="width: 100px; height: 100px"><br>
+        </div>
+        <div style="flex:1">
+            <h2 style="text-align: center">TourEase <span th:text="${title}"></span></h2>
+            <h2 style="text-align: center"><span th:text="${status}"></span></h2>
+        </div>
+    </div>
+    <div style="display:flex">
+        <div style="flex:1">
+            <p style="margin: 0; margin-left: 5px"><b>Информация за резервацията:</b></p>
+            <div class="data">
+                <div>Настаняване: <br><b><span th:text="${checkIn}"></span></b></div>
+                <div>Напускане: <br><b><span th:text="${checkOut}"></span></b></div>
+                <div>Дължина на престоя: <br><span th:text="${nights}"></span> нощувки</div>
+                <div>Общо гости: <br><b><span th:text="${people}"></span></b></div>
+                <div>Цена: <br><b><span th:text="${currency}"></span>   <span th:text="${price}"></span></b></div>
+            </div>
+        </div>
+
+        <div style="flex:1">
+            <p style="margin: 0; margin-left: 5px"><b>Информация за госта:</b></p>
+            <div class="data" style="margin-bottom: 50px">
+                <div>Име: <br><b><span th:text="${name}"></span></b></div>
+                <div>Емайл: <br><span th:text="${email}"></span></div>
+                <div>Телефон: <br><span th:text="${telephone}"></span></div>
+                <div>Държава: <br><span th:text="${country}"></span></div>
+            </div>
+        </div>
+    </div>
+    <table class="bordered">
+        <thead>
+        <tr>
+            <td style="padding-left: 3px">№ стая</td>
+            <td style="padding-left: 3px">Тип стая</td>
+            <td style="padding-left: 3px">Изхранване</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="padding-left: 3px" th:text="${room}"></td>
+            <td style="padding-left: 3px" th:text="${type}"></td>
+            <td style="padding-left: 3px" th:text="${meal}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="display:flex">
+        <div style="flex:1">
+            <table style="float: left">
+                <tbody>
+                <tr>
+                    <td style="text-align: left"><span> Цена за нощувка:</span></td>
+                    <td style="text-align: right"><span th:text="${nightPrice}"></span> <span th:text="${currency}"></span></td>
+                </tr>
+                <tr>
+                    <td style="text-align: left"><span>Цена за изхранване за ден:</span></td>
+                    <td style="text-align: right"><span th:text="${mealPrice}"></span> <span th:text="${currency}"></span></td>
+                </tr>
+                <tr>
+                    <td style="text-align: left"><span>Общо цена за престоя:</span></td>
+                    <td style="text-align: right"><span th:text="${totalPrice}"></span> <span th:text="${currency}"></span></td>
+                </tr>
+                <tr>
+                    <td style="text-align: left">Отстъпка (<span th:text="${discount}"></span>%):</td>
+                    <td style="text-align: right"><span th:text="${discountedPrice}"></span> <span th:text="${currency}"></span></td>
+                </tr>
+                <tr>
+                    <td style="text-align: left"><span>Аванс:</span></td>
+                    <td style="text-align: right">-<span th:text="${advancedPayment}"></span> <span th:text="${currency}"></span></td>
+                </tr>
+                <tr>
+                    <td style="text-align: left"><span>Крайна цена:</span></td>
+                    <td style="text-align: right"><span th:text="${price}"></span> <span th:text="${currency}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+<footer>
+    <div style="text-align: left; margin-top: 50px">
+        <div>Изготвил: <b><span th:text="${worker}"></span></b>
+            , <b><span th:text="${workerPhone}"></span></b></div>
+        <hr>
+        <span th:text="${timestamp}"></span>,
+        <span th:text="${hotel}"></span>, <span th:text="${address}"></span>
+    </div>
+</footer>
+</html>
