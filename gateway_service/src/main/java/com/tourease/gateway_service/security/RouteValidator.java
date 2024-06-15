@@ -21,6 +21,7 @@ public class RouteValidator {
             "/hotel-service/image/getImage/*",
             "/hotel-service/image/getForHotel",
             "/hotel-service/image/getForHotel/*",
+            "/hotel-service/docs/reservation",
             "/core-service/search/listing",
             "/configuration-service/currency/getCurrencyRates",
     };
@@ -59,7 +60,8 @@ public class RouteValidator {
             "/hotel-service/hotel/room/*",
             "/hotel-service/worker/type",
             "/hotel-service/worker/type/*",
-            "/hotel-service/hotel/worker/save",
+            "/hotel-service/hotel/worker",
+            "/hotel-service/hotel/worker/*",
     };
 
     public final String[] managerAllowedUrlMatchers = {
