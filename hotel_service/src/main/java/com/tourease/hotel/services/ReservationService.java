@@ -101,14 +101,16 @@ public class ReservationService {
     public List<SchemaReservationsVO> getAllReservationsViewByHotel(Long hotelId, LocalDate date) {
         LocalDate plusDay = date.plusDays(1);
         List<Reservation> reservations = reservationRepository.findAllByRoomHotelIdAndDate(hotelId, date, plusDay);
-        reservations.sort(Comparator.comparing((Reservation r) -> switch (r.getStatus()) {
+        List<Reservation> modifiableReservations = new ArrayList<>(reservations);
+
+        modifiableReservations.sort(Comparator.comparing((Reservation r) -> switch (r.getStatus()) {
             case FINISHED -> 1;
             case CONFIRMED -> 2;
             case ACCOMMODATED -> 3;
             case ENDING -> 4;
             default -> 0;
         }));
-        return reservations.stream().map(SchemaReservationsVO::new).toList();
+        return modifiableReservations.stream().map(SchemaReservationsVO::new).toList();
     }
 
     public List<ReservationListing> getAllReservationsForDateAndStatus(Long hotelId, LocalDate date, ReservationStatus status) {
