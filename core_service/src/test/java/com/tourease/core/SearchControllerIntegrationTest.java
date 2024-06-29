@@ -44,20 +44,6 @@ public class SearchControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    public void testGetHotelListing() throws Exception {
-        // Arrange
-        String searchText = "test";
-        int page = 1;
-        IndexVM<HotelPreview> mockResponse = new IndexVM<>();
-        when(searchService.listing(searchText, page)).thenReturn(mockResponse);
-
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/search/listing")
-                        .param("page", String.valueOf(page)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void testGetNotAvailableDates() throws Exception {
         Long hotelId = 1L;
         Long typeId = 2L;
@@ -75,6 +61,18 @@ public class SearchControllerIntegrationTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$[0]").value(fromDate.toString()))
                 .andExpect(jsonPath("$[1]").value(toDate.toString()));
+    }
+
+    @Test
+    public void testGetHotelListing() throws Exception {
+        String searchText = "test";
+        int page = 1;
+        IndexVM<HotelPreview> mockResponse = new IndexVM<>();
+        when(searchService.listing(searchText, page)).thenReturn(mockResponse);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/search/listing")
+                        .param("page", String.valueOf(page)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
