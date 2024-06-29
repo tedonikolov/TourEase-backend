@@ -83,7 +83,7 @@ public class SearchControllerIntegrationTest {
         Long typeId = 2L;
         LocalDate fromDate = LocalDate.now();
         LocalDate toDate = LocalDate.now().plusDays(7);
-        List<RoomVO> mockRooms = List.of(new RoomVO(1L, "101"), new RoomVO(2L, "102")); // Adjust based on actual RoomVO structure
+        List<RoomVO> mockRooms = List.of(new RoomVO(1L, "101"), new RoomVO(2L, "102"));
         when(hotelServiceClient.getFreeRoomsBetweenDateByTypeId(hotelId, typeId, fromDate, toDate)).thenReturn(mockRooms);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/search/getFreeRoomsForDateByTypeId")

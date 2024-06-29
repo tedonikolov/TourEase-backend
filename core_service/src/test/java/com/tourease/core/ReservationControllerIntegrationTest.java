@@ -48,7 +48,7 @@ public class ReservationControllerIntegrationTest {
     @BeforeEach
     public void setup(WebApplicationContext webApplicationContext) {
         objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // Register the JavaTimeModule here
+        objectMapper.registerModule(new JavaTimeModule());
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
