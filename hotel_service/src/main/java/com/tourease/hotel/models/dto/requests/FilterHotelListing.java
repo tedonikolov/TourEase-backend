@@ -29,16 +29,16 @@ public class FilterHotelListing {
     private int pageNumber;
 
     public void decodeURL() {
-        if(facilities.isEmpty()){
+        if (facilities == null || facilities.isEmpty()) {
             facilities = null;
         }
-        if(name.isEmpty()){
+        if (name == null || name.isEmpty()) {
             name = null;
         }
-        if(country.isEmpty()){
+        if (country == null || country.isEmpty()) {
             country = null;
         }
-        if(city.isEmpty()){
+        if (city == null || city.isEmpty()) {
             city = null;
         }
         if (name != null) {
