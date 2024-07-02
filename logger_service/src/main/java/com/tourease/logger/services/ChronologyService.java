@@ -28,8 +28,10 @@ public class ChronologyService {
     }
 
     public IndexVM<MessageLog> gerChronology(ChronologyFilter filter) {
-        Page<Chronology> page = chronologyRepository.findChronologyByFilter(filter.email(),
-                filter.createdAfter() == null ? LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC) : filter.createdAfter(),
+        Page<Chronology> page = chronologyRepository.findChronologyByFilter(
+                filter.email(),
+                filter.createdAfter() == null ? LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC)
+                        : filter.createdAfter(),
                 filter.createdBefore() == null ? LocalDateTime.now() : filter.createdBefore().plusDays(1),
                 filter.type() == null ? "" : filter.type().getLabel(),
                 PageRequest.of(filter.page(), filter.pageSize(), Sort.by(Sort.Direction.DESC, "createdOn")));

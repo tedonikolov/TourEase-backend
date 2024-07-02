@@ -45,11 +45,6 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic transportServiceTopic() {
-        return TopicBuilder.name("transport_service").build();
-    }
-
-    @Bean
     public NewTopic configurationServiceTopic() {
         return TopicBuilder.name("configuration_service").build();
     }

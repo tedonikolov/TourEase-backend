@@ -36,11 +36,6 @@ public class ReadMessagesService {
         createChronology(record);
     }
 
-    @KafkaListener(topics = "transport_service", groupId = "transport_service")
-    public void listenTransportService(ConsumerRecord<String, String> record) {
-        createChronology(record);
-    }
-
     @KafkaListener(topics = "configuration_service", groupId = "configuration_service")
     public void listenConfigurationService(ConsumerRecord<String, String> record) {
         createChronology(record);
@@ -52,10 +47,11 @@ public class ReadMessagesService {
     }
 
     private void createChronology(ConsumerRecord<String, String> record) {
-        Chronology chronology = new Chronology();
-        chronology.setEmail(record.key());
-        chronology.setLog(record.value());
-        chronology.setCreatedOn(Instant.ofEpochMilli(record.timestamp()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Chronology chronology = Chronology.builder()
+                .email(record.key())
+                .log(record.value())
+                .createdOn(Instant.ofEpochMilli(record.timestamp()).atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .build();
 
         chronologyService.saveChronology(chronology);
 
