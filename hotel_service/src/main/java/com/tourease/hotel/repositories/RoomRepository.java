@@ -49,11 +49,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             AND r NOT IN (
                 SELECT r FROM Room r
                 JOIN r.reservations res
-                WHERE (res.checkIn BETWEEN cast(:fromDate as date) AND cast(:toMinusDay as date)
+                WHERE ((res.checkIn BETWEEN cast(:fromDate as date) AND cast(:toDate as date)
                 OR res.checkOut BETWEEN cast(:fromPlusDay as date) AND cast(:toDate as date))
-                OR (res.checkIn < cast(:fromDate as date) AND res.checkOut > cast(:toDate as date))
+                OR (res.checkIn < cast(:fromDate as date) AND res.checkOut > cast(:toDate as date)))
                 AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'PENDING')
             )
             """)
-    List<Room> findAllFreeByHotelBetweenDateAndType(Long hotelId, Long typeId, LocalDate fromDate, LocalDate fromPlusDay, LocalDate toDate, LocalDate toMinusDay);
+    List<Room> findAllFreeByHotelBetweenDateAndType(Long hotelId, Long typeId, LocalDate fromDate, LocalDate fromPlusDay, LocalDate toDate);
 }

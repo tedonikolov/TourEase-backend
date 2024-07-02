@@ -44,6 +44,7 @@ public class BookingApiClient {
                 Hotel newHotel = new Hotel();
                 newHotel.setName(hotel.property().name());
                 newHotel.setStars(Stars.setValue(hotel.property().propertyClass()));
+                newHotel.setCurrency(Currency.EUR);
 
                 hotelRepository.save(newHotel);
 

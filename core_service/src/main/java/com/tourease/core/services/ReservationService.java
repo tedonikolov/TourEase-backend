@@ -120,7 +120,8 @@ public class ReservationService {
                 CurrencyRateVO currencyRate = currencyRates.stream().filter(rate -> rate.currency().equals(reservation.getCurrency())).findFirst().orElseThrow(() -> new CustomException("Invalid currency", ErrorCode.Failed));
                 BigDecimal newPrice = convertPrice(reservationUpdateVO.price(), reservationUpdateVO.currency() ,currencyRate);
                 if (newPrice.compareTo(reservation.getPrice()) != 0){
-                    emailServiceClient.sendPaymentChangeReservation(new PaymentChangeReservationVO(reservationUpdateVO.reservationNumber(), reservationUpdateVO.name(), reservationUpdateVO.email(), newPrice, reservation.getPrice(), reservation.getCurrency()));
+                    if(reservationUpdateVO.email()!=null)
+                        emailServiceClient.sendPaymentChangeReservation(new PaymentChangeReservationVO(reservationUpdateVO.reservationNumber(), reservationUpdateVO.name(), reservationUpdateVO.email(), newPrice, reservation.getPrice(), reservation.getCurrency()));
 
                     reservation.setPrice(newPrice);
                 }

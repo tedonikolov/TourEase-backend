@@ -17,7 +17,7 @@ import com.tourease.hotel.services.communication.ConfigServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class PaymentService {
                 .nightPrice(paymentCreateVO.nightPrice())
                 .discount(paymentCreateVO.discount())
                 .advancedPayment(paymentCreateVO.advancedPayment())
-                .hotelPrice(paymentCreateVO.price().multiply(getRate(hotel.getCurrency(),currencyRates)).setScale(2))
+                .hotelPrice(paymentCreateVO.price().multiply(Currency.getRate(hotel.getCurrency(), paymentCreateVO.currency(), currencyRates)).setScale(2, RoundingMode.HALF_UP))
                 .paidFor(paymentCreateVO.paidFor())
                 .reservationNumber(paymentCreateVO.reservationNumber())
                 .worker(worker)
@@ -95,8 +95,12 @@ public class PaymentService {
         }
     }
 
-    public Payment getPaymentByReservationNumber(Long reservationNumber) {
-        return paymentRepository.findByReservationNumber(reservationNumber).stream().findFirst().orElse(null);
+    public Payment getPaymentForReservationNumber(Long reservationNumber) {
+        return paymentRepository.findNotPaidByReservationNumberAndReservationType(reservationNumber);
+    }
+
+    public List<Payment> getPaymentsForReservationNumber(Long reservationNumber) {
+        return paymentRepository.findByReservationNumberAndReservationType(reservationNumber);
     }
 
     public Payment updatePayment(PaymentCreateVO paymentCreateVO, Long userId) {
@@ -108,7 +112,7 @@ public class PaymentService {
             payment.setPrice(paymentCreateVO.price());
             payment.setCurrency(paymentCreateVO.currency());
             payment.setHotelCurrency(payment.getHotel().getCurrency());
-            payment.setHotelPrice(paymentCreateVO.price().multiply(getRate(payment.getHotel().getCurrency(),currencyRates)).setScale(2));
+            payment.setHotelPrice(paymentCreateVO.price().multiply(Currency.getRate(payment.getHotel().getCurrency(), paymentCreateVO.currency(), currencyRates)).setScale(2,  RoundingMode.HALF_UP));
             payment.setMealPrice(paymentCreateVO.mealPrice());
             payment.setNightPrice(paymentCreateVO.nightPrice());
             payment.setDiscount(paymentCreateVO.discount());
@@ -118,24 +122,5 @@ public class PaymentService {
         } else {
             return createPayment(paymentCreateVO, userId);
         }
-    }
-
-    private BigDecimal getRate(Currency hotelCurrency, List<CurrencyRateVO> currencyRates) {
-        return switch (hotelCurrency) {
-            case BGN ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.BGN)).findFirst().orElseThrow().rateBGN();
-            case USD ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.USD)).findFirst().orElseThrow().rateUSD();
-            case EUR ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.EUR)).findFirst().orElseThrow().rateEUR();
-            case GBP ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.GBP)).findFirst().orElseThrow().rateGBP();
-            case RUB ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.RUB)).findFirst().orElseThrow().rateRUB();
-            case RON ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.RON)).findFirst().orElseThrow().rateRON();
-            case TRY ->
-                    currencyRates.stream().filter(currencyRateVO -> currencyRateVO.currency().equals(Currency.TRY)).findFirst().orElseThrow().rateTRY();
-        };
     }
 }

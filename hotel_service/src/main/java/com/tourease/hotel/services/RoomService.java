@@ -3,7 +3,9 @@ package com.tourease.hotel.services;
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
 import com.tourease.hotel.models.dto.requests.RoomVO;
+import com.tourease.hotel.models.dto.requests.TakenDaysForRoom;
 import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
+import com.tourease.hotel.models.dto.response.ReservationListing;
 import com.tourease.hotel.models.dto.response.RoomReservationVO;
 import com.tourease.hotel.models.dto.response.TypeCount;
 import com.tourease.hotel.models.entities.*;
@@ -25,6 +27,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
     private final TypeService typeService;
+    private final PaymentService paymentService;
 
     public void save(RoomVO roomVO) {
         Hotel hotel = hotelRepository.findById(roomVO.hotelId()).get();
@@ -98,24 +101,35 @@ public class RoomService {
             default -> 0;
         }));
 
-        return new RoomReservationVO(room, info.orElse(null), info.map(Reservation::getWorker).orElse(null));
+        if(info.isPresent()){
+            Payment payment = paymentService.getPaymentsForReservationNumber(info.get().getReservationNumber()).getFirst();
+            return new RoomReservationVO(room, new ReservationListing(info.get(),payment,info.get().getCustomers().stream().toList()), info.map(Reservation::getWorker).orElse(null));
+        }
+        else
+            return new RoomReservationVO(room, null,null);
     }
 
-    public List<OffsetDateTime> getTakenDaysForRoom(Long id) {
+    public TakenDaysForRoom getTakenDaysForRoom(Long id) {
         Room room = roomRepository.getById(id);
+
+        List<OffsetDateTime> checkInDates = new ArrayList<>();
+        List<OffsetDateTime> checkOutDates = new ArrayList<>();
 
         List<Reservation> reservations = room.getReservations().stream()
                 .filter(reservation -> reservation.getStatus() == ReservationStatus.ACCOMMODATED
-                        || reservation.getStatus() == ReservationStatus.CONFIRMED).toList();
+                        || reservation.getStatus() == ReservationStatus.CONFIRMED || reservation.getStatus() == ReservationStatus.PENDING
+                ).toList();
 
-        List<OffsetDateTime> offsetDateTimes = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            for (OffsetDateTime date = reservation.getCheckIn(); date.isBefore(reservation.getCheckOut()); date = date.plusDays(1)) {
-                offsetDateTimes.add(date);
+            for (OffsetDateTime date = reservation.getCheckIn(); date.isBefore(reservation.getCheckOut().plusDays(1)); date = date.plusDays(1)) {
+                if (!date.isEqual(reservation.getCheckOut()))
+                    checkInDates.add(date);
+                if (!date.isEqual(reservation.getCheckIn()))
+                    checkOutDates.add(date);
             }
         }
 
-        return offsetDateTimes;
+        return new TakenDaysForRoom(checkInDates, checkOutDates);
     }
 
     public List<FreeRoomCountVO> getFreeRoomCountByDatesForHotel(Long hotelId, LocalDate fromDate, LocalDate toDate) {
@@ -172,6 +186,6 @@ public class RoomService {
     }
 
     public List<Room> getFreeRoomsBetweenDateByTypeId(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
-        return roomRepository.findAllFreeByHotelBetweenDateAndType(hotelId, typeId, fromDate, fromDate.plusDays(1), toDate, toDate.plusDays(1));
+        return roomRepository.findAllFreeByHotelBetweenDateAndType(hotelId, typeId, fromDate, fromDate.plusDays(1), toDate);
     }
 }

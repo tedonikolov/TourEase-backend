@@ -33,8 +33,9 @@ public class WorkerService {
         } else {
             worker = workerRepository.findById(workerVO.id()).get();
 
-            if(workerVO.workerType()!=worker.getWorkerType())
+            if(workerVO.workerType()!=worker.getWorkerType()) {
                 userServiceClient.changeUserType(workerVO.id(), workerVO.workerType());
+            }
 
             WorkerMapper.updateEntity(worker,workerVO);
         }

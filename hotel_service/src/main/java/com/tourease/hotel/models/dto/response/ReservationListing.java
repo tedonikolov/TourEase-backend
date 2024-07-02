@@ -32,7 +32,8 @@ public record ReservationListing(
     public ReservationListing(Reservation reservation, Payment payment, List<Customer> customers) {
         this(reservation.getId(), reservation.getReservationNumber(), reservation.getCreationDate(), reservation.getStatus(),
                 reservation.getRoom(), reservation.getType(), reservation.getMeal(), reservation.getPeopleCount(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(),
-                payment.getPrice(), payment.getMealPrice(), payment.getNightPrice(), payment.getDiscount(), payment.getAdvancedPayment(), payment.getCurrency(),
+                payment==null ? null : payment.getHotelPrice(), payment==null ? null : payment.getMealPrice(), payment==null ? null : payment.getNightPrice(), payment==null ? null : payment.getDiscount(),
+                payment==null ? null : payment.getAdvancedPayment(), payment==null ? null : payment.getHotel().getCurrency(),
                 customers,  reservation.getWorker() !=null ? reservation.getWorker().getFullName() : "TourEase");
     }
 }

@@ -14,12 +14,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
             SELECT r FROM Reservation r
             WHERE r.room.id = :id
-            AND ((r.checkIn BETWEEN cast(:fromDate as date) AND cast(:toMinusDay as date)
+            AND ((r.checkIn BETWEEN cast(:fromDate as date) AND cast(:toDate as date)
             OR r.checkOut BETWEEN cast(:fromPlusDay as date) AND cast(:toDate as date))
             OR (r.checkIn < cast(:fromDate as date) AND r.checkOut > cast(:toDate as date)))
-            AND (r.status = 'CONFIRMED' OR r.status = 'ACCOMMODATED')
+            AND (r.status = 'CONFIRMED' OR r.status = 'ACCOMMODATED' OR r.status = 'PENDING')
             """)
-    List<Reservation> isRoomTaken(Long id, OffsetDateTime fromDate, OffsetDateTime fromPlusDay, OffsetDateTime toDate, OffsetDateTime toMinusDay);
+    List<Reservation> isRoomTaken(Long id, OffsetDateTime fromDate, OffsetDateTime fromPlusDay, OffsetDateTime toDate);
 
     @Query("""
             SELECT r FROM Reservation r

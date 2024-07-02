@@ -20,7 +20,7 @@ public class HotelServiceClient {
     private final RestTemplate defaultRestTemplate;
     private final EurekaClient eurekaClient;
 
-    private final String hotelAppName = "CONFIGURATION-SERVICE";
+    private final String hotelAppName = "HOTEL-SERVICE";
     private final String hotelServiceUrl = "http://hotel-service";
 
     public void checkConnection() {
@@ -46,19 +46,17 @@ public class HotelServiceClient {
                 .queryParam("toPrice", filterHotelListing.getToPrice())
                 .queryParam("fromDate", filterHotelListing.getFromDate())
                 .queryParam("toDate", filterHotelListing.getToDate())
-                .queryParam("pageNumber", filterHotelListing.getPageNumber());
+                .queryParam("pageNumber", filterHotelListing.getPageNumber())
+                .queryParam("currency", filterHotelListing.getCurrency());
 
         return defaultRestTemplate.getForObject(builder.toUriString(), IndexVM.class);
     }
 
-    public List<LocalDate> getNotAvailableDates(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
+    public TakenDaysForType getNotAvailableDates(Long typeId) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(hotelServiceUrl + "/internal/getNotAvailableDates")
-                .queryParam("hotelId", hotelId)
-                .queryParam("typeId", typeId)
-                .queryParam("fromDate", fromDate)
-                .queryParam("toDate", toDate);
+                .queryParam("typeId", typeId);
 
-        return Arrays.stream(defaultRestTemplate.getForObject(builder.toUriString(), LocalDate[].class)).toList();
+        return defaultRestTemplate.getForObject(builder.toUriString(), TakenDaysForType.class);
     }
 
     public Long createReservation(ReservationCreateDTO reservationCreateDTO, UserVO userVO) {

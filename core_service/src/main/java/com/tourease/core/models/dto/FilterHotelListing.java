@@ -1,5 +1,6 @@
 package com.tourease.core.models.dto;
 
+import com.tourease.core.models.enums.Currency;
 import com.tourease.core.models.enums.Facility;
 import com.tourease.core.models.enums.MealType;
 import com.tourease.core.models.enums.Stars;
@@ -25,4 +26,5 @@ public class FilterHotelListing {
     private LocalDate fromDate;
     private LocalDate toDate;
     private int pageNumber;
+    private Currency currency;
 }

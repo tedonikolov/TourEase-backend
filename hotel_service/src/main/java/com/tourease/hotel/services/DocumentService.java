@@ -41,7 +41,7 @@ public class DocumentService {
     public byte[] generateInvoicePdf(HttpServletResponse response, Long userId, Long reservationId, String language) {
         try {
             Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException("Reservation not found", ErrorCode.Failed));
-            Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
+            Payment payment = paymentService.getPaymentsForReservationNumber(reservation.getReservationNumber()).getFirst();
             Worker worker = workerService.findById(userId);
 
             TemplateSpec templateSpec = new TemplateSpec(language.equals("bg") ? "reservationBG" : "reservationEN", TemplateMode.HTML);
@@ -118,10 +118,7 @@ public class DocumentService {
         context.setVariable("totalPrice", totalPrice);
         context.setVariable("discount",  payment==null ? 0 : payment.getDiscount());
         context.setVariable("discountedPrice",  payment==null ? 0 :
-                payment.getDiscount().intValue() != 0 ?
-                        BigDecimal.valueOf((totalPrice.doubleValue() * (1 - payment.getDiscount().doubleValue() / 100)) - payment.getAdvancedPayment().doubleValue()).setScale(2, RoundingMode.HALF_UP)
-                        :
-                        BigDecimal.valueOf(totalPrice.doubleValue() - payment.getAdvancedPayment().doubleValue()).setScale(2, RoundingMode.HALF_UP));
+                        BigDecimal.valueOf(totalPrice.doubleValue() * (payment.getDiscount().doubleValue() / 100)).setScale(2, RoundingMode.HALF_UP));
         context.setVariable("nightPrice",  payment==null ? 0 : payment.getNightPrice().setScale(2, RoundingMode.HALF_UP));
         context.setVariable("mealPrice",  payment==null ? 0 : BigDecimal.valueOf(payment.getMealPrice().doubleValue() * reservation.getPeopleCount()).setScale(2, RoundingMode.HALF_UP));
         context.setVariable("advancedPayment",  payment==null ? 0 : payment.getAdvancedPayment().setScale(2, RoundingMode.HALF_UP));

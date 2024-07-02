@@ -1,5 +1,6 @@
 package com.tourease.hotel.models.dto.requests;
 
+import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.FacilityEnum;
 import com.tourease.hotel.models.enums.MealType;
 import com.tourease.hotel.models.enums.Stars;
@@ -27,6 +28,7 @@ public class FilterHotelListing {
     private LocalDate fromDate;
     private LocalDate toDate;
     private int pageNumber;
+    private Currency currency;
 
     public void decodeURL() {
         if (facilities == null || facilities.isEmpty()) {

@@ -3,6 +3,8 @@ package com.tourease.core.controllers;
 import com.tourease.core.models.custom.IndexVM;
 import com.tourease.core.models.dto.HotelPreview;
 import com.tourease.core.models.dto.RoomVO;
+import com.tourease.core.models.dto.TakenDaysForType;
+import com.tourease.core.models.enums.Currency;
 import com.tourease.core.services.SearchService;
 import com.tourease.core.services.communication.HotelServiceClient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,8 +30,8 @@ public class SearchController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieve information")
     })
     @GetMapping("/listing")
-    public ResponseEntity<IndexVM<HotelPreview>> getHotelListing(@RequestParam String searchText, @RequestParam int page){
-        return ResponseEntity.ok(searchService.listing(searchText, page));
+    public ResponseEntity<IndexVM<HotelPreview>> getHotelListing(@RequestHeader Currency currency, @RequestParam String searchText, @RequestParam int page) {
+        return ResponseEntity.ok(searchService.listing(searchText, page, currency));
     }
 
     @Operation(summary = "Retrieve not available dates.",
@@ -37,8 +39,8 @@ public class SearchController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully, created owner.")})
     @GetMapping("/getNotAvailableDates")
-    public ResponseEntity<List<LocalDate>> getNotAvailableDates(@RequestParam Long hotelId, @RequestParam Long typeId, @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate){
-        return ResponseEntity.ok(hotelServiceClient.getNotAvailableDates(hotelId, typeId, fromDate, toDate));
+    public ResponseEntity<TakenDaysForType> getNotAvailableDates(@RequestParam Long typeId){
+        return ResponseEntity.ok(hotelServiceClient.getNotAvailableDates(typeId));
     }
 
     @Operation(description = "Get all free rooms by date for hotel",

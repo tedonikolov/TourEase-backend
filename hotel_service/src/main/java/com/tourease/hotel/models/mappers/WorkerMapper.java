@@ -19,6 +19,6 @@ public class WorkerMapper {
     public static void updateEntity(Worker worker, WorkerVO workerVO) {
         worker.setFullName(workerVO.fullName());
         worker.setPhone(workerVO.phone());
-        worker.setWorkerType(worker.getWorkerType());
+        worker.setWorkerType(workerVO.workerType());
     }
 }

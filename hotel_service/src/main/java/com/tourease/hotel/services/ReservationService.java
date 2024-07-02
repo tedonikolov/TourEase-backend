@@ -12,7 +12,6 @@ import com.tourease.hotel.models.enums.WorkerType;
 import com.tourease.hotel.repositories.ReservationRepository;
 import com.tourease.hotel.services.communication.CoreServiceClient;
 import com.tourease.hotel.services.communication.EmailServiceClient;
-import com.tourease.hotel.services.communication.UserServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,6 @@ public class ReservationService {
     private final MealService mealService;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final CoreServiceClient coreServiceClient;
-    private final UserServiceClient userServiceClient;
     private final EmailServiceClient emailServiceClient;
 
     public void createReservation(ReservationCreateDTO reservationInfo, Long userId) {
@@ -50,7 +48,7 @@ public class ReservationService {
 
         Room room = roomService.findById(reservationInfo.roomId());
 
-        if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).isEmpty()) {
+        if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut()).isEmpty()) {
 
             Reservation reservation = Reservation.builder()
                     .reservationNumber(reservationInfo.checkIn().getYear() * 10000000L +
@@ -123,9 +121,10 @@ public class ReservationService {
         };
 
         return reservations.stream().map(reservation -> {
-            Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
+            Payment payment = paymentService.getPaymentForReservationNumber(reservation.getReservationNumber());
 
-            return new ReservationListing(reservation, payment, reservation.getCustomers().stream().toList());
+            return new ReservationListing(reservation, payment,
+                    reservation.getCustomers().stream().sorted(Comparator.comparing(Customer::getId)).toList());
         }).collect(Collectors.toList());
     }
 
@@ -186,10 +185,10 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
 
-        Payment payment = paymentService.getPaymentByReservationNumber(reservation.getReservationNumber());
-
         if (status.equals(ReservationStatus.CONFIRMED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
             Worker worker = workerService.findById(userId);
+            Payment payment = paymentService.getPaymentForReservationNumber(reservation.getReservationNumber());
+
             emailServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
                     new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
         }
@@ -205,20 +204,28 @@ public class ReservationService {
         Meal meal = mealService.findById(reservationInfo.mealId());
 
         reservation.setCheckIn(reservationInfo.checkIn());
+        OffsetDateTime checkOut = reservation.getCheckOut();
         reservation.setCheckOut(reservationInfo.checkOut());
         reservation.setNights(reservationInfo.nights());
         reservation.setPeopleCount(reservationInfo.peopleCount());
         reservation.setMeal(meal);
         reservation.setType(type);
 
-        if (room != null && reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut(), reservationInfo.checkOut().minusDays(1)).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
+        if (room != null && reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut()).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
             reservation.setRoom(room);
         } else if (room != null) {
             throw new CustomException("Room is already reserved", ErrorCode.AlreadyExists);
         }
 
         Worker worker = workerService.findById(userId);
-        if(worker.getWorkerType().equals(WorkerType.MANAGER)){
+        if(worker.getWorkerType().equals(WorkerType.MANAGER) || checkOut!=reservationInfo.checkOut()) {
+            if(reservationInfo.checkOut().toLocalDate().isEqual(LocalDate.now())) {
+                reservation.setStatus(ReservationStatus.ENDING);
+            } else if(reservation.getStatus() != ReservationStatus.CONFIRMED && reservation.getStatus() != ReservationStatus.PENDING
+                    && (reservation.getCheckIn().toLocalDate().isBefore(LocalDate.now()) && reservation.getCheckOut().toLocalDate().isAfter(LocalDate.now()))) {
+                reservation.setStatus(ReservationStatus.ACCOMMODATED);
+            }
+
             Payment payment = paymentService.updatePayment(new PaymentCreateVO(reservation.getCustomers().stream().findFirst().get().getId(), type.getHotel().getId(), reservationInfo.price(), reservationInfo.mealPrice(), reservationInfo.nightPrice(), reservationInfo.discount(), reservationInfo.advancedPayment(), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), userId);
             if(coreServiceClient.checkReservation(reservation.getReservationNumber()))
             {

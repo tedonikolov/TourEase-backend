@@ -4,6 +4,7 @@ import com.tourease.core.models.custom.IndexVM;
 import com.tourease.core.models.dto.DataSet;
 import com.tourease.core.models.dto.FilterHotelListing;
 import com.tourease.core.models.dto.HotelPreview;
+import com.tourease.core.models.enums.Currency;
 import com.tourease.core.models.enums.Facility;
 import com.tourease.core.models.enums.MealType;
 import com.tourease.core.models.enums.Stars;
@@ -18,20 +19,23 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+
 @Service
 @AllArgsConstructor
 public class SearchService {
     private final HotelServiceClient hotelServiceClient;
     private final TranslaterApiClient translaterApiClient;
 
-    public IndexVM<HotelPreview> listing(String searchText, int page) {
+    public IndexVM<HotelPreview> listing(String searchText, int page, Currency currency) {
         hotelServiceClient.checkConnection();
-        String text = translaterApiClient.translate(searchText);
+        String text = translaterApiClient.translate(searchText.replace(",",""));
 
         DataSet dataSet = hotelServiceClient.getDataSet();
 
         FilterHotelListing filterHotelListing = new FilterHotelListing();
         filterHotelListing.setPageNumber(page);
+        filterHotelListing.setCurrency(currency);
+
         List<Facility> facilities = new ArrayList<>();
 
         StringTokenizer tokenizer = new StringTokenizer(text);
@@ -46,19 +50,37 @@ public class SearchService {
                 continue;
             }
 
-            if(!Objects.equals(token, "up") && !Objects.equals(token, "to") && !Objects.equals(token, "from") && !Objects.equals(token, "between")) {
-                if(recognizeToken(token, dataSet.countries())!=null)
+            if(!Objects.equals(token, "up") && !Objects.equals(token, "to")
+                    && !Objects.equals(token, "from") && !Objects.equals(token, "between")) {
+                if(recognizeToken(token, dataSet.countries())!=null) {
                     filterHotelListing.setCountry(token);
-
-                if(containsToken(token, dataSet.cities())!=null)
+                    if (!tokenizer.hasMoreTokens()) {
+                        break;
+                    }
+                    token = tokenizer.nextToken();
+                    continue;
+                }
+                if(containsToken(token, dataSet.cities())!=null) {
                     filterHotelListing.setCity(containsToken(token, dataSet.cities()));
+                    if (!tokenizer.hasMoreTokens()) {
+                        break;
+                    }
+                    token = tokenizer.nextToken();
+                    continue;
+                }
             }
 
             if(!token.equalsIgnoreCase("breakfast"))
                 recognizeFacility(token, Facility.values(), facilities);
 
-            if(token.equalsIgnoreCase("breakfast"))
+            if(token.equalsIgnoreCase("breakfast")) {
                 filterHotelListing.setMealType(MealType.BREAKFAST);
+                if (!tokenizer.hasMoreTokens()) {
+                    break;
+                }
+                token = tokenizer.nextToken();
+                continue;
+            }
 
             if (!tokenizer.hasMoreTokens()) {
                 break;
@@ -68,20 +90,41 @@ public class SearchService {
 
             filterHotelListing.setMealType(recognizeMeal(token, nextToken, MealType.values()));
 
-            if(Objects.equals(token, "hotel") && containsToken(nextToken, dataSet.names()) != null)
+            if(Objects.equals(token, "hotel") && containsToken(nextToken, dataSet.names()) != null) {
                 filterHotelListing.setName(nextToken);
+                if (!tokenizer.hasMoreTokens()) {
+                    break;
+                }
+                token = nextToken;
+                continue;
+            }
 
             if(Objects.equals(nextToken, "people") || Objects.equals(nextToken, "person")) {
                 filterHotelListing.setPeople(Integer.parseInt(token));
+                if (!tokenizer.hasMoreTokens()) {
+                    break;
+                }
+                token = nextToken;
+                continue;
             }
 
             if(Objects.equals(nextToken, "stars") || Objects.equals(nextToken, "star")) {
                 filterHotelListing.setStars(recognizeStars(token));
+                if (!tokenizer.hasMoreTokens()) {
+                    break;
+                }
+                token = nextToken;
+                continue;
             }
 
             String regex = "[1-5]-\\bstar\\b|[1-5]-\\bstars\\b";
             if(token.matches(regex)){
                 filterHotelListing.setStars(recognizeStars(token.substring(0, 1)));
+                if (!tokenizer.hasMoreTokens()) {
+                    break;
+                }
+                token = nextToken;
+                continue;
             }
 
             if(Objects.equals(token, "from")) {

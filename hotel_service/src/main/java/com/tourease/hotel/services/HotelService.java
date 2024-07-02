@@ -6,18 +6,23 @@ import com.tourease.hotel.models.custom.IndexVM;
 import com.tourease.hotel.models.dto.requests.FilterHotelListing;
 import com.tourease.hotel.models.dto.requests.HotelCreateVO;
 import com.tourease.hotel.models.dto.requests.HotelWorkingPeriodVO;
+import com.tourease.hotel.models.dto.response.CurrencyRateVO;
 import com.tourease.hotel.models.dto.response.HotelPreview;
 import com.tourease.hotel.models.entities.*;
+import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.mappers.HotelMapper;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.repositories.ImageRepository;
 import com.tourease.hotel.repositories.ReservationRepository;
+import com.tourease.hotel.services.communication.ConfigServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -34,6 +39,7 @@ public class HotelService {
     private final OwnerService ownerService;
     private final LocationService locationService;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ConfigServiceClient configServiceClient;
 
     public void save(HotelCreateVO hotelCreateVO) {
         if (hotelCreateVO.id() == 0) {
@@ -65,6 +71,9 @@ public class HotelService {
     }
 
     public IndexVM<HotelPreview> listing(FilterHotelListing filterHotelListing) {
+        configServiceClient.checkConnection();
+        List<CurrencyRateVO> currencyRates = configServiceClient.getCurrencyRates();
+
         filterHotelListing.decodeURL();
 
         List<Hotel> hotelsList = hotelRepository.findHotelByFilter(filterHotelListing.getCountry(),
@@ -75,7 +84,7 @@ public class HotelService {
         List<HotelPreview> hotels = new ArrayList<>();
 
         for (Hotel hotel : hotelsList) {
-            Set<Type> types = hotel.getTypes().stream().filter(type -> filterTypePrice(type, filterHotelListing) && filterTypePeople(type, filterHotelListing)).collect(Collectors.toSet());
+            Set<Type> types = hotel.getTypes().stream().filter(type -> filterTypePrice(type, filterHotelListing, currencyRates) && filterTypePeople(type, filterHotelListing)).collect(Collectors.toSet());
             Set<Meal> meals = filterHotelListing.getMealType() != null ?
                     hotel.getMeals().stream().filter(meal -> meal.getType().equals(filterHotelListing.getMealType())).collect(Collectors.toSet())
                     : hotel.getMeals();
@@ -90,12 +99,11 @@ public class HotelService {
 
         if (hotels.size() > 10) {
             for (int i = filterHotelListing.getPageNumber() * 10 - 10; i < hotels.size(); i++) {
-                if (filterHotelListing.getFromPrice() != null && filterHotelListing.getToDate() != null) {
+                if (filterHotelListing.getFromDate() != null && filterHotelListing.getToDate() != null) {
                     Set<Type> types = hotels.get(i).getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
                                     reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
                                             filterHotelListing.getFromDate().plusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getToDate().minusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
+                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
                             .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
                     if (types.isEmpty())
                         continue;
@@ -116,8 +124,7 @@ public class HotelService {
                     Set<Type> types = hotel.getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
                                     reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
                                             filterHotelListing.getFromDate().plusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getToDate().minusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
+                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
                             .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
                     if (types.isEmpty())
                         continue;
@@ -132,13 +139,18 @@ public class HotelService {
         return new IndexVM<>(new PageImpl<>(listing, PageRequest.of(filterHotelListing.getPageNumber() - 1, 10), hotels.size()));
     }
 
-    private boolean filterTypePrice(Type type, FilterHotelListing filter) {
-        if (filter.getFromPrice() != null && filter.getToPrice() != null && type.getPrice().doubleValue() >= filter.getFromPrice().doubleValue() && type.getPrice().doubleValue() <= filter.getToPrice().doubleValue())
+    private boolean filterTypePrice(Type type, FilterHotelListing filter, List<CurrencyRateVO> currencyRates) {
+        BigDecimal rate = Currency.getRate(filter.getCurrency(), type.getCurrency(),currencyRates);
+        if (filter.getFromPrice() != null && filter.getToPrice() != null &&
+                type.getPrice().multiply(rate).setScale(2, RoundingMode.HALF_UP).doubleValue() >= filter.getFromPrice().doubleValue() &&
+                type.getPrice().multiply(rate).setScale(2, RoundingMode.HALF_UP).doubleValue() <= filter.getToPrice().doubleValue())
             return true;
         else {
-            if (filter.getFromPrice() != null && filter.getToPrice() == null && type.getPrice().doubleValue() >= filter.getFromPrice().doubleValue())
+            if (filter.getFromPrice() != null && filter.getToPrice() == null &&
+                    type.getPrice().multiply(rate).setScale(2, RoundingMode.HALF_UP).doubleValue() >= filter.getFromPrice().doubleValue())
                 return true;
-            else if (filter.getToPrice() != null && filter.getFromPrice() == null && type.getPrice().doubleValue() <= filter.getToPrice().doubleValue())
+            else if (filter.getToPrice() != null && filter.getFromPrice() == null &&
+                    type.getPrice().multiply(rate).setScale(2, RoundingMode.HALF_UP).doubleValue() <= filter.getToPrice().doubleValue())
                 return true;
             else
                 return filter.getFromPrice() == null && filter.getToPrice() == null;

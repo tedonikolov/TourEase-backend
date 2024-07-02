@@ -1,9 +1,12 @@
 package com.tourease.hotel.controllers;
 
 import com.tourease.hotel.models.dto.requests.RoomVO;
+import com.tourease.hotel.models.dto.requests.TakenDaysForRoom;
+import com.tourease.hotel.models.dto.requests.TakenDaysForType;
 import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
 import com.tourease.hotel.models.dto.response.RoomReservationVO;
 import com.tourease.hotel.models.entities.Room;
+import com.tourease.hotel.services.InternalService;
 import com.tourease.hotel.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -21,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RoomController {
     private final RoomService roomService;
+    private final InternalService internalService;
 
     @Operation(description = "Create/update room",
             summary = "Create/update room")
@@ -81,8 +84,17 @@ public class RoomController {
             @ApiResponse(responseCode = "200", description = "Successful get reservations")
     })
     @GetMapping("/getTakenDaysForRoom")
-    public ResponseEntity<List<OffsetDateTime>> getTakenDaysForRoom(@RequestHeader Long id) {
+    public ResponseEntity<TakenDaysForRoom> getTakenDaysForRoom(@RequestHeader Long id) {
         return ResponseEntity.ok(roomService.getTakenDaysForRoom(id));
+    }
+
+    @Operation(summary = "Retrieve not available dates.",
+            description = "Returns not available dates for a given hotel and type.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully, created owner.")})
+    @GetMapping("/getNotAvailableDatesForType")
+    public ResponseEntity<TakenDaysForType> getNotAvailableDates(@RequestParam Long typeId){
+        return ResponseEntity.ok(internalService.getNotAvailableDates(typeId));
     }
 
     @Operation(description = "Get room count between dates for hotel",

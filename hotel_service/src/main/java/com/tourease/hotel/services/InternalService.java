@@ -2,9 +2,7 @@ package com.tourease.hotel.services;
 
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.configuration.exception.ErrorCode;
-import com.tourease.hotel.models.dto.requests.PaymentCreateVO;
-import com.tourease.hotel.models.dto.requests.RatingVO;
-import com.tourease.hotel.models.dto.requests.ReservationCreateDTO;
+import com.tourease.hotel.models.dto.requests.*;
 import com.tourease.hotel.models.dto.response.DataSet;
 import com.tourease.hotel.models.dto.response.HotelVO;
 import com.tourease.hotel.models.entities.*;
@@ -44,30 +42,35 @@ public class InternalService {
         );
     }
 
-    public List<LocalDate> getNotAvailableDates(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
-        List<LocalDate> notAvailableDates = new ArrayList<>();
+    public TakenDaysForType getNotAvailableDates(Long typeId) {
+        Map<LocalDate, Integer> takenCheckInDays = new HashMap<>();
+        Map<LocalDate, Integer> takenCheckOutDays = new HashMap<>();
 
-        int roomsCount = roomRepository.findAllByType(typeId).size();
 
-        for (LocalDate date = fromDate; date.isBefore(toDate.plusDays(1)); date = date.plusDays(1)) {
-            int freeRoomsCount = roomsCount;
-            List<Room> takenRooms = roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
-
-            for (Room room : takenRooms){
-                for (Type type : room.getTypes()){
-                    if (type.getId().equals(typeId)){
-                        freeRoomsCount--;
-                        break;
-                    }
+        List<Room> rooms = roomRepository.findAllByType(typeId);
+        rooms.forEach(room -> {
+                    TakenDaysForRoom days = roomService.getTakenDaysForRoom(room.getId());
+                    days.checkInDates().forEach(day -> takenCheckInDays.put(day.toLocalDate(), takenCheckInDays.getOrDefault(day.toLocalDate(), 0) + 1));
+                    days.checkOutDates().forEach(day -> takenCheckOutDays.put(day.toLocalDate(), takenCheckOutDays.getOrDefault(day.toLocalDate(), 0) + 1));
                 }
-            }
+        );
 
-            if (freeRoomsCount == 0){
-                notAvailableDates.add(date);
+        List<LocalDate> checkInDates = new ArrayList<>();
+        List<LocalDate> checkOutDates = new ArrayList<>();
+
+        for (LocalDate date : takenCheckInDays.keySet()) {
+            if (roomRepository.findAllByType(typeId).size() == takenCheckInDays.get(date)) {
+                checkInDates.add(date);
             }
         }
 
-        return notAvailableDates;
+        for (LocalDate date : takenCheckOutDays.keySet()) {
+            if (roomRepository.findAllByType(typeId).size() == takenCheckOutDays.get(date)) {
+                checkOutDates.add(date);
+            }
+        }
+
+        return new TakenDaysForType(checkInDates, checkOutDates);
     }
 
     public Long createReservation(ReservationCreateDTO reservationInfo) {

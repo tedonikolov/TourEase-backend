@@ -5,6 +5,8 @@ import com.tourease.core.controllers.SearchController;
 import com.tourease.core.models.custom.IndexVM;
 import com.tourease.core.models.dto.HotelPreview;
 import com.tourease.core.models.dto.RoomVO;
+import com.tourease.core.models.dto.TakenDaysForType;
+import com.tourease.core.models.enums.Currency;
 import com.tourease.core.services.SearchService;
 import com.tourease.core.services.communication.HotelServiceClient;
 import com.tourease.core.services.communication.TranslaterApiClient;
@@ -45,22 +47,21 @@ public class SearchControllerIntegrationTest {
 
     @Test
     public void testGetNotAvailableDates() throws Exception {
-        Long hotelId = 1L;
         Long typeId = 2L;
         LocalDate fromDate = LocalDate.now();
         LocalDate toDate = LocalDate.now().plusDays(7);
-        List<LocalDate> mockDates = List.of(fromDate, toDate);
-        when(hotelServiceClient.getNotAvailableDates(hotelId, typeId, fromDate, toDate)).thenReturn(mockDates);
+        TakenDaysForType mockDates = new TakenDaysForType(List.of(fromDate, toDate), List.of(fromDate, toDate));
+
+        when(hotelServiceClient.getNotAvailableDates(typeId)).thenReturn(mockDates);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/search/getNotAvailableDates")
-                        .param("hotelId", String.valueOf(hotelId))
-                        .param("typeId", String.valueOf(typeId))
-                        .param("fromDate", fromDate.toString())
-                        .param("toDate", toDate.toString()))
+                        .param("typeId", String.valueOf(typeId)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$[0]").value(fromDate.toString()))
-                .andExpect(jsonPath("$[1]").value(toDate.toString()));
+                .andExpect(jsonPath("$.checkInDates[0]").value(fromDate.toString()))
+                .andExpect(jsonPath("$.checkInDates[1]").value(toDate.toString()))
+                .andExpect(jsonPath("$.checkOutDates[0]").value(fromDate.toString()))
+                .andExpect(jsonPath("$.checkOutDates[1]").value(toDate.toString()));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class SearchControllerIntegrationTest {
         String searchText = "test";
         int page = 1;
         IndexVM<HotelPreview> mockResponse = new IndexVM<>();
-        when(searchService.listing(searchText, page)).thenReturn(mockResponse);
+        when(searchService.listing(searchText, page, Currency.BGN)).thenReturn(mockResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/search/listing")
                         .param("page", String.valueOf(page)))
