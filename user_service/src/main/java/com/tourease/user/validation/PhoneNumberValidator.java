@@ -34,5 +34,4 @@ public class PhoneNumberValidator implements ConstraintValidator<Phone, RegularV
             return false;
         }
     }
-
 }

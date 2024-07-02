@@ -22,12 +22,7 @@ public class AuthenticationServiceClient {
             throw new InternalServiceException("No connection to authentication-service.");
     }
 
-    public String generateTokenForEmail(String email) {
-        return restTemplate.postForObject(authServiceUrl + "/internal/generateTokenForEmail", email, String.class);
-    }
-
     public String retrieveEmailFromToken(String token) {
         return restTemplate.postForObject(authServiceUrl + "/internal/retrieveEmail", token, String.class);
     }
-
 }

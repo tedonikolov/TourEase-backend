@@ -48,7 +48,8 @@ public class PassportService {
         for(Passport passport : passports){
             passport.setExpired(true);
             kafkaTemplate.send("user_service", passport.getRegular().getUser().getEmail(), "Passport date expired!");
-            emailServiceClient.sendPassportDateExpiredNotify(passport.getRegular().getUser().getEmail(),passport.getRegular().getFirstName()+" "+passport.getRegular().getLastName());
+            emailServiceClient.sendPassportDateExpiredNotify(passport.getRegular().getUser().getEmail(),
+                    passport.getRegular().getFirstName()+" "+passport.getRegular().getLastName());
         }
 
         passportRepository.saveAll(passports);

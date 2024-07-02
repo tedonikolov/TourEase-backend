@@ -61,12 +61,7 @@ public class UserService {
     }
 
     public void activateUser(String token) {
-        authenticationServiceClient.checkConnection();
-        String email = authenticationServiceClient.retrieveEmailFromToken(token);
-        if (email==null)
-            throw new CustomException("Invalid token", ErrorCode.Failed);
-
-        User user = findEntity(email);
+        User user = getUserFromToken(token);
 
         switch (user.getUserStatus()) {
             case ACTIVE -> throw new CustomException("Profile already activated!", ErrorCode.AlreadyActive);
@@ -107,13 +102,8 @@ public class UserService {
     }
 
     public void changePassword(ChangePasswordVO changePasswordVO) {
-        authenticationServiceClient.checkConnection();
-        String email = authenticationServiceClient.retrieveEmailFromToken(changePasswordVO.email());
+        User user = getUserFromToken(changePasswordVO.token());
 
-        if (email==null)
-            throw new CustomException("Couldn't change password!", ErrorCode.Failed);
-
-        User user = findEntity(email);
         user.setPassword(passwordEncoder.encode(changePasswordVO.password()));
         if(user.getUserStatus()==UserStatus.PENDING){
             user.setUserStatus(UserStatus.ACTIVE);
@@ -163,5 +153,14 @@ public class UserService {
         kafkaTemplate.send("user_service", user.getEmail(), "Customer details retrieved!");
 
         return new UserVO(user);
+    }
+
+    private User getUserFromToken(String token) {
+        authenticationServiceClient.checkConnection();
+        String email = authenticationServiceClient.retrieveEmailFromToken(token);
+        if (email==null)
+            throw new CustomException("Invalid token", ErrorCode.Failed);
+
+        return findEntity(email);
     }
 }
