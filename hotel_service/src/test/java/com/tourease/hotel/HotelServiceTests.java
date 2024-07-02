@@ -150,7 +150,7 @@ public class HotelServiceTests {
         List<Hotel> hotelsList = Arrays.asList(hotel);
         when(hotelRepository.findHotelByFilter(null, "Golden Sands", null, null, null,null))
                 .thenReturn(hotelsList);
-        when(reservationRepository.isRoomTaken(anyLong(), any(), any(), any(), any())).thenReturn(null);
+        when(reservationRepository.isRoomTaken(anyLong(), any(), any(), any())).thenReturn(null);
         when(imageRepository.findByHotel_Id(anyLong())).thenReturn(Collections.emptyList());
 
         IndexVM<HotelPreview> result = hotelService.listing(filter);
