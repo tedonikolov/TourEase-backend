@@ -43,7 +43,7 @@ public class InternalController {
             @ApiResponse(responseCode = "200", description = "Successful mark reservation as cancel")
     })
     @PutMapping("/reservation/update")
-    public ResponseEntity<Void> changeReservationStatusToCancelled(@RequestBody ReservationUpdateVO reservationUpdateVO) {
+    public ResponseEntity<Void> updateReservation(@RequestBody ReservationUpdateVO reservationUpdateVO) {
         reservationService.updateReservation(reservationUpdateVO);
         return ResponseEntity.ok().build();
     }

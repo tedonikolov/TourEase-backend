@@ -1,10 +1,10 @@
 package com.tourease.hotel.models.dto.requests;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public record TakenDaysForRoom(
-        List<OffsetDateTime> checkInDates,
-        List<OffsetDateTime> checkOutDates
+        List<LocalDate> checkInDates,
+        List<LocalDate> checkOutDates
 ) {
 }

@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Table(name = "reservation")
@@ -26,8 +27,8 @@ public class Reservation {
     private Long reservationNumber;
     @CreationTimestamp
     private OffsetDateTime creationDate;
-    private OffsetDateTime checkIn;
-    private OffsetDateTime checkOut;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private Currency currency;

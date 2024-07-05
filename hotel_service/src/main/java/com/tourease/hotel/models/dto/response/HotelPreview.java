@@ -30,6 +30,8 @@ public class HotelPreview{
         private Integer people;
         private LocalDate openingDate;
         private LocalDate closingDate;
+        private LocalDate fromDate;
+        private LocalDate toDate;
 
         public HotelPreview(Hotel hotel, Set<Meal> meals, Set<Type> types, int people) {
             this.hotelId = hotel.getId();

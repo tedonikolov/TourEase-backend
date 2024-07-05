@@ -27,7 +27,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             SELECT r FROM Room r
             jOIN r.reservations res
             WHERE r.hotel.id = :hotelId
-            AND cast(:date as date) BETWEEN res.checkIn AND res.checkOut
+            AND cast(:date as date) >= res.checkIn AND cast(:date as date) < res.checkOut
             AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'FINISHED')
             """)
     List<Room> findAllFinishedByHotelForDate(Long hotelId, LocalDate date);
@@ -36,7 +36,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             SELECT r FROM Room r
             jOIN r.reservations res
             WHERE r.hotel.id = :hotelId
-            AND cast(:date as date) BETWEEN res.checkIn AND res.checkOut
+            AND cast(:date as date) >= res.checkIn AND cast(:date as date) < res.checkOut
             AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'PENDING')
             """)
     List<Room> findAllTakenByHotelForDate(Long hotelId, LocalDate date);
@@ -49,11 +49,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             AND r NOT IN (
                 SELECT r FROM Room r
                 JOIN r.reservations res
-                WHERE ((res.checkIn BETWEEN cast(:fromDate as date) AND cast(:toDate as date)
-                OR res.checkOut BETWEEN cast(:fromPlusDay as date) AND cast(:toDate as date))
-                OR (res.checkIn < cast(:fromDate as date) AND res.checkOut > cast(:toDate as date)))
+                WHERE (res.checkIn >= cast(:fromDate as date) AND res.checkIn < cast(:toDate as date)
+                OR res.checkOut > cast(:fromDate as date) AND res.checkOut <= cast(:toDate as date)
+                OR res.checkIn <= cast(:fromDate as date) AND res.checkOut >= cast(:toDate as date))
                 AND (res.status = 'CONFIRMED' OR res.status = 'ACCOMMODATED' OR res.status = 'PENDING')
             )
             """)
-    List<Room> findAllFreeByHotelBetweenDateAndType(Long hotelId, Long typeId, LocalDate fromDate, LocalDate fromPlusDay, LocalDate toDate);
+    List<Room> findAllFreeByHotelBetweenDateAndType(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate);
 }

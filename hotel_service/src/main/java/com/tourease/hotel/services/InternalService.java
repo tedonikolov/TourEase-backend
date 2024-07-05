@@ -50,8 +50,8 @@ public class InternalService {
         List<Room> rooms = roomRepository.findAllByType(typeId);
         rooms.forEach(room -> {
                     TakenDaysForRoom days = roomService.getTakenDaysForRoom(room.getId());
-                    days.checkInDates().forEach(day -> takenCheckInDays.put(day.toLocalDate(), takenCheckInDays.getOrDefault(day.toLocalDate(), 0) + 1));
-                    days.checkOutDates().forEach(day -> takenCheckOutDays.put(day.toLocalDate(), takenCheckOutDays.getOrDefault(day.toLocalDate(), 0) + 1));
+                    days.checkInDates().forEach(day -> takenCheckInDays.put(day, takenCheckInDays.getOrDefault(day, 0) + 1));
+                    days.checkOutDates().forEach(day -> takenCheckOutDays.put(day, takenCheckOutDays.getOrDefault(day, 0) + 1));
                 }
         );
 
@@ -74,7 +74,7 @@ public class InternalService {
     }
 
     public Long createReservation(ReservationCreateDTO reservationInfo) {
-        if(roomService.getFreeRoomsBetweenDateByTypeId(reservationInfo.hotelId(), reservationInfo.typeId(), reservationInfo.checkIn().toLocalDate(), reservationInfo.checkOut().toLocalDate()).isEmpty()){
+        if(roomService.getFreeRoomsBetweenDateByTypeId(reservationInfo.hotelId(), reservationInfo.typeId(), reservationInfo.checkIn(), reservationInfo.checkOut()).isEmpty()){
             throw new CustomException("No available rooms", ErrorCode.Failed);
         }
 
@@ -110,7 +110,7 @@ public class InternalService {
 
             reservationRepository.save(reservation);
 
-            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), meal.getPrice(), type.getPrice(), BigDecimal.valueOf(0), BigDecimal.valueOf(0), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), null);
+            paymentService.createPayment(new PaymentCreateVO(customer.getId(), reservationInfo.hotelId(), reservationInfo.price(), reservationInfo.mealPrice(), reservationInfo.nightPrice(), BigDecimal.valueOf(0), BigDecimal.valueOf(0), reservationInfo.currency(), PaidFor.RESERVATION, reservation.getReservationNumber()), null);
             return reservation.getReservationNumber();
     }
 

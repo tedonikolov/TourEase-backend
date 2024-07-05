@@ -5,6 +5,7 @@ import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.ReservationStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -17,8 +18,8 @@ public record ReservationListing(
         Type type,
         Meal meal,
         int peopleCount,
-        OffsetDateTime checkIn,
-        OffsetDateTime checkOut,
+        LocalDate checkIn,
+        LocalDate checkOut,
         int nights,
         BigDecimal price,
         BigDecimal priceForMeal,

@@ -17,7 +17,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class ReservationService {
 
         Room room = roomService.findById(reservationInfo.roomId());
 
-        if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut()).isEmpty()) {
+        if (reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkOut()).isEmpty()) {
 
             Reservation reservation = Reservation.builder()
                     .reservationNumber(reservationInfo.checkIn().getYear() * 10000000L +
@@ -66,7 +65,7 @@ public class ReservationService {
                     .peopleCount(reservationInfo.peopleCount())
                     .build();
 
-            if (reservation.getCheckIn().toLocalDate().isEqual(LocalDate.now())) {
+            if (reservation.getCheckIn().isEqual(LocalDate.now())) {
                 if (reservationInfo.customer().passportId().isEmpty())
                     reservation.setStatus(ReservationStatus.CONFIRMED);
                 else
@@ -87,7 +86,7 @@ public class ReservationService {
 
             if (reservation.getStatus().equals(ReservationStatus.CONFIRMED) && !reservation.getCustomers().stream().findFirst().get().getEmail().isEmpty()) {
                 emailServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
-                        new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
+                        new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
             }
 
             kafkaTemplate.send("hotel_service", worker.getEmail(), "New reservation created for hotel with name:" + worker.getHotel().getName());
@@ -97,8 +96,7 @@ public class ReservationService {
     }
 
     public List<SchemaReservationsVO> getAllReservationsViewByHotel(Long hotelId, LocalDate date) {
-        LocalDate plusDay = date.plusDays(1);
-        List<Reservation> reservations = reservationRepository.findAllByRoomHotelIdAndDate(hotelId, date, plusDay);
+        List<Reservation> reservations = reservationRepository.findAllByRoomHotelIdAndDate(hotelId, date);
         List<Reservation> modifiableReservations = new ArrayList<>(reservations);
 
         modifiableReservations.sort(Comparator.comparing((Reservation r) -> switch (r.getStatus()) {
@@ -113,12 +111,14 @@ public class ReservationService {
 
     public List<ReservationListing> getAllReservationsForDateAndStatus(Long hotelId, LocalDate date, ReservationStatus status) {
         List<Reservation> reservations = switch (status) {
-            case CONFIRMED -> reservationRepository.findAllConfirmedByHotelIdAndDate(hotelId, date, date.plusDays(1));
+            case CONFIRMED -> reservationRepository.findAllConfirmedByHotelIdAndDate(hotelId, date);
             case PENDING -> reservationRepository.findAllPendingByHotelId(hotelId);
             case ENDING -> reservationRepository.findAllEndingByHotelId(hotelId);
-            case CANCELLED -> reservationRepository.findAllCanceledByHotelId(hotelId, date, date.plusDays(1));
+            case CANCELLED -> reservationRepository.findAllCanceledByHotelId(hotelId, date);
             default -> new ArrayList<>();
         };
+
+        reservations.sort(Comparator.comparing(Reservation::getCreationDate));
 
         return reservations.stream().map(reservation -> {
             Payment payment = paymentService.getPaymentForReservationNumber(reservation.getReservationNumber());
@@ -132,7 +132,7 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findAll();
         for (Reservation reservation : reservations) {
             if (reservation.getStatus().equals(ReservationStatus.ACCOMMODATED) &&
-                    reservation.getCheckOut().isBefore(OffsetDateTime.from(OffsetDateTime.now().plusDays(1)))) {
+                    reservation.getCheckOut().isBefore(LocalDate.now().plusDays(1))) {
                 changeReservationStatus(reservation.getId(), null, ReservationStatus.ENDING);
             }
         }
@@ -142,7 +142,7 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findAll();
         for (Reservation reservation : reservations) {
             if ((reservation.getStatus().equals(ReservationStatus.PENDING) || reservation.getStatus().equals(ReservationStatus.CONFIRMED))
-                    && reservation.getCheckIn().isBefore(OffsetDateTime.from(OffsetDateTime.now()))) {
+                    && reservation.getCheckIn().isBefore(LocalDate.now())) {
 
                 changeReservationStatus(reservation.getId(), null, ReservationStatus.NO_SHOW);
             }
@@ -163,7 +163,7 @@ public class ReservationService {
             customerService.updateCustomer(customer, customerDTO);
 
         if (reservation.getStatus().equals(ReservationStatus.CONFIRMED)) {
-            if (LocalDate.now().isEqual(reservation.getCheckIn().toLocalDate())) {
+            if (LocalDate.now().isEqual(reservation.getCheckIn())) {
                 reservation.setStatus(ReservationStatus.ACCOMMODATED);
             }
 
@@ -190,7 +190,7 @@ public class ReservationService {
             Payment payment = paymentService.getPaymentForReservationNumber(reservation.getReservationNumber());
 
             emailServiceClient.sendReservationConfirmation(new ReservationConfirmationVO(reservation.getCustomers().stream().findFirst().get().getEmail(), reservation.getCustomers().stream().findFirst().get().getCountry(),
-                    new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn().toLocalDate(), reservation.getCheckOut().toLocalDate(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
+                    new ReservationVO(reservation.getReservationNumber(), reservation.getCheckIn(), reservation.getCheckOut(), reservation.getNights(), reservation.getPeopleCount(), reservation.getType().getName(), reservation.getMeal().getType().name(), payment.getPrice(), payment.getCurrency().name(), reservation.getRoom().getHotel().getName(), reservation.getRoom().getHotel().getLocation().getCountry(), reservation.getRoom().getHotel().getLocation().getCity(), reservation.getRoom().getHotel().getLocation().getAddress(), worker.getFullName(), worker.getEmail(), worker.getPhone())));
         }
 
         coreServiceClient.checkConnection();
@@ -204,14 +204,14 @@ public class ReservationService {
         Meal meal = mealService.findById(reservationInfo.mealId());
 
         reservation.setCheckIn(reservationInfo.checkIn());
-        OffsetDateTime checkOut = reservation.getCheckOut();
+        LocalDate checkOut = reservation.getCheckOut();
         reservation.setCheckOut(reservationInfo.checkOut());
         reservation.setNights(reservationInfo.nights());
         reservation.setPeopleCount(reservationInfo.peopleCount());
         reservation.setMeal(meal);
         reservation.setType(type);
 
-        if (room != null && reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkIn().plusDays(1), reservationInfo.checkOut()).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
+        if (room != null && reservationRepository.isRoomTaken(room.getId(), reservationInfo.checkIn(), reservationInfo.checkOut()).stream().filter(reservation1 -> !reservation1.getId().equals(reservationInfo.id())).toList().isEmpty()) {
             reservation.setRoom(room);
         } else if (room != null) {
             throw new CustomException("Room is already reserved", ErrorCode.AlreadyExists);
@@ -219,10 +219,10 @@ public class ReservationService {
 
         Worker worker = workerService.findById(userId);
         if(worker.getWorkerType().equals(WorkerType.MANAGER) || checkOut!=reservationInfo.checkOut()) {
-            if(reservationInfo.checkOut().toLocalDate().isEqual(LocalDate.now())) {
+            if(reservationInfo.checkOut().isEqual(LocalDate.now())) {
                 reservation.setStatus(ReservationStatus.ENDING);
             } else if(reservation.getStatus() != ReservationStatus.CONFIRMED && reservation.getStatus() != ReservationStatus.PENDING
-                    && (reservation.getCheckIn().toLocalDate().isBefore(LocalDate.now()) && reservation.getCheckOut().toLocalDate().isAfter(LocalDate.now()))) {
+                    && (reservation.getCheckIn().isBefore(LocalDate.now()) && reservation.getCheckOut().isAfter(LocalDate.now()))) {
                 reservation.setStatus(ReservationStatus.ACCOMMODATED);
             }
 

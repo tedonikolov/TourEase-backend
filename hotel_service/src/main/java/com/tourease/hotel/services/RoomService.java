@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
@@ -88,13 +87,11 @@ public class RoomService {
         Optional<Reservation> info = room.getReservations().stream()
                 .filter(reservation -> reservation.getStatus() == ReservationStatus.ACCOMMODATED
                         || reservation.getStatus() == ReservationStatus.CONFIRMED
-                        || reservation.getStatus() == ReservationStatus.ENDING
-                        || reservation.getStatus() == ReservationStatus.FINISHED)
+                        || reservation.getStatus() == ReservationStatus.ENDING)
                 .filter(reservation ->
-                (reservation.getCheckIn().toLocalDate().isBefore(date) || reservation.getCheckIn().toLocalDate().isEqual(date))
-                        && (reservation.getCheckOut().toLocalDate().isAfter(date) || reservation.getCheckOut().toLocalDate().isEqual(date))
+                (reservation.getCheckIn().isBefore(date) || reservation.getCheckIn().isEqual(date))
+                        && (reservation.getCheckOut().isAfter(date) || reservation.getCheckOut().isEqual(date))
         ).max(Comparator.comparing((Reservation r) -> switch (r.getStatus()) {
-            case FINISHED -> 1;
             case CONFIRMED -> 2;
             case ACCOMMODATED -> 3;
             case ENDING -> 4;
@@ -105,15 +102,26 @@ public class RoomService {
             Payment payment = paymentService.getPaymentsForReservationNumber(info.get().getReservationNumber()).getFirst();
             return new RoomReservationVO(room, new ReservationListing(info.get(),payment,info.get().getCustomers().stream().toList()), info.map(Reservation::getWorker).orElse(null));
         }
-        else
-            return new RoomReservationVO(room, null,null);
+        else {
+            info = room.getReservations().stream()
+                    .filter(reservation -> reservation.getStatus() == ReservationStatus.FINISHED)
+                    .filter(reservation ->
+                            (reservation.getCheckIn().isBefore(date) || reservation.getCheckIn().isEqual(date))
+                                    && reservation.getCheckOut().isAfter(date)
+                    ).findFirst();
+            if (info.isPresent()) {
+                Payment payment = paymentService.getPaymentsForReservationNumber(info.get().getReservationNumber()).getFirst();
+                return new RoomReservationVO(room, new ReservationListing(info.get(), payment, info.get().getCustomers().stream().toList()), info.map(Reservation::getWorker).orElse(null));
+            } else
+                return new RoomReservationVO(room, null,null);
+        }
     }
 
     public TakenDaysForRoom getTakenDaysForRoom(Long id) {
         Room room = roomRepository.getById(id);
 
-        List<OffsetDateTime> checkInDates = new ArrayList<>();
-        List<OffsetDateTime> checkOutDates = new ArrayList<>();
+        List<LocalDate> checkInDates = new ArrayList<>();
+        List<LocalDate> checkOutDates = new ArrayList<>();
 
         List<Reservation> reservations = room.getReservations().stream()
                 .filter(reservation -> reservation.getStatus() == ReservationStatus.ACCOMMODATED
@@ -121,7 +129,7 @@ public class RoomService {
                 ).toList();
 
         for (Reservation reservation : reservations) {
-            for (OffsetDateTime date = reservation.getCheckIn(); date.isBefore(reservation.getCheckOut().plusDays(1)); date = date.plusDays(1)) {
+            for (LocalDate date = reservation.getCheckIn(); date.isBefore(reservation.getCheckOut().plusDays(1)); date = date.plusDays(1)) {
                 if (!date.isEqual(reservation.getCheckOut()))
                     checkInDates.add(date);
                 if (!date.isEqual(reservation.getCheckIn()))
@@ -159,7 +167,7 @@ public class RoomService {
             FreeRoomCountVO freeRoomCountVO = new FreeRoomCountVO(date,dateCounts);
 
             //Find the room count for each date
-            List<Room> takenRooms = date.isBefore(LocalDate.now()) ? roomRepository.findAllFinishedByHotelForDate(hotelId, date.plusDays(1)) : roomRepository.findAllTakenByHotelForDate(hotelId, date.plusDays(1));
+            List<Room> takenRooms = date.isBefore(LocalDate.now()) ? roomRepository.findAllFinishedByHotelForDate(hotelId, date) : roomRepository.findAllTakenByHotelForDate(hotelId, date);
 
             takenRooms.forEach(
                     room -> {
@@ -186,6 +194,6 @@ public class RoomService {
     }
 
     public List<Room> getFreeRoomsBetweenDateByTypeId(Long hotelId, Long typeId, LocalDate fromDate, LocalDate toDate) {
-        return roomRepository.findAllFreeByHotelBetweenDateAndType(hotelId, typeId, fromDate, fromDate.plusDays(1), toDate);
+        return roomRepository.findAllFreeByHotelBetweenDateAndType(hotelId, typeId, fromDate, toDate);
     }
 }

@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -91,6 +89,8 @@ public class HotelService {
 
             if (!types.isEmpty()) {
                 HotelPreview hotelPreview = new HotelPreview(hotel, meals, types, filterHotelListing.getPeople() == null ? 1 : filterHotelListing.getPeople());
+                hotelPreview.setFromDate(filterHotelListing.getFromDate());
+                hotelPreview.setToDate(filterHotelListing.getToDate());
                 hotels.add(hotelPreview);
             }
         }
@@ -101,9 +101,8 @@ public class HotelService {
             for (int i = filterHotelListing.getPageNumber() * 10 - 10; i < hotels.size(); i++) {
                 if (filterHotelListing.getFromDate() != null && filterHotelListing.getToDate() != null) {
                     Set<Type> types = hotels.get(i).getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
-                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getFromDate().plusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
+                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate(),
+                                            filterHotelListing.getToDate()).isEmpty())
                             .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
                     if (types.isEmpty())
                         continue;
@@ -122,9 +121,8 @@ public class HotelService {
             for (HotelPreview hotel : hotels) {
                 if (filterHotelListing.getFromDate() != null && filterHotelListing.getToDate() != null) {
                     Set<Type> types = hotel.getTypes().stream().filter(type -> !type.getRooms().stream().filter(room ->
-                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getFromDate().plusDays(1).atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0)),
-                                            filterHotelListing.getToDate().atTime(LocalTime.now()).atOffset(ZoneOffset.ofHours(0))).isEmpty())
+                                    reservationRepository.isRoomTaken(room.getId(), filterHotelListing.getFromDate(),
+                                            filterHotelListing.getToDate()).isEmpty())
                             .collect(Collectors.toSet()).isEmpty()).collect(Collectors.toSet());
                     if (types.isEmpty())
                         continue;

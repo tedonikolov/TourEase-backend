@@ -6,6 +6,7 @@ import com.tourease.core.models.enums.ReservationStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -14,8 +15,8 @@ public class ReservationDTO {
     private Long id;
     private Long reservationNumber;
     private OffsetDateTime creationDate;
-    private OffsetDateTime checkIn;
-    private OffsetDateTime checkOut;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
     private Integer nights;
     private String price;
     private Integer peopleCount;

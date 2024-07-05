@@ -3,11 +3,11 @@ package com.tourease.core.models.dto;
 import com.tourease.core.models.enums.Currency;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 public record ReservationUpdateVO(Long reservationNumber,
-                                  OffsetDateTime checkIn,
-                                  OffsetDateTime checkOut,
+                                  LocalDate checkIn,
+                                  LocalDate checkOut,
                                   Integer nights,
                                   Integer peopleCount,
                                   BigDecimal price,

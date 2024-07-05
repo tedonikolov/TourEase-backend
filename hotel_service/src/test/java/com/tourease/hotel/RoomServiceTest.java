@@ -22,8 +22,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -149,8 +147,8 @@ public class RoomServiceTest {
         LocalDate date = LocalDate.now();
         Reservation reservation = new Reservation();
         reservation.setStatus(ReservationStatus.CONFIRMED);
-        reservation.setCheckIn(date.atStartOfDay().atOffset(ZoneOffset.UTC));
-        reservation.setCheckOut(date.plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC));
+        reservation.setCheckIn(date);
+        reservation.setCheckOut(date.plusDays(1));
 
         room.getReservations().add(reservation);
         when(roomRepository.getById(1L)).thenReturn(room);
@@ -183,8 +181,8 @@ public class RoomServiceTest {
     void testGetTakenDaysForRoom() {
         Reservation reservation = new Reservation();
         reservation.setStatus(ReservationStatus.CONFIRMED);
-        OffsetDateTime checkIn = OffsetDateTime.now().minusDays(1);
-        OffsetDateTime checkOut = OffsetDateTime.now().plusDays(1);
+        LocalDate checkIn = LocalDate.now().minusDays(1);
+        LocalDate checkOut = LocalDate.now().plusDays(1);
         reservation.setCheckIn(checkIn);
         reservation.setCheckOut(checkOut);
         room.getReservations().add(reservation);
@@ -202,7 +200,7 @@ public class RoomServiceTest {
         LocalDate toDate = fromDate.plusDays(5);
         List<Room> freeRooms = List.of(room);
 
-        when(roomRepository.findAllFreeByHotelBetweenDateAndType(1L, 1L, fromDate, fromDate.plusDays(1), toDate))
+        when(roomRepository.findAllFreeByHotelBetweenDateAndType(1L, 1L, fromDate, toDate))
                 .thenReturn(freeRooms);
 
         List<Room> result = roomService.getFreeRoomsBetweenDateByTypeId(1L, 1L, fromDate, toDate);

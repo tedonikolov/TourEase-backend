@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -28,8 +29,8 @@ public class Reservation {
 
     @CreationTimestamp
     private OffsetDateTime creationDate;
-    private OffsetDateTime checkIn;
-    private OffsetDateTime checkOut;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
     private int nights;
     private int peopleCount;
     @Enumerated(EnumType.STRING)

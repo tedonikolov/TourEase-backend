@@ -86,8 +86,7 @@ public class ReservationService {
         Page<Reservation> reservations = reservationRepository.findByUserId(userId, reservationsFilter.getReservationNumber(),
                 reservationsFilter.getCreationDate() != null ? OffsetDateTime.of(reservationsFilter.getCreationDate(), LocalTime.MIN, ZoneOffset.UTC) : null,
                 reservationsFilter.getCreationDate() != null ? OffsetDateTime.of(reservationsFilter.getCreationDate(), LocalTime.MAX, ZoneOffset.UTC) : null,
-                reservationsFilter.getCheckIn() != null ? OffsetDateTime.of(reservationsFilter.getCheckIn(), LocalTime.MIN, ZoneOffset.UTC) : null,
-                reservationsFilter.getCheckIn() != null ? OffsetDateTime.of(reservationsFilter.getCheckIn(), LocalTime.MAX, ZoneOffset.UTC) : null,
+                reservationsFilter.getCheckIn() != null ? reservationsFilter.getCheckIn() : null,
                 reservationsFilter.getStatus(), PageRequest.of(page, size));
         List<ReservationDTO> reservationDTOs = new ArrayList<>();
 

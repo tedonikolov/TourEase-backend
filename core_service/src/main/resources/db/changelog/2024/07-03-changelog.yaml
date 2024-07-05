@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeReservationDatesType
+      author: Tedo
+      changes:
+        - modifyDataType:
+            columnName: check_in
+            newDataType: DATE
+            tableName: reservation
+        - modifyDataType:
+            columnName: check_out
+            newDataType: DATE
+            tableName: reservation

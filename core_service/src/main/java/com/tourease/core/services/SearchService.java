@@ -95,7 +95,7 @@ public class SearchService {
                 if (!tokenizer.hasMoreTokens()) {
                     break;
                 }
-                token = nextToken;
+                token = tokenizer.nextToken();
                 continue;
             }
 
@@ -104,7 +104,7 @@ public class SearchService {
                 if (!tokenizer.hasMoreTokens()) {
                     break;
                 }
-                token = nextToken;
+                token = tokenizer.nextToken();
                 continue;
             }
 
@@ -113,7 +113,7 @@ public class SearchService {
                 if (!tokenizer.hasMoreTokens()) {
                     break;
                 }
-                token = nextToken;
+                token = tokenizer.nextToken();
                 continue;
             }
 
@@ -130,15 +130,19 @@ public class SearchService {
             if(Objects.equals(token, "from")) {
                 LocalDate date = recognizeDate(nextToken);
                 if (date != null) {
-                    LocalDate toDate = recognizeDate(nextToken);
-                    if(toDate == null) {
-                        nextToken = tokenizer.nextToken();
+                    filterHotelListing.setFromDate(date);
+                    if (!tokenizer.hasMoreTokens()) {
+                        break;
                     }
-                    filterHotelListing.setFromDate(recognizeDate(nextToken));
+                    token = tokenizer.nextToken();
+                    continue;
                 } else {
                     try {
                         filterHotelListing.setFromPrice(new BigDecimal(nextToken));
                     } catch (NumberFormatException e) {
+                        if (!tokenizer.hasMoreTokens()) {
+                            break;
+                        }
                         nextToken = tokenizer.nextToken();
                         filterHotelListing.setFromPrice(new BigDecimal(nextToken));
                     }
@@ -148,15 +152,19 @@ public class SearchService {
             if(Objects.equals(token, "to") || Objects.equals(token, "until")) {
                 LocalDate date = recognizeDate(nextToken);
                 if (date != null) {
-                    LocalDate toDate = recognizeDate(nextToken);
-                    if(toDate == null) {
-                        nextToken = tokenizer.nextToken();
+                    filterHotelListing.setToDate(date);
+                    if (!tokenizer.hasMoreTokens()) {
+                        break;
                     }
-                    filterHotelListing.setToDate(recognizeDate(nextToken));
+                    token = tokenizer.nextToken();
+                    continue;
                 } else {
                     try {
                         filterHotelListing.setToPrice(new BigDecimal(nextToken));
                     } catch (NumberFormatException e) {
+                        if (!tokenizer.hasMoreTokens()) {
+                            break;
+                        }
                         nextToken = tokenizer.nextToken();
                         filterHotelListing.setToPrice(new BigDecimal(nextToken));
                     }
@@ -170,17 +178,33 @@ public class SearchService {
                     nextToken = tokenizer.nextToken();
                     LocalDate toDate = recognizeDate(nextToken);
                     if(toDate == null) {
+                        if (!tokenizer.hasMoreTokens()) {
+                            break;
+                        }
                         nextToken = tokenizer.nextToken();
                     }
                     filterHotelListing.setToDate(recognizeDate(nextToken));
+                    if (!tokenizer.hasMoreTokens()) {
+                        break;
+                    }
+                    token = tokenizer.nextToken();
+                    continue;
                 } else {
                     filterHotelListing.setFromPrice(new BigDecimal(nextToken));
                     nextToken = tokenizer.nextToken();
                     try {
                         filterHotelListing.setToPrice(new BigDecimal(nextToken));
                     } catch (NumberFormatException e) {
+                        if (!tokenizer.hasMoreTokens()) {
+                            break;
+                        }
                         nextToken = tokenizer.nextToken();
                         filterHotelListing.setToPrice(new BigDecimal(nextToken));
+                        if (!tokenizer.hasMoreTokens()) {
+                            break;
+                        }
+                        token = tokenizer.nextToken();
+                        continue;
                     }
                 }
             }
@@ -243,7 +267,7 @@ public class SearchService {
     }
 
     public LocalDate recognizeDate(String dateString) {
-        List<String> formatStrings = Arrays.asList("yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy", "yyyy/MM/dd", "dd/MM/yyyy", "MM/dd/yyyy");
+        List<String> formatStrings = Arrays.asList("yyyy-MM-dd", "d-M-yyyy", "yyyy/MM/dd", "d/M/yyyy");
 
         for (String formatString : formatStrings) {
             try {

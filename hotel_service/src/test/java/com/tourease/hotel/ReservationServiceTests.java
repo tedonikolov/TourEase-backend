@@ -18,7 +18,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,23 +55,23 @@ public class ReservationServiceTests {
         reservation1.setId(1L);
         reservation1.setStatus(ReservationStatus.ACCOMMODATED);
         reservation1.setRoom(new Room());
-        reservation1.setCheckIn(OffsetDateTime.now().minusDays(2));
-        reservation1.setCheckOut(OffsetDateTime.now().plusDays(2));
+        reservation1.setCheckIn(LocalDate.now().minusDays(2));
+        reservation1.setCheckOut(LocalDate.now().plusDays(2));
 
         Reservation reservation2 = new Reservation();
         reservation2.setId(2L);
         reservation2.setStatus(ReservationStatus.CONFIRMED);
         reservation2.setRoom(new Room());
-        reservation2.setCheckIn(OffsetDateTime.now().minusDays(1));
-        reservation2.setCheckOut(OffsetDateTime.now().plusDays(1));
+        reservation2.setCheckIn(LocalDate.now().minusDays(1));
+        reservation2.setCheckOut(LocalDate.now().plusDays(1));
 
-        when(reservationRepository.findAllByRoomHotelIdAndDate(hotelId, date, plusDay))
+        when(reservationRepository.findAllByRoomHotelIdAndDate(hotelId, date))
                 .thenReturn(List.of(reservation1, reservation2));
 
         List<SchemaReservationsVO> result = reservationService.getAllReservationsViewByHotel(hotelId, date);
 
         assertEquals(2, result.size());
-        assertEquals(reservation2.getId(), result.get(0).reservationId()); // Should be sorted by status
+        assertEquals(reservation2.getId(), result.get(0).reservationId());
         assertEquals(reservation1.getId(), result.get(1).reservationId());
     }
 
@@ -87,8 +86,8 @@ public class ReservationServiceTests {
         reservation.setReservationNumber(123456789L);
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservation.setRoom(new Room());
-        reservation.setCheckIn(OffsetDateTime.now().minusDays(1));
-        reservation.setCheckOut(OffsetDateTime.now().plusDays(1));
+        reservation.setCheckIn(LocalDate.now().minusDays(1));
+        reservation.setCheckOut(LocalDate.now().plusDays(1));
         reservation.setType(new Type());
         reservation.setMeal(new Meal());
         reservation.setPeopleCount(2);
@@ -102,7 +101,7 @@ public class ReservationServiceTests {
         payment.setAdvancedPayment(BigDecimal.ZERO);
         payment.setCurrency(Currency.USD);
 
-        when(reservationRepository.findAllConfirmedByHotelIdAndDate(hotelId, date, date.plusDays(1)))
+        when(reservationRepository.findAllConfirmedByHotelIdAndDate(hotelId, date))
                 .thenReturn(List.of(reservation));
         when(paymentService.getPaymentForReservationNumber(reservation.getReservationNumber()))
                 .thenReturn(payment);
@@ -120,7 +119,7 @@ public class ReservationServiceTests {
         Reservation reservation = new Reservation();
         reservation.setId(1L);
         reservation.setStatus(ReservationStatus.ACCOMMODATED);
-        reservation.setCheckOut(OffsetDateTime.now().minusDays(1));
+        reservation.setCheckOut(LocalDate.now().minusDays(1));
 
         when(reservationRepository.findAll()).thenReturn(List.of(reservation));
         when(reservationRepository.findById(1l)).thenReturn(java.util.Optional.of(reservation));
@@ -140,7 +139,7 @@ public class ReservationServiceTests {
         Reservation reservation = new Reservation();
         reservation.setId(1L);
         reservation.setStatus(ReservationStatus.CONFIRMED);
-        reservation.setCheckIn(OffsetDateTime.now().minusDays(1));
+        reservation.setCheckIn(LocalDate.now().minusDays(1));
 
         when(reservationRepository.findAll()).thenReturn(List.of(reservation));
         when(reservationRepository.findById(1l)).thenReturn(java.util.Optional.of(reservation));
