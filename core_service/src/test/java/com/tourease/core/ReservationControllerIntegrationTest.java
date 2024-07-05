@@ -25,7 +25,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -55,7 +54,7 @@ public class ReservationControllerIntegrationTest {
     @Test
     public void testCreateReservation() throws Exception {
         ReservationCreateDTO reservationCreateDTO = new ReservationCreateDTO(
-                1L, 1L, 1L, 1L, OffsetDateTime.now(), OffsetDateTime.now().plusDays(1), 1, BigDecimal.valueOf(100), 1, Currency.USD
+                1L, 1L, 1L, 1L, LocalDate.now(), LocalDate.now().plusDays(1), 1, BigDecimal.valueOf(100), BigDecimal.valueOf(100), BigDecimal.valueOf(100), 1, Currency.USD
         );
         Long userId = 1L;
 

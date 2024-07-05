@@ -118,7 +118,8 @@ public class ReservationService {
             default -> new ArrayList<>();
         };
 
-        reservations.sort(Comparator.comparing(Reservation::getCreationDate));
+        if(reservations.size()>1)
+            reservations.sort(Comparator.comparing(Reservation::getCreationDate));
 
         return reservations.stream().map(reservation -> {
             Payment payment = paymentService.getPaymentForReservationNumber(reservation.getReservationNumber());

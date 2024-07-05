@@ -9,10 +9,12 @@ import com.tourease.hotel.models.dto.requests.TakenDaysForRoom;
 import com.tourease.hotel.models.dto.response.FreeRoomCountVO;
 import com.tourease.hotel.models.dto.response.RoomReservationVO;
 import com.tourease.hotel.models.entities.*;
+import com.tourease.hotel.models.enums.Currency;
 import com.tourease.hotel.models.enums.ReservationStatus;
 import com.tourease.hotel.models.enums.RoomStatus;
 import com.tourease.hotel.repositories.HotelRepository;
 import com.tourease.hotel.repositories.RoomRepository;
+import com.tourease.hotel.services.PaymentService;
 import com.tourease.hotel.services.RoomService;
 import com.tourease.hotel.services.TypeService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +40,9 @@ public class RoomServiceTest {
 
     @Mock
     private TypeService typeService;
+
+    @Mock
+    private PaymentService paymentService;
 
     @InjectMocks
     private RoomService roomService;
@@ -149,9 +155,23 @@ public class RoomServiceTest {
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservation.setCheckIn(date);
         reservation.setCheckOut(date.plusDays(1));
+        reservation.setReservationNumber(123456L);
+
+        Payment payment = new Payment();
+        payment.setHotelPrice(BigDecimal.valueOf(100));
+        payment.setPrice(BigDecimal.valueOf(100));
+        payment.setMealPrice(BigDecimal.valueOf(20));
+        payment.setNightPrice(BigDecimal.valueOf(80));
+        payment.setDiscount(BigDecimal.ZERO);
+        payment.setAdvancedPayment(BigDecimal.ZERO);
+        payment.setCurrency(Currency.USD);
+        Hotel hotel = new Hotel();
+        hotel.setCurrency(Currency.USD);
+        payment.setHotel(hotel);
 
         room.getReservations().add(reservation);
         when(roomRepository.getById(1L)).thenReturn(room);
+        when(paymentService.getPaymentsForReservationNumber(reservation.getReservationNumber())).thenReturn(List.of(payment));
 
         RoomReservationVO reservationVO = roomService.getReservationForRoom(1L, date);
 

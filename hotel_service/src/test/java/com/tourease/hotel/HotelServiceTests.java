@@ -8,11 +8,14 @@ import java.time.LocalDate;
 import java.util.*;
 
 
+import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
 import com.tourease.configuration.exception.CustomException;
 import com.tourease.hotel.models.custom.IndexVM;
 import com.tourease.hotel.models.dto.requests.FilterHotelListing;
 import com.tourease.hotel.models.dto.requests.HotelCreateVO;
 import com.tourease.hotel.models.dto.requests.HotelWorkingPeriodVO;
+import com.tourease.hotel.models.dto.response.CurrencyRateVO;
 import com.tourease.hotel.models.dto.response.HotelPreview;
 import com.tourease.hotel.models.entities.Hotel;
 import com.tourease.hotel.models.entities.Location;
@@ -26,6 +29,7 @@ import com.tourease.hotel.repositories.ReservationRepository;
 import com.tourease.hotel.services.HotelService;
 import com.tourease.hotel.services.LocationService;
 import com.tourease.hotel.services.OwnerService;
+import com.tourease.hotel.services.communication.ConfigServiceClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -49,6 +53,12 @@ public class HotelServiceTests {
 
     @Mock
     private LocationService locationService;
+
+    @Mock
+    private ConfigServiceClient configServiceClient;
+
+    @Mock
+    private EurekaClient eurekaClient;
 
     @Mock
     private KafkaTemplate<String, String> kafkaTemplate;
@@ -141,11 +151,18 @@ public class HotelServiceTests {
 
     @Test
     public void testListing() {
+        when(eurekaClient.getApplication("CONFIGURATION-SERVICE")).thenReturn(new Application("CONFIGURATION-SERVICE"));
+        when(configServiceClient.getCurrencyRates()).thenReturn(List.of(
+                new CurrencyRateVO(Currency.BGN, BigDecimal.valueOf(1.0), BigDecimal.valueOf(1.0),
+                        BigDecimal.valueOf(1.0), BigDecimal.valueOf(1.0), BigDecimal.valueOf(1.0),
+                        BigDecimal.valueOf(1.0), BigDecimal.valueOf(1.0))));
+
         FilterHotelListing filter = new FilterHotelListing();
         filter.setPageNumber(1);
         filter.setFromPrice(BigDecimal.valueOf(100));
         filter.setToPrice(BigDecimal.valueOf(200));
         filter.setCity("Golden Sands");
+        filter.setCurrency(Currency.BGN);
 
         List<Hotel> hotelsList = Arrays.asList(hotel);
         when(hotelRepository.findHotelByFilter(null, "Golden Sands", null, null, null,null))

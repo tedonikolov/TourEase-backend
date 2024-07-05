@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,7 +50,6 @@ public class ReservationServiceTests {
     public void testGetAllReservationsViewByHotel() {
         Long hotelId = 1L;
         LocalDate date = LocalDate.now();
-        LocalDate plusDay = date.plusDays(1);
 
         Reservation reservation1 = new Reservation();
         reservation1.setId(1L);
@@ -92,14 +92,19 @@ public class ReservationServiceTests {
         reservation.setMeal(new Meal());
         reservation.setPeopleCount(2);
         reservation.setNights(1);
+        reservation.setCreationDate(OffsetDateTime.now());
 
         Payment payment = new Payment();
+        payment.setHotelPrice(BigDecimal.valueOf(100));
         payment.setPrice(BigDecimal.valueOf(100));
         payment.setMealPrice(BigDecimal.valueOf(20));
         payment.setNightPrice(BigDecimal.valueOf(80));
         payment.setDiscount(BigDecimal.ZERO);
         payment.setAdvancedPayment(BigDecimal.ZERO);
         payment.setCurrency(Currency.USD);
+        Hotel hotel = new Hotel();
+        hotel.setCurrency(Currency.USD);
+        payment.setHotel(hotel);
 
         when(reservationRepository.findAllConfirmedByHotelIdAndDate(hotelId, date))
                 .thenReturn(List.of(reservation));
@@ -111,7 +116,7 @@ public class ReservationServiceTests {
         assertEquals(1, result.size());
         ReservationListing listing = result.get(0);
         assertEquals(reservation.getId(), listing.id());
-        assertEquals(payment.getPrice(), listing.price());
+        assertEquals(payment.getHotelPrice(), listing.price());
     }
 
     @Test
